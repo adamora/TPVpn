@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block style %}
+{% endblock %}
+{% block mainContent %}
+  
+<!-- page content -->
+<div class="right_col" role="main" ng-app="TPVpnapp">
+
+    <br />
+    <div id='StartAngular' ng-controller="MovementsCtrl" ng-init="takeSales('{{workerNow.market.pk}}','{{workerNow.user.pk}}');">
+
+        <div class="row top_tiles">
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-caret-square-o-right"></i>
+                    </div>
+                    <div class="count">179</div>
+
+                    <h3>New Sign ups{$ angularnofunciona $}</h3>
+                    <p>Lorem ipsum psdea itgum rixt.</p>
+                </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-comments-o small"></i>
+                    </div>
+                    <div class="count">179</div>
+
+                    <h3>Ventas Realizadas</h3>
+                    <p>Ventas realizadas.</p>
+                </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-sort-amount-desc"></i>
+                    </div>
+                    <div class="count">{$ listSales.length $}</div>
+
+                    <h3>Ventas</h3>
+                    <p>Ventas realizadas desde {$ firstDate $}.</p>
+                </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-check-square-o"></i>
+                    </div>
+                    <div class="count">179900</div>
+
+                    <h3>New Sign ups</h3>
+                    <p>Lorem ipsum psdea itgum rixt.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Movimientos de Caja <small>Periodo: 7 días</small></h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <canvas id="canvas000"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Ventas del día</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <ul class="list-unstyled top_profiles scroll-view">
+                            {% for i in totBySeller %}
+                            <li class="media event">
+                                <img class="pull-left img-circle img-profile" src="/media/{{i.image}}" alt="/media/{{i.image}}" style="height:45px;width:45px"/>
+                                    <!--i class="fa fa-user aero"></i-->
+                                    <!--img src="/media/{{i.image}}" alt="/media/{{i.image}}" class="img-circle aero" style="height:45px;width:45px"></img-->
+                                <div class="media-body">
+                                    <a class="title" href="#">{{i.seller}}</a>
+                                    <p><strong>{{i.amount}}€. </strong> Total ingresado </p>
+                                    <p> <small>{{i.sales}} {% if i.sales == 1 %}Venta{% else %}Ventas{% endif %} Hoy</small>
+                                    </p>
+                                </div>
+                            </li> 
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- my angularjs -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.min.js"></script>
+    <script src="{% static "app.js" %}" type="text/javascript" ></script>
+    <script src="{% static "common/controllers/controllers.js" %}" type="text/javascript" ></script>
+    <script src="{% static "common/services/services.js" %}" type="text/javascript" ></script>
+    <script src="{% static "common/factories/factories.js" %}" type="text/javascript" ></script>
+    <!-- /my angularjs -->
+
+    <script>
+        $(document).ready(function () {            
+            //alert();
+            //var listData = angular.element(document.getElementById('StartAngular')).scope().listSalesAmount;
+            //var listDates = angular.element(document.getElementById('StartAngular')).scope().listSalesDates;
+            setTimeout(function(){
+            var lineChartData = {
+                labels: listDates,
+                datasets: [
+                    {
+                        label: "Ingresos Diarios",
+                        fillColor: "rgba(38, 185, 154, 0.31)", //rgba(220,220,220,0.2)
+                        strokeColor: "rgba(38, 185, 154, 0.7)", //rgba(220,220,220,1)
+                        pointColor: "rgba(38, 185, 154, 0.7)", //rgba(220,220,220,1)
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(220,220,220,1)",
+                        data: listData
+                },
+                    {
+                        label: "Beneficio",
+                        fillColor: "rgba(3, 88, 106, 0.3)", //rgba(151,187,205,0.2)
+                        strokeColor: "rgba(3, 88, 106, 0.70)", //rgba(151,187,205,1)
+                        pointColor: "rgba(3, 88, 106, 0.70)", //rgba(151,187,205,1)
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(151,187,205,1)",
+                        data: listBenefice
+                }
+            ]
+
+            }
+
+            new Chart(document.getElementById("canvas000").getContext("2d")).Line(lineChartData, {
+                responsive: true,
+                animation:true,
+                tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+                multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>€"
+            });
+            }, 500); //CONTADOR DE TIEMPO! -> NECESARIO PORQUE EL BUCLE TARDA EN PROCESAR
+        });
+
+    </script>
+
+{% endblock %}

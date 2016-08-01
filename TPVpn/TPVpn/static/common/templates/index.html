@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% block mainContent %}
+    {% load staticfiles %}
+
+
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title hidden-print">
+            <div class="title_left">
+                <h3>
+                    Buscar Facturas
+                    <!--small>
+                        Utilice el buscador para encontrar facturas anteriores
+                    </small-->
+                </h3>
+            </div>
+
+            <div class="title_right">
+            <form method='post' action='' id='searchBill'> {% csrf_token %}
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <div class="input-group">
+                        <!--input type="text" class="form-control" placeholder="Buscar..."-->
+                            {{searchBill.sale_code}}
+                            <span class="input-group-btn">
+                                <input type="hidden" name="inputProduct" value="searchBill">
+                                <button class="btn btn-default" type="submit">Ir!</button>
+                            </span>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="row hidden-print">
+                        <div class="x_title hidden-print">
+                            <h4> <!--small>Sample user invoice design</small-->
+                                <form method='post' action='' id="addProd"> {% csrf_token %}
+                                <div class='col-xs-8'>
+                                    <div class='col-xs-5'>
+                                        Buscar Producto:<br> {{ addProd.product }}
+                                    </div> &nbsp;&nbsp;
+                                    <div class='col-xs-2'>
+                                        Cantidad:<br> {{ addProd.amount }}
+                                    </div>
+                                    <div class='col-xs-1'>
+                                        <br>
+                                        <input type="hidden" name="inputProduct" value="addProduct">
+                                        <button type="submit" class="btn btn-success">Agregar</button>
+                                    </div>
+                                </div>
+                                <div class='col-xs-4'>
+                                    {% if not fail == None %}
+                                        <br><a class='red'>{{ fail }}</a>
+                                    {% endif %}
+                                </div>
+                                </form>
+                            </h4>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="x_content">
+
+                        <section class="content invoice">
+                            <!-- title row -->
+                            <div class="row">
+                                <div class="col-xs-12 invoice-header">
+                                    <h1>
+                                        <i class="fa fa-list"></i> Factura.
+                                        <small class="pull-right"><icon class="fa fa-calendar"></icon> Fecha: {{ date }}</small>
+                                    </h1>
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- info row -->
+                            <div class="row invoice-info">
+                                <div class="col-sm-4 invoice-col">
+                                    De:
+                                    <address>
+                                        <strong>{{ workerNow.market.name }} - <span>{{workerNow.user.first_name}} {{workerNow.user.last_name}}</span></strong>
+                                        <br>{{ market.direction.direction }}, nº {{ market.direction.numDir }} <!-- {{ market.stairs }} {{ market.numFlat }} {{ market.door }} 795 Freedom Ave, Suite 600 -->
+                                        <br>{{ market.direction.postalCode }} {{ market.direction.location }} ({{ market.direction.province }})
+                                        <br>Teléfono: {{market.tel}}
+                                        <br>Email: {{market.email}}
+                                    </address>
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-4 invoice-col">
+                                    Para:
+                                    {% if sale.buyer == None %}
+                                    <address>
+                                        <strong>Anónimo</strong>
+                                    </address>
+                                    {% else %}
+                                    <address>
+                                        <strong>{{sale.buyer.name}}</strong>
+                                        <br>DNI: <strong>{{sale.buyer.dni}}</strong>
+                                        {% if not sale.buyer.tel == None %}
+                                            <br>Teléfono: {{sale.buyer.tel}}
+                                        {% else %}
+                                            <br>Teléfono: Ninguno
+                                        {% endif %}
+                                        {% if not sale.buyer.email == None %}
+                                            <br>Email: {{sale.buyer.email}}
+                                        {% else %}
+                                            <br>Email: Ninguno
+                                        {% endif %}
+                                        <br>Cartera: {{sale.buyer.wallet}}
+                                    </address>
+                                    {% endif %}
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-4 invoice-col">
+                                    <b>Factura nº {{ sale.sale_code }}</b>
+                                    <br>
+                                    <br>
+                                    <b>Orden Nº:</b> {{ sale.id }}
+                                    <br>
+                                    <b>Fecha:</b> {{ sale.date }}
+                                    <br>
+                                    {% if sale.done == False %}
+                                        <b>Cobro:</b> <a class="red">No Realizado</a>
+                                    {% else %}
+                                        <b>Cobro:</b> <a class="green">Realizado</a>
+                                    {% endif %}
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+
+                            <!-- Table row -->
+                            <div class="row">
+                                <div class="col-xs-12 table">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Cantidad</th>
+                                                <th>Producto</th>
+                                                <th>Serial #</th>
+                                                <th>Precio Unitario</th>
+                                                <th>Precio Total</th>
+                                                <th>Eliminar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% if oldProds == None %}
+                                            <tr>
+                                                <td>(Vacío)</td>
+                                                <td>(Vacío)</td>
+                                                <td>(Vacío)</td>
+                                                <td>(Vacío)</td>
+                                                <td>(Vacío)</td>
+                                                <td>(Vacío)</td>
+                                            </tr>
+                                        {% else %}
+                                            {% for i,j in mixList%}
+
+                                                <form method='post' action='' id="modProd"> {% csrf_token %}
+                                                <tr>
+                                                    <td class='col-xs-1'>{{ i.amount }}</td><!--td>{{ i.amount }}</td-->
+                                                    <td class='col-xs-3'>{{ j.product.product.name }}</td>
+                                                    <td class='col-xs-2'>{{ j.product.id }}</td>
+                                                    <td class='col-xs-2'><div class='col-xs-10'>{{ i.sellPrice }}</div><div class='col-xs-2'>€</div></td>
+                                                    <td class='col-xs-2'>{{ j.totAmount }} €</td>
+                                                    <td class='col-xs-2'>
+                                                        <a class="btn btn-danger btn-xs" href="/deleteItem/{{ sale.id }}/{{j.id}}" style=""><i class="fa fa-close"></i> &nbsp;&nbsp;Eliminar&nbsp;&nbsp; </a>
+                                                        <br>
+                                                        <input type="hidden" name="inputProduct" value="modifyProd">
+                                                        <button type="submit" class="btn btn-success btn-xs disabled"><i class="fa fa-refresh"></i> &nbsp;Actualizar</button>
+                                                    </td>
+                                                </tr>
+                                                </form>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+
+                            <div class="row">
+                                <!-- accepted payments column -->
+                                <div class="col-xs-6">
+                                    {% if sale.buyer == None %}
+                                    <p class="lead">Buscar un Cliente:</p>
+                                    <form method='post' action='' id='takeCli'> {% csrf_token %}
+                                        <div class='row'>
+                                            {{searchCli.buyer}}
+                                            <!--{{searchCli.buyer.errors}}-->
+                                        </div>
+                                        <br>
+                                        <div class='row'>
+                                            <input type="hidden" name="inputProduct" value="takeClient">
+                                            <center><button type="submit" class="btn btn-warning">Agregar</button></center>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <p class="lead">¡Hola {{sale.buyer.name}}!:
+                                        <a class="btn btn-danger" href="/deleteClient/{{sale.id}}"><i class="fa fa-user"></i> Borrar Cliente</a>
+                                    </p>
+                                        <div class="avatar-view" title='{{sale.buyer.name}}'>
+                                            <center><img src="/static/{{sale.buyer.image}}" alt="/static/{{sale.buyer.image}}"></center>
+                                        </div>
+
+                                        <h3>Tu saldo actual es de: <a class='green'>{{sale.buyer.wallet}}€</a></h3>
+                                    {% endif %}
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-xs-6">
+                                    <p class="lead"><icon class="fa fa-calculator"></icon> Facturación</p>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width:50%">Subtotal:</th>
+                                                    <td>{{ sale.subtotal }}€</td>
+                                                </tr>
+                                                {% if not sale.buyer == None %}
+                                                <tr>
+                                                    <th>Desgrabar del Monedero:</th>
+                                                    {% if sale.usedWallet > 0 %}
+                                                        <td>-{{sale.usedWallet}}€</td>
+                                                    {% else %}
+                                                        <form method='post' action='' id='inputMoney'> {% csrf_token %}
+                                                            <td>
+                                                                <div class="col-xs-5">{{takeAmount.wallet}}</div>
+                                                                <div class="col-xs-6">
+                                                                    <input type="hidden" name="inputProduct" value="takeAmount">
+                                                                    <button type="submit" class="btn btn-success">Actualizar</button>
+                                                                </div>
+                                                            </td>
+                                                        </form>
+                                                    {% endif %}
+                                                </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <th>Total a Cobrar:</th>
+                                                    <td>{{sale.totAmount}}€</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Importe recibido:</th>
+                                                        {% if sale.totAmount == 0 %}
+                                                            <td>0.0€</td>
+                                                        {% else %}
+                                                            {% if sale.recivedAmount >= sale.totAmount %}
+                                                                <td class="green">{{sale.recivedAmount}}€</td>
+                                                            {% else %}
+                                                                <form method='post' action='' id='inputMoney'> {% csrf_token %}
+                                                                    <td>
+                                                                        <div class="col-xs-5">{{recivedAmount.wallet}}</div>
+                                                                        <div class="col-xs-6">
+                                                                            <input type="hidden" name="inputProduct" value="recAmount">
+                                                                            <button type="submit" class="btn btn-success">Actualizar</button>
+                                                                        </div>
+                                                                    </td>
+                                                                </form>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <th>A devolver:</th>
+                                                    {% if sale.devolution == 0 %}
+                                                        <td>{{sale.devolution}}€</td>
+                                                    {% elif sale.devolution > 0 %}
+                                                        <td>0.0€</td>
+                                                    {% else %}
+                                                        <td class='red'>{{sale.devolution}}€</td>
+                                                    {% endif %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+
+                            <!-- this row will not appear when printing -->
+                            <div class="row hidden-print">
+                                <div class="col-xs-12">
+                                    <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Imprimir Factura</button>
+                                    <button class="btn btn-success pull-right"><i class="fa fa-credit-card"></i> Realizar Cobro</button>
+                                    <a class="btn btn-danger pull-right" style="margin-right: 5px;" href="/deleteSale/{{sale.id}}"><i class="fa fa-close"></i> Cancelar Factura</a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+{% if not fail == None %}
+    <script type="text/javascript" src="js/notify/pnotify.core.js"></script>
+    <script type="text/javascript" src="js/notify/pnotify.buttons.js"></script>
+    <script type="text/javascript" src="js/notify/pnotify.nonblock.js"></script>
+
+    <script>
+        $(function () {
+            var cnt = 10; //$("#custom_notifications ul.notifications li").length + 1;
+            TabbedNotification = function (options) {
+                var message = "<div id='ntf" + cnt + "' class='text alert-" + options.type + "' style='display:none'><h2><i class='fa fa-bell'></i> " + options.title + "</h2><div class='close'><a href='javascript:;' class='notification_close'><i class='fa fa-close'></i></a></div><p>" + options.text + "</p></div>";
+
+                if (document.getElementById('custom_notifications') == null) {
+                    alert('doesnt exists');
+                } else {
+                    $('#custom_notifications ul.notifications').append("<li><a id='ntlink" + cnt + "' class='alert-" + options.type + "' href='#ntf" + cnt + "'><i class='fa fa-bell animated shake'></i></a></li>");
+                    $('#custom_notifications #notif-group').append(message);
+                    cnt++;
+                    CustomTabs(options);
+                }
+            }
+
+            CustomTabs = function (options) {
+                $('.tabbed_notifications > div').hide();
+                $('.tabbed_notifications > div:first-of-type').show();
+                $('#custom_notifications').removeClass('dsp_none');
+                $('.notifications a').click(function (e) {
+                    e.preventDefault();
+                    var $this = $(this),
+                        tabbed_notifications = '#' + $this.parents('.notifications').data('tabbed_notifications'),
+                        others = $this.closest('li').siblings().children('a'),
+                        target = $this.attr('href');
+                    others.removeClass('active');
+                    $this.addClass('active');
+                    $(tabbed_notifications).children('div').hide();
+                    $(target).show();
+                });
+            }
+
+            CustomTabs();
+
+            var tabid = idname = '';
+            $(document).on('click', '.notification_close', function (e) {
+                idname = $(this).parent().parent().attr("id");
+                tabid = idname.substr(-2);
+                $('#ntf' + tabid).remove();
+                $('#ntlink' + tabid).parent().remove();
+                $('.notifications a').first().addClass('active');
+                $('#notif-group div').first().css('display','block');
+            });
+        })
+    </script>
+
+    <script type="text/javascript">
+        var permanotice, tooltip, _alert;
+        $(function () {
+            new PNotify({
+                title: "¡Error!",
+                type: "error",
+                text: "{{fail}}",
+                nonblock: {
+                    nonblock: true
+                },
+                before_close: function (PNotify) {
+                    // You can access the notice's options with this. It is read only.
+                    //PNotify.options.text;
+
+                    // You can change the notice's options after the timer like this:
+                    PNotify.update({
+                        title: PNotify.options.title + " - Enjoy your Stay",
+                        before_close: null
+                    });
+                    PNotify.queueRemove();
+                    return false;
+                }
+            });
+
+        });
+    </script>
+{% endif %}
+{% endblock %}

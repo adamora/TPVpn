@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block mainContent %}
+<div class="right_col" role="main">
+
+    <div class="row">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Clientes</h3>
+            </div>
+
+            <div class="title_right">
+            <form method='post' action='' id='searchBill'> {% csrf_token %}
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <div class="input-group">
+                        {{searchClie.array}}
+                        <span class="input-group-btn">
+                            <input type="hidden" name="searchCli" value="newSearch">
+                            <button class="btn btn-default" type="submit">Ir!</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_content">
+
+                        <div class="row">
+
+                            <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:center;">
+                                <ul class="pagination pagination-split">
+                                    <li><a href="#">A~C</a>
+                                    </li>
+                                    <li><a href="#">D~F</a>
+                                    </li>
+                                    <li><a href="#">G~I</a>
+                                    </li>
+                                    <li><a href="#">J~L</a>
+                                    </li>
+                                    <li><a href="#">M~Ñ</a>
+                                    </li>
+                                    <li><a href="#">O~Q</a>
+                                    </li>
+                                    <li><a href="#">R~T</a>
+                                    </li>
+                                    <li><a href="#">U~W</a>
+                                    </li>
+                                    <li><a href="#">X~Z</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+
+                            {% for client in clients %}
+                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                    <div class="well profile_view">
+                                        <div class="col-sm-12">
+                                            <h4 class="brief"><i>Cliente de <b>{{marketNow.name}}</b></i></h4>
+                                            <div class="left col-xs-7">
+                                                <h2>{{client.name}}</h2>
+                                                <p><strong>DNI: </strong> {{client.dni}} </p>
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fa fa-phone"></i>
+                                                        {% if client.tel == None %}
+                                                          (Ninguno)
+                                                        {% else %}
+                                                          {{client.tel}}
+                                                        {% endif %}
+                                                    </li>
+                                                    <li><i class="fa fa-envelope"></i>
+                                                        {% if client.email == None %}
+                                                          (Ninguno)
+                                                        {% else %}
+                                                          {{client.email}}
+                                                        {% endif %}
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                            <div class="col-xs-5 text-center">
+                                                <a href="/client_profile/{{client.pk}}" ><img src="/media/{{client.image}}" alt="" class="img-circle img-responsive" style="height:150px;width:150px"></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 bottom text-center">
+                                            <div class="col-xs-12 col-sm-6 emphasis">
+                                                <p class="ratings">
+                                                    <a style="text-decoration:none">Monedero: </a>
+                                                      {% if client.wallet > 0 %}
+                                                        <a class="green" style="text-decoration:none">{{client.wallet}}</a>
+                                                      {% elif client.wallet == 0 %}
+                                                        <a style="text-decoration:none">{{client.wallet}}</a>
+                                                      {% else %}
+                                                        <a class="red" style="text-decoration:none">{{client.wallet}}</a>
+                                                      {% endif %}
+                                                      <icon class="fa fa-eur"></icon>
+                                                </p>
+                                            </div>
+                                            <div class="clearfix"></div><p></p>
+                                            <center class="">
+                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{client.pk}}">
+                                                  <i class="fa fa-comments-o"></i>
+                                                </button>
+                                                <a href="/client_profile/{{client.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
+                                                    </i> Perfil </a>
+                                                <a href="/modCli/{{client.pk}}" type="button" class="btn btn-warning btn-xs"> <i class="fa fa-pencil"></i> Editar </a>
+                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-money-{{client.pk}}"> <i class="fa fa-eur"></i> Monedero </button>
+                                                <a href="javascript:void(0);" onclick="delete_client('{{client.name}}','{{client.pk}}')" type="button" class="btn btn-danger btn-xs"> <i class="fa fa-close"></i> Eliminar </a>
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- MODAL (VENTANA EMERGENTE PARA MENSAJE -->
+                                <div class="modal fade bs-example-modal-{{client.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">Enviar mensaje a {{client.name}}</h4>
+                                            </div>
+                                            <form class="form-horizontal form-label-left" method='post' action='' id="newNotification"> {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Mensaje a enviar <br><span class="required small red"><i>(500 caracteres como máximo)</i></span><div class='byline'><span class='red'>{{ notification.content.errors }}</span></div>
+                                                        </label>
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            {{ notification.content }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <input type="hidden" name="newNotification" value="{{client.pk}}">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /END MODAL -->
+                                <!-- MODAL (VENTANA EMERGENTE PARA MONEDERO -->
+                                <div class="modal fade bs-example-modal-money-{{client.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">Monedero de {{client.name}}. <br><small>Saldo actual: <a class="green">{{client.wallet}}€</a></small></h4>
+                                            </div>
+                                            <form class="form-horizontal form-label-left" method='post' action='' id="modWallet"> {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Cambiar fondos <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ wallet.new.errors }}</span></div>
+                                                        </label>
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            {{ wallet.new }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar fondos <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ wallet.add.errors }}</span></div>
+                                                        </label>
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            {{ wallet.add }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <input type="hidden" name="modWallet" value="{{client.pk}}">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /END MODAL -->
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    {% block scripts %}
+      <script type="text/javascript">
+        function delete_client(client_name,id_client)
+        {
+          var deleteProd = confirm("¿Está seguro que desea dar de baja al cliente '"+client_name+"'?");
+
+          if(deleteProd)
+          {
+            var url = "/deleteClient/"+id_client;
+            window.location.assign(url);
+          }
+        }
+
+      </script>
+
+    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block style %}
+{% endblock %}
+{% block mainContent %}
+<div id="StartAngular" class="right_col" role="main" ng-app="TPVpnapp" ng-controller="MovementsCtrl" ng-init="takeSales('{{workerNow.market.pk}}','{{workerNow.user.pk}}')">
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><i class="fa fa-filter"></i> Filtros <small>Según fecha, IVA o categoría</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<div class="col-md-3 col-sm-6 col-xs-12">
+					{$ angular $}
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<select class="select2_single_category form-control">
+							<option></option>
+							{% for i in categorys %}
+							<option value="{{i}}">{{i}}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="filter">
+							<div id="reportrange" style="line-height: 28px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+								<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+								<span>Not Working</span> <b class="caret"></b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+			    <div class="x_title">
+			        <h2><i class="fa fa-align-left"></i> Ventas realizadas <small>Pulse sobre una venta para desplegar su información</small></h2>
+			        <div class="clearfix"></div>
+			    </div>
+			    <div class="x_content">
+			        <!-- start accordion -->
+			        <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+			            {% for sale in sales %}
+			            <div class="panel">
+			                <a class="panel-heading" role="tab" id="heading{{sale.id}}" data-toggle="collapse" data-parent="#accordion" href="#{{sale.id}}" aria-expanded="false" aria-controls="{{sale.id}}">
+			                    <div class="col-md-9 col-sm-9 col-xs-9">
+			                    	<h4 class="panel-title"><b>{{sale.sale_code}}</b></h4>
+			                    </div>
+			                    <div class="col-md-3 col-sm-3 col-xs-3">
+			                    	<h4 class="panel-title">{{sale.date}}</h4>
+			                    </div>
+			                    <br>
+			                </a>
+			                <div id="{{sale.id}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{sale.id}}">
+			                    <div class="panel-body">
+									<div class="row invoice-info">
+										<div class="col-sm-4 invoice-col">
+											De
+											<address>
+											<strong>{{sale.seller.user.first_name}} {{sale.seller.user.last_name}} ({{sale.market.name}})</strong>
+												<br>C/{{sale.market.direction.direction}}, Nº {{sale.market.direction.numDir}} - {{sale.market.direction.stairs}} {{sale.market.direction.numFlat}} {{sale.market.direction.door}}
+												<br>{{sale.market.direction.location}} ({{sale.market.direction.province}}), CP {{sale.market.direction.postalCode}} 
+												<br>Teléfono: {{sale.market.tel}}
+												<br>Email: {{sale.market.email}}
+											</address>
+										</div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+											Para
+											<address>
+												{% if sale.buyer == None %}
+												<strong>Anónimo</strong>
+												<br>Efectivo: {{sale.recivedAmount}}
+												{% else %}
+												<strong>{{sale.buyer.name}}</strong>
+												<br>DNI: {{sale.buyer.dni}}
+												<br>Phone: {{sale.buyer.tel}}
+												<br>Email: {{sale.buyer.email}}
+												<br>Monedero/Efectivo: {{sale.usedWallet}}/{{sale.recivedAmount}}
+												{% endif %}
+											</address>
+										</div>
+                                        <!-- /.col -->
+										<div class="col-sm-4 invoice-col">
+											<b>Venta:</b> {{sale.sale_code}}
+											<br>
+											<br>
+											<b>ID Venta:</b> {{sale.pk}}
+											<br>
+											<b>Tot. Cobrar:</b> {{sale.totAmount}}
+											<br>
+											<b>Tot. Devuelto:</b> {{sale.devolution}}
+											<br>
+											<b>Beneficio:</b> {{sale.benefice}}
+										</div>
+										<!-- /.col -->
+									</div>
+			                    </div>
+			                </div>
+			            </div>
+			            {% endfor %}
+			        </div>
+			        <!-- end of accordion -->
+			    </div>
+			</div>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+{% endblock %}
+{% block scripts %}
+  <!-- my angularjs -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.min.js"></script>
+  <script src="{% static "app.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/controllers/controllers.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/services/services.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/factories/factories.js" %}" type="text/javascript" ></script>
+  <!-- /my angularjs -->
+	<!-- select2 -->
+	<link href="{% static "common/templates/css/select/select2.min.css" %} " rel="stylesheet">
+	<script>
+		$(document).ready(function () {
+			$(".select2_single_category").select2({
+				placeholder: "Seleccione una categoría",
+				allowClear: true
+			})
+			.on("select2:select",function() {
+				/*var category = $(".select2_single_category").val();
+				angular.element(document.getElementById('StartAngular')).scope().clearCategory();
+				angular.element(document.getElementById('StartAngular')).scope().filterCategory(category);
+				angular.element(document.getElementById('StartAngular')).scope().$apply();*/
+			})
+			.on("select2:unselect", function() {
+				/*angular.element(document.getElementById('StartAngular')).scope().clearCategory();
+				angular.element(document.getElementById('StartAngular')).scope().$apply();*/
+			});
+		});
+	</script>
+
+	<!-- daterangepicker -->
+    <script type="text/javascript" src="{% static "common/templates/js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/datepicker/daterangepicker.js" %}"></script>
+    
+    <!-- datepicker -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+        	setTimeout(function(){
+            var cb = function (start, end, label) {
+                console.log(start.toISOString(), end.toISOString(), label);
+                $('#reportrange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+                //alert("Callback has fired: [" + start.format('D MMMM, YYYY') + " to " + end.format('D MMMM, YYYY') + ", label = " + label + "]");
+            }
+            var optionSet1 = {
+                startDate: listDates[0],
+                endDate: moment(),
+                minDate: listDates[0],
+                maxDate: moment().format("DD/MM/YYYY"),
+                dateLimit: {
+                    days: 60
+                },
+                showDropdowns: true,
+                showWeekNumbers: true,
+                timePicker: false,
+                timePickerIncrement: 1,
+                timePicker12Hour: true,
+                ranges: {
+                    'Hoy': [moment(), moment()],
+                    'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Últimos 7 Días': [moment().subtract(6, 'days'), moment()],
+                    'Últimos 30 Días': [moment().subtract(29, 'days'), moment()],
+                    'Este Mes': [moment().startOf('month'), moment().endOf('month')],
+                    'Pasado Mes': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                opens: 'left',
+                buttonClasses: ['btn btn-default'],
+                applyClass: 'btn-small btn-primary',
+                cancelClass: 'btn-small',
+                format: 'DD/MM/YYYY',
+                separator: ' to ',
+                locale: {
+                    applyLabel: 'Vale',
+                    cancelLabel: 'Limpiar',
+                    fromLabel: 'Desde',
+                    toLabel: 'A',
+                    customRangeLabel: 'Personalizada',
+                    daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    firstDay: 1
+                }
+            };
+            $('#reportrange span').html(listDates[0] + ' - ' + moment().format('DD/MM/YYYY'));
+            $('#reportrange').daterangepicker(optionSet1, cb);
+            $('#reportrange').on('show.daterangepicker', function () {
+                $('#reportrange').data('daterangepicker').setStartDate(listDates[0]);
+				$('#reportrange').data('daterangepicker').setEndDate(moment().format('DD/MM/YYYY'));
+            });
+            $('#reportrange').on('hide.daterangepicker', function () {
+                console.log("hide event fired");
+            });
+            $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+                console.log("apply event fired, start/end dates are " + picker.startDate.format('D MMMM, YYYY') + " to " + picker.endDate.format('D MMMM, YYYY'));
+                /*$('#reportrange').data('daterangepicker').setStartDate(picker.startDate.format('DD/MM/YYYY'));
+				$('#reportrange').data('daterangepicker').setEndDate(picker.endDate.format('DD/MM/YYYY'));*/
+            });
+            $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
+            	alert("entra");
+                $('#reportrange span').html(listDates[0] + ' - ' + moment().format('DD/MM/YYYY'));
+                $('#reportrange').data('daterangepicker').setStartDate(listDates[0]);
+				$('#reportrange').data('daterangepicker').setEndDate(moment().format('DD/MM/YYYY'));
+            });
+            $('#options1').click(function () {
+                $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
+            });
+            $('#options2').click(function () {
+                $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
+            });
+            $('#destroy').click(function () {
+                $('#reportrange').data('daterangepicker').remove();
+            });
+            }, 500); //CONTADOR DE TIEMPO! -> NECESARIO PORQUE EL BUCLE TARDA EN PROCESAR
+        });
+    </script>
+    <!-- /datepicker -->
+{% endblock %}

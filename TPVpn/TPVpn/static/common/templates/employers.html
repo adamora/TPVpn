@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block mainContent %}
+<div class="right_col" role="main">
+
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Empleados de {{workerNow.market.name}}</h3>
+            </div>
+
+            <div class="title_right">
+              <form method='post' action='' id='searchBill' enctype="multipart/form-data"> {% csrf_token %}
+                  <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                      <div class="input-group">
+                          {{search.array}}
+                          <span class="input-group-btn">
+                              <input type="hidden" name="searchWorkerForm" value="searchWorker">
+                              <button class="btn btn-default" type="submit">Ir!</button>
+                          </span>
+                      </div>
+                  </div>
+              </form>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_content">
+
+                        <div class="row">
+
+                            <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:center;">
+                                <ul class="pagination pagination-split">
+                                    <li><a href="#">A~C</a>
+                                    </li>
+                                    <li><a href="#">D~F</a>
+                                    </li>
+                                    <li><a href="#">G~I</a>
+                                    </li>
+                                    <li><a href="#">J~L</a>
+                                    </li>
+                                    <li><a href="#">M~Ñ</a>
+                                    </li>
+                                    <li><a href="#">O~Q</a>
+                                    </li>
+                                    <li><a href="#">R~T</a>
+                                    </li>
+                                    <li><a href="#">U~W</a>
+                                    </li>
+                                    <li><a href="#">X~Z</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+
+                            {% for worker in workers %}
+                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                    <div class="well profile_view">
+                                        <div class="col-sm-12">
+                                            <h4 class="brief"><i>Trabajador de <b>{{worker.market.name}}</b></i></h4>
+                                            <div class="left col-xs-7">
+                                                <h2>{{worker.user.first_name}} {{worker.user.last_name}}</h2>
+                                                <p><strong>DNI: </strong> {{worker.dni}} </p>
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fa fa-phone"></i>
+                                                        {% if worker.tel1 == None %}
+                                                            Tlf: (Ninguno)
+                                                        {% else %}
+                                                            Tlf: {{worker.tel1}}
+                                                        {% endif %}
+                                                    </li>
+                                                    <li><i class="fa fa-envelope"></i>
+                                                        {% if worker.user.email == None %}
+                                                            (Ninguno)
+                                                        {% else %}
+                                                            {{worker.user.email}}
+                                                        {% endif %}
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                            <div class="col-xs-5 text-center">
+                                                <a href="/employer_profile/{{worker.dni}}"><img src="/media/{{worker.image}}" alt="" class="img-circle img-responsive" style="height:150px;width:150px"></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 bottom text-center">
+                                            <div class="col-xs-12 col-sm-6 emphasis">
+                                                <p class="ratings">
+                                                    <a style="text-decoration:none">Login: </a>
+                                                    <a class="green" style="text-decoration:none">{{worker.user.username}}</a>
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6 emphasis">
+                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{worker.dni}}"> <i class="fa fa-user">
+                                                    </i> <i class="fa fa-comments-o"></i> </button>
+                                                <a href="/employer_profile/{{worker.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
+                                                    </i> Perfil </a>
+                                                {% if workerNow == worker %}
+                                                <!--a href="/modWorker/{{worker.pk}}" type="button" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i> Editar </a-->
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
+                                <div class="modal fade bs-example-modal-{{worker.dni}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">Enviar mensaje a {{worker.user.username}}</h4>
+                                            </div>
+                                            <form class="form-horizontal form-label-left" method='post' action='' id="newNotification"> {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Mensaje a enviar <br><span class="required small red"><i>(500 caracteres como máximo)</i></span><div class='byline'><span class='red'>{{ notification.content.errors }}</span></div>
+                                                        </label>
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            {{ notification.content }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <input type="hidden" name="newNotification" value="{{worker.dni}}">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /END MODAL -->
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

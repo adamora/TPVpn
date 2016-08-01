@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block mainContent %}
+  <div class="right_col" role="main">
+
+      <div class="">
+          <div class="page-title">
+              <div class="title_left">
+                  <h3>Registrar trabajador en {{ workerNow.market }}</h3>
+              </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="x_panel">
+                      <div class="x_title">
+                          <h2>Formulario de Trabajador <small>Los campos con <big class='red'><b>*</b></big> son obligatorios</small></h2>
+                          <ul class="nav navbar-right panel_toolbox">
+                              <li>
+                                <a class="collapse-link">
+                                  <i class="fa fa-chevron-up"></i>
+                                </a>
+                              </li>
+                              <li>
+                                <a class="close-link">
+                                  <i class="fa fa-close"></i>
+                                </a>
+                              </li>
+                          </ul>
+                          <div class="clearfix"></div>
+                      </div>
+                      <div class="x_content">
+
+                        <form class="form-horizontal form-label-left" method='post' action='#' id="neWorker" enctype="multipart/form-data"> {% csrf_token %}
+
+                          <!-- Smart Wizard -->
+                          <div id="wizard" class="form_wizard wizard_horizontal">
+                              <ul class="wizard_steps">
+                                  <li>
+                                    <a href="#step-1">
+                                      <span class="step_no">1</span>
+                                      <span class="step_descr">
+                                        Paso 1<br />
+                                        <small>Datos del Trabajador (1 de 3)</small>
+                                      </span>
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#step-2">
+                                      <span class="step_no">2</span>
+                                      <span class="step_descr">
+                                        Paso 2<br />
+                                        <small>Datos del Trabajador (2 de 3)</small>
+                                      </span>
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#step-3">
+                                      <span class="step_no">3</span>
+                                      <span class="step_descr">
+                                        Paso 3<br />
+                                        <small>Dirección del Trabajador (3 de 3)</small>
+                                      </span>
+                                    </a>
+                                  </li>
+                              </ul>
+                                <div id="step-1">
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Nombre de usuario <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.username }}
+                                      {{ newuser.username.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      E-mail <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.email }}
+                                      {{ newuser.email.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Contraseña <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.password1 }}
+                                      {{ newuser.password1.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Repita contraseña <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.password2 }}
+                                      {{ newuser.password2.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Contraseña del Negocio <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ password.secretKey }}
+                                      {{ password.secretKey.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Nombre de pila <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.first_name }}
+                                      {{ newuser.first_name.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Apellidos <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newuser.last_name }}
+                                      {{ newuser.last_name.error }}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div id="step-2">
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      DNI <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ neworker.dni }}
+                                      {{ neworker.dni.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">
+                                      Género <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      <div id="id_genre" class="btn-group" data-toggle="buttons">
+                                          <label for="id_genre_0" class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                            <input class="form-control" id="id_genre_0" name="genre" type="radio" value="Hombre" /> Hombre
+                                          </label>
+                                          <label for="id_genre_1" class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                            <input class="form-control" id="id_genre_1" name="genre" type="radio" value="Mujer" /> Mujer
+                                          </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Nº. Seguridad Social <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ neworker.segSocial }}
+                                      {{ neworker.segSocial.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Teléfono <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ neworker.tel1 }}
+                                      {{ neworker.tel1.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Teléfono <span class="required"><small>(Opcional)</small></span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ neworker.tel2 }}
+                                      {{ neworker.tel2.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Foto de perfil <span class="required"></span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ neworker.image }}
+                                      {{ neworker.image.error }}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div id="step-3">
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Localidad <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.location }}
+                                      {{ newAddress.location.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Provincia <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.province }}
+                                      {{ newAddress.province.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Código Postal <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.postalCode }}
+                                      {{ newAddress.postalCode.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Dirección <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.direction }}
+                                      {{ newAddress.direction.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Número <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.numDir }}
+                                      {{ newAddress.numDir.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Escaleras <span class="required"></span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.stairs }}
+                                      {{ newAddress.stairs.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Planta <span class="required"></span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.numFlat }}
+                                      {{ newAddress.numFlat.error }}
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                      Localidad <span class="required"></span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                      {{ newAddress.door }}
+                                      {{ newAddress.door.error }}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                    <input type="hidden" name="neWorkerForm" value="registerUser">
+                                    <!--button class="btn btn-default submit" type="submit">Registrar</a-->
+                                </div>
+                              <!--/form-->
+                              <!--div id="step-4">
+                                  <h2 class="StepTitle">Step 4 Content</h2>
+                                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                  </p>
+                                  <p>
+                                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                  </p>
+                                  <p>
+                                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                  </p>
+                              </div-->
+
+                          </div>
+                          <!-- End SmartWizard Content -->
+                        </form>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+
+
+  <div class="clearfix"></div>
+
+
+  {% block scripts %}
+    <script src="{% static "common/templates/js/bootstrap.min.js" %}"></script>
+
+    <!-- chart js -->
+    <script src="{% static "common/templates/js/chartjs/chart.min.js" %}"></script>
+    <!-- bootstrap progress js -->
+    <script src="{% static "common/templates/js/progressbar/bootstrap-progressbar.min.js" %}"></script>
+    <script src="{% static "common/templates/js/nicescroll/jquery.nicescroll.min.js" %}"></script>
+    <!-- icheck -->
+    <script src="{% static "common/templates/js/icheck/icheck.min.js" %}"></script>
+
+    <script src="{% static "common/templates/js/custom.js" %}"></script>
+    <!-- form wizard -->
+    <script type="text/javascript" src="{% static "common/templates/js/wizard/jquery.smartWizard.js" %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Smart Wizard
+            $('#wizard').smartWizard();
+
+            function onFinishCallback() {
+                $('#wizard').smartWizard('showMessage', 'Finish Clicked');
+                  alert('Finish Clicked');
+            }
+        });
+
+        $(document).ready(function () {
+            // Smart Wizard
+            $('#wizard_verticle').smartWizard({
+                transitionEffect: 'slide'
+            });
+
+        });
+    </script>
+  {% endblock %}
+{% endblock %}

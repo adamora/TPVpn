@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block style %}
+{% endblock %}
+{% block mainContent %}
+
+<!-- page content -->
+<div class="right_col" role="main">
+  <div class="" ng-app="TPVpnapp">
+  <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{workerNow.market.pk}}','{{workerNow.user.pk}}')">
+    <div class="clearfix"></div>
+    {% csrf_token %}
+    <div class="row">
+
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel">
+            <div class="col-md-2 col-sm-2 col-xs-2">
+              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity'></input>
+            </div>
+            <div class="col-md-10 col-sm-10 col-xs-10">
+              <input id='barCodeInpt' type="text" class="form-control" ng-change="takeProd(takeBar)" ng-model='takeBar' placeholder="Código de barras"></input>
+            </div>
+            <br><div class="clearfix"></div><br>
+            <div class="col-md-2 col-sm-2 col-xs-2">
+              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity' style="height: 38px;"></input>
+            </div>
+            <div class="col-md-10 col-sm-10 col-xs-10">
+              <select class="select2_single_products form-control">
+                <option></option>
+                <option ng-repeat='i in showProducts' value="{$ i.id $};;{$ i.name $};;{$ i.sellPrice $}">{$ i.name $}</option>
+              </select>
+            </div>
+            <div class="clearfix"></div><br>
+
+            <form>
+              <div class="col-md-3 col-sm-3 col-xs-3">
+                <input type="text" class="form-control" ng-model='improvisePrice' placeholder="Precio €"></input>
+              </div>
+              <div class="col-md-7 col-sm-7 col-xs-7">
+                <input type="text" class="form-control" ng-model='improviseName' placeholder="Producto improvisado"></input>
+              </div>
+              <div class="col-md-2 col-sm-2 col-xs-2">
+                <button type='submit' class='btn btn-success' ng-click="addList('null' + improviseName + improvisePrice,improviseName,improvisePrice); improviseName=''; improvisePrice=0">Añadir</button>
+              </div>
+            </form>
+
+            <!--a ng-repeat='i in showProducts'>
+              <img src="{$ i.image $}" title="{$ i.name $}" class="avatar" style="height:50px;width:50px" ng-click="addList(i.id,i.name,i.sellPrice);"></img>
+            </a-->
+
+        </div>
+      </div>
+
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel">
+            <select class="select2_single_provider form-control">
+              <option></option>
+              {% for i in providers %}
+                <option value="{{i.pk}}">{{i.namePro}}</option>
+              {% endfor %}
+            </select>
+            <div class="clearfix"></div><br>
+            <select class="select2_single_category form-control" >
+              <option></option>
+              {% for i in categorys %}
+                <option value="{{i}}">{{i}}</option>
+              {% endfor %}
+            </select>
+            <div class="clearfix"></div><br>
+            <select class="select2_single_subcategory form-control">
+              <option></option>
+              {% for i in subcategorys %}
+                <option value="{{i}}">{{i}}</option>
+              {% endfor %}
+            </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel" style="height: 350px; overflow: scroll; overflow-x:hidden;" id="productListPanel">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Cantidad</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id='listaProductos' >
+              <tr ng-repeat='i in listProd'>
+                <td><a ng-click='addList(i.pk,i.name,i.price)'><i class="green fa fa-plus"></i></a> <b>{$ i.num $}</b> <a ng-click="decreaseProdList(i.pk,i.name,i.price)"><i class="red fa fa-minus"></i></a></td>
+                <td>{$ i.name $}</td>
+                <td>{$ i.price $}€</td>
+                <td>{$ i.finalPrice $}€</td>
+                <td><a ng-click="clearRowLP(i.pk)"><i class="red fa fa-close"></i></a></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><button id='endSale' class="btn btn-warning" ng-click="updateServer('{{workerNow.market.pk}}','{{workerNow.user.pk}}')">Finalizar Venta</button></td>
+                <td><big><b>Total:</b><big></td>
+                <td><big><b class="red">{$ totalPrice $}€</b><big></td>
+                <td></td>
+              </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel" ng-show="!showClient">
+            <div class="x_title">
+              <h2>Agregar Monedero</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <select class="select2_single_client form-control">
+                <option></option>
+                <option ng-repeat="i in clientList" value="{$ i.dni $}">{$ i.name $} - DNI: {$ i.dni $}</option>
+              </select>
+            </div>
+          </div>
+          <div class="x_panel" ng-show="showClient">
+
+            <div class="col-md-2 col-sm-2 col-xs-2">
+              <img src="{$ actualClient.image $}" title="{$ actualClient.name $}" class="avatar" style="height:70px;width:70px"></img>
+            </div>
+            <div class="col-md-5 col-sm-5 col-xs-5">
+              <small>Bienvenido,</small>
+              <h2><b>{$ actualClient.name $}</b></h2>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+              <small>Saldo actual:</small>
+              <h2><b class="green">{$ actualClient.wallet $}€</b><b> - <b class="red">{$ moneyFromWallet $}€</b> = {$ actualClient.wallet - moneyFromWallet $}€</b></h2>
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-1">
+                <a title="Quitar cliente" ng-click="clearClient()"><i class="fa fa-close"></i></a>
+            </div>
+          </div>
+          <div class="x_panel">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th><b>PAGO<b></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th >Total:</th>
+                    <td>{$ totalPrice $}€</td>
+                  </tr>
+                  <tr>
+                    <th>Efectivo:</th>
+                    <td>
+                      <div class="col-md-9 col-sm-9 col-xs-11">
+                        <input type='text' class="form-control" style="height: 25px;" onClick='this.select();' ng-model='moneyFromClient' ng-change='updateDevolution()'></input>
+                      </div>
+                      <div class="col-md-1 col-sm-1 col-xs-1">€</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Monedero:</th>
+                    <td ng-show="!showClient">0€</td>
+                    <td ng-show="showClient">
+                      <div class="col-md-9 col-sm-9 col-xs-11">
+                        <input type='text' class="form-control" style="height: 25px;" onClick='this.select();' ng-model='moneyFromWallet' ng-change='updateDevolution()'></input>
+                      </div>
+                      <div class="col-md-1 col-sm-1 col-xs-1">€</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Devolucion:</th>
+                    <td>{$ devolution $}€</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>IVA</th>
+                    <th>B. Impon.</th>
+                    <th>Cuota</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>4%</td>
+                    <td>{$ baseImp.s $}€</td>
+                    <td>{$ iva.s $}€</td>
+                  </tr>
+                  <tr>
+                    <td>10%</td>
+                    <td>{$ baseImp.r $}€</td>
+                    <td>{$ iva.r $}€</td>
+                  </tr>
+                  <tr>
+                    <td>21%</td>
+                    <td>{$ baseImp.g $}€</td>
+                    <td>{$ iva.g $}€</td>
+                  </tr>
+                  <tr>
+                    <td><b>Total:</b></td>
+                    <td>{$ baseImpTot $}€</td>
+                    <td>{$ ivaTot $}€</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="clearfix"></div><br />
+  </div>
+
+{% endblock %}
+{% block scripts %}
+  <!-- my angularjs -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.min.js"></script>
+  <script src="{% static "app.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/controllers/controllers.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/services/services.js" %}" type="text/javascript" ></script>
+  <script src="{% static "common/factories/factories.js" %}" type="text/javascript" ></script>
+  <!-- /my angularjs -->
+  <!-- select2 -->
+  <link href="{% static "common/templates/css/select/select2.min.css" %} " rel="stylesheet">
+  <script>
+      $(document).ready(function () {
+          $(".select2_single_products").select2({
+              placeholder: "Seleccione producto",
+              allowClear: true
+          })
+          .on("select2:select", function() {
+            // fired to the original element when the dropdown closes
+            var str = $(".select2_single_products").val();
+
+            res = str.split(";;");
+
+            $(".select2_single_products").select2('val','');
+
+            angular.element(document.getElementById('StartAngular')).scope().addList(res[0],res[1],res[2]);
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+
+            //Pone el scroll abajo cuando prod introducido en venta
+            var objDiv = document.getElementById("productListPanel");
+            objDiv.scrollTop = objDiv.scrollHeight;
+          })
+          .select2('val',''); //AREA DE SELECCION VACÍA
+
+
+          $(".select2_single_provider").select2({
+              placeholder: "Seleccione proveedor",
+              allowClear: true
+          })
+          .on("select2:select",function() {
+            var provider = $(".select2_single_provider").val();
+            angular.element(document.getElementById('StartAngular')).scope().clearProvider();
+            angular.element(document.getElementById('StartAngular')).scope().filterProvider(provider);
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+            $(".select2_single_products").select2('val','');
+          })
+          .on("select2:unselect", function() {
+            angular.element(document.getElementById('StartAngular')).scope().clearProvider();
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+          });
+
+
+          $(".select2_single_category").select2({
+              placeholder: "Seleccione categoría",
+              allowClear: true
+          })
+          .on("select2:select",function() {
+            var category = $(".select2_single_category").val();
+            angular.element(document.getElementById('StartAngular')).scope().clearCategory();
+            angular.element(document.getElementById('StartAngular')).scope().filterCategory(category);
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+            $(".select2_single_products").select2('val','');
+          })
+          .on("select2:unselect", function() {
+            angular.element(document.getElementById('StartAngular')).scope().clearCategory();
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+          });
+
+
+          $(".select2_single_subcategory").select2({
+              placeholder: "Seleccione subcategoría",
+              allowClear: true
+          })
+          .on("select2:select",function() {
+            var subcategory = $(".select2_single_subcategory").val();
+            alert(subcategory);
+            angular.element(document.getElementById('StartAngular')).scope().clearSubcategory();
+            angular.element(document.getElementById('StartAngular')).scope().filterSubcategory(subcategory);
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+            $(".select2_single_products").select2('val','');
+          })
+          .on("select2:unselect", function() {
+            angular.element(document.getElementById('StartAngular')).scope().clearSubcategory();
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+          });
+
+          $(".select2_single_client").select2({
+              placeholder: "Seleccione un cliente",
+              allowClear: true
+          })
+          .on("select2:select", function() {
+            var client = $(".select2_single_client").val();
+
+            angular.element(document.getElementById('StartAngular')).scope().addClient(client);
+            angular.element(document.getElementById('StartAngular')).scope().$apply();
+            $(".select2_single_client").select2('val','');
+          });
+
+      });
+  </script>
+  <!-- /select2 -->
+
+  <!-- shortcuts -->
+  <script>
+    var ctrl = false;
+    var alt = false;
+    document.onkeydown = function(e) {
+      if(e.which == 17)
+        ctrl=true;
+      if(e.which == 18)
+        alt = true;
+      if(e.which == 80 && ctrl == true && alt==true)  { //para ctrl+alt+p
+          $(".select2_single_provider").select2('close');
+          $(".select2_single_category").select2('close');
+          $(".select2_single_subcategory").select2('close');
+          $(".select2_single_client").select2('close');
+          $(".select2_single_products").select2('open');
+          ctrl = false;
+          alt = false;
+          return false;
+      }
+      else if(e.which == 66 && ctrl == true && alt==true)  { //para ctrl+alt+p
+           $(".select2_single_products").select2('close');
+           $(".select2_single_provider").select2('close');
+           $(".select2_single_category").select2('close');
+           $(".select2_single_subcategory").select2('close');
+           $(".select2_single_client").select2('close');
+           $("#barCodeInpt").focus();
+           ctrl = false;
+           alt = false;
+           return false;
+      }
+      if(e.which == 13 && ctrl == true) { //para ctlr+intro
+        $('#endSale').click();
+        return false;
+      }
+    };
+    document.onkeyup = function(e) {
+      if(e.which == 17)
+        ctrl=false;
+      if(e.which == 18)
+        alt = false;
+    };
+  </script>
+  <!-- /shortcuts -->
+
+{% endblock %}

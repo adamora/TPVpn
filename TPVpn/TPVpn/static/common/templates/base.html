@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+
+<head>
+{% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TPV | Pequeño Comercio</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <link href="{% static "common/templates/css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <link href="{% static "common/templates/fonts/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static "common/templates/css/animate.min.css" %}" rel="stylesheet">
+
+    <!-- Custom styling plus plugins -->
+    <link href="{% static "common/templates/css/custom.css" %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static "common/templates/css/maps/jquery-jvectormap-2.0.1.css" %}"  />
+    <link href="{% static "common/templates/css/icheck/flat/green.css" %}" rel="stylesheet" />
+    <link href="{% static "common/templates/css/floatexamples.css" %}" rel="stylesheet" type="text/css" />
+    <!-- Select2 -->
+    <link href="{% static "common/templates/css/select/select2.min.css" %}" rel="stylesheet">
+
+    <script src="{% static "common/templates/js/jquery.min.js" %}"></script>
+    <script src="{% static "common/templates/js/nprogress.js" %}"></script>
+    <script>
+        NProgress.start();
+    </script>
+    {% block style %}{% endblock %}
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="/index" class="site_title"><i class="fa fa-paw"></i> <span> tpvPC </span></a>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <!-- menu prile quick info -->
+                    <div class="profile">
+                        <div class="profile_pic">
+                            <img src="/media/{{workerNow.image}}" alt="/media/{{workerNow.image}}" class="img-circle profile_img" style="height:70px;width:70px">
+                        </div>
+                        <div class="profile_info">
+                            <span>Bienvenido,</span>
+                            <h2>{{workerNow.user.first_name}}</h2>
+                        </div>
+                    </div>
+                    <!-- /menu prile quick info -->
+                    <div class="clearfix" style="hidden"></div>
+                    <br>
+
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+
+                        <div class="menu_section">
+
+                            <h3>General</h3>
+                            <ul class="nav side-menu">
+                                <li><a><i class="fa fa-calculator"></i> Principal <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li><a href="/index/">Venta</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-shopping-cart"></i> Productos <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li><a href="/products/">Ver Productos</a>
+                                        </li>
+                                        <li><a href="/new_product/">Agregar Producto</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-users"></i> Clientes <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li><a href="/clients/">Ver Clientes</a>
+                                        </li>
+                                        <li><a href="/new_client/">Agregar Cliente</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-institution"></i> Empleados <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li><a href="/employers/">Ver Empleados</a>
+                                        </li>
+                                        <li><a href="/new_employer/">Agregar Empleado</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-money"></i> Movimientos de Caja <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li>
+                                            <a href="/cashFlows/">Ver Movimientos</a>
+                                        </li>
+                                        <li>
+                                            <a href="/sales/">Ventas</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /sidebar menu -->
+
+                    <!-- /menu footer buttons -->
+                    <div class="sidebar-footer hidden-small">
+                        <a data-toggle="tooltip" data-placement="top" title="Configuración">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Pantalla Completa">
+                            <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Lock">
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Cerrar Sesión" href="/logout/">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                    <!-- /menu footer buttons -->
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+
+                <div class="nav_menu">
+                    <nav class="" role="navigation">
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="/media/{{workerNow.image}}" alt="">{{workerNow.user.first_name}}
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
+                                    <li><a href="/employer_profile/{{workerNow.dni}}">  Perfil</a>
+                                    </li>
+                                    <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                                {% if not fail == None %}
+                                <li role="presentation" class="dropdown open">
+                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="true">
+                                    <i class="fa fa-envelope-o"></i>
+                                        <span class="badge bg-red">1</span>
+                                {% else %}
+                                <li role="presentation" class="dropdown">
+                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-envelope-o"></i>
+                                        <span class="badge">0</span>
+                                {% endif %}
+                                </a>
+                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list animated fadeInDown" role="menu">
+                                    {% if not fail == None %}
+                                    <li>
+                                        <a>
+                                            <span class="image">
+                                                <img src="/media/{{workerNow.image}}" alt="Profile Image" />
+                                            </span>
+                                            <span>
+                                                <span>{{workerNow.user.first_name}}</span>
+                                                <span class="time">hace 1 minuto</span>
+                                            </span>
+                                            <span class="message">
+                                                {{fail}}
+                                            </span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    <li>
+                                        <div class="text-center">
+                                            <a>
+                                                <strong><a href="/employer_profile/{{workerNow.pk}}">Ver todas mis alertas</strong>
+                                                <i class="fa fa-angle-right"></i>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+            <!-- /top navigation -->
+
+            {% block mainContent %}{% endblock %}
+
+               <footer>
+                    <div class="">
+                        <p class="pull-right">Trabajo Fin de Grado por <a>Adam Mora Tortajada</a>.
+                            <span class="lead">| Universidad de Cordoba</span>
+                        </p>
+                    </div>
+                    <div class="clearfix"></div>
+                </footer>
+                <!-- /footer content -->
+        </div>
+            <!-- /page content -->
+    </div>
+
+
+    <div id="custom_notifications" class="custom-notifications dsp_none">
+        <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+        </ul>
+        <div class="clearfix"></div>
+        <div id="notif-group" class="tabbed_notifications"></div>
+    </div>
+
+    <script src="{% static "common/templates/js/bootstrap.min.js" %}"></script>
+
+    <!-- gauge js -->
+    <script type="text/javascript" src="{% static "common/templates/js/gauge/gauge.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/gauge/gauge_demo.js" %}"></script>
+    <!-- chart js -->
+    <script src="{% static "common/templates/js/chartjs/chart.min.js" %}"></script>
+    <!-- bootstrap progress js -->
+    <script src="{% static "common/templates/js/progressbar/bootstrap-progressbar.min.js" %}"></script>
+    <script src="{% static "common/templates/js/nicescroll/jquery.nicescroll.min.js" %}"></script>
+    <!-- icheck -->
+    <script src="{% static "common/templates/js/icheck/icheck.min.js" %}"></script>
+    
+
+    <script src="{% static "common/templates/js/custom.js" %}"></script>
+
+    <!-- flot js -->
+    <!--[if lte IE 8]><script type="text/javascript" src="js/excanvas.min.js"></script><![endif]-->
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.pie.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.orderBars.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.time.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/date.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.spline.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.stack.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/curvedLines.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/flot/jquery.flot.resize.js" %}"></script>
+    <!-- select2 -->
+    <script src="{% static "common/templates/js/select/select2.full.js" %}"></script>
+
+    <!-- PNotify -->
+    <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.core.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.buttons.js" %}"></script>
+    <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.nonblock.js" %}"></script>
+
+    <script>
+        $(function () {
+            var cnt = 10; //$("#custom_notifications ul.notifications li").length + 1;
+            TabbedNotification = function (options) {
+                var message = "<div id='ntf" + cnt + "' class='text alert-" + options.type + "' style='display:none'><h2><i class='fa fa-bell'></i> " + options.title + "</h2><div class='close'><a href='javascript:;' class='notification_close'><i class='fa fa-close'></i></a></div><p>" + options.text + "</p></div>";
+
+                if (document.getElementById('custom_notifications') == null) {
+                    alert('doesnt exists');
+                } else {
+                    $('#custom_notifications ul.notifications').append("<li><a id='ntlink" + cnt + "' class='alert-" + options.type + "' href='#ntf" + cnt + "'><i class='fa fa-bell animated shake'></i></a></li>");
+                    $('#custom_notifications #notif-group').append(message);
+                    cnt++;
+                    CustomTabs(options);
+                }
+            }
+
+            CustomTabs = function (options) {
+                $('.tabbed_notifications > div').hide();
+                $('.tabbed_notifications > div:first-of-type').show();
+                $('#custom_notifications').removeClass('dsp_none');
+                $('.notifications a').click(function (e) {
+                    e.preventDefault();
+                    var $this = $(this),
+                        tabbed_notifications = '#' + $this.parents('.notifications').data('tabbed_notifications'),
+                        others = $this.closest('li').siblings().children('a'),
+                        target = $this.attr('href');
+                    others.removeClass('active');
+                    $this.addClass('active');
+                    $(tabbed_notifications).children('div').hide();
+                    $(target).show();
+                });
+            }
+
+            CustomTabs();
+
+            var tabid = idname = '';
+            $(document).on('click', '.notification_close', function (e) {
+                idname = $(this).parent().parent().attr("id");
+                tabid = idname.substr(-2);
+                $('#ntf' + tabid).remove();
+                $('#ntlink' + tabid).parent().remove();
+                $('.notifications a').first().addClass('active');
+                $('#notif-group div').first().css('display','block');
+            });
+        })
+    </script>
+    <script type="text/javascript">
+        var permanotice, tooltip, _alert;
+        $(function () {
+            new PNotify({
+                {% autoescape off %}
+                {{fail}}
+                {% endautoescape %},
+                before_close: function (PNotify) {
+                    // You can access the notice's options with this. It is read only.
+                    //PNotify.options.text;
+
+                    // You can change the notice's options after the timer like this:
+                    PNotify.update({
+                        title: PNotify.options.title + " - Enjoy your Stay",
+                        before_close: null
+                    });
+                    PNotify.queueRemove();
+                    return false;
+                }
+            });
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.progress .bar').progressbar(); // bootstrap 2
+            $('.progress .progress-bar').progressbar(); // bootstrap 3
+        });
+    </script>
+    <!-- /PNotity -->
+
+    {% block scripts %}{% endblock %}
+    <!-- /footer content -->
+
+</body>
+</html>

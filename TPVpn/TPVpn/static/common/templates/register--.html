@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+
+<head>
+{% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TPV | Pequeño Comercio</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <link href="{% static "common/templates/css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <link href="{% static "common/templates/fonts/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static "common/templates/css/animate.min.css" %}" rel="stylesheet">
+
+    <!-- Custom styling plus plugins -->
+    <link href="{% static "common/templates/css/custom.css" %}" rel="stylesheet">
+    <link href="{% static "common/templates/css/icheck/flat/green.css" %}" rel="stylesheet">
+
+    <!-- Select 2 -->
+    <script src="{% static "common/templates/js/select/select2.full.js" %}"></script>
+    <script src="{% static "common/templates/js/jquery.min.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            $(".select2_single").select2({
+                placeholder: "Select a state",
+                allowClear: true
+            });
+    </script>
+
+    <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+<body style="background:#F7F7F7;" ng-app="TPVpnapp">
+    <div ng-controller='RegisterCtrl'>
+        <div id="wrapper">
+            <div id="login" class="animate form">
+                <section class="login_content">
+                    <form class="form-horizontal form-label-left" method='post' action='#' id="neWorker"> 
+                        <h1>Crea tu Cuenta</h1>
+                        <div>
+                            <!-- Smart Wizard -->
+                            <div id="wizard" class="form_wizard wizard_horizontal">
+                                <ul class="wizard_steps">
+                                    <li>
+                                        <a href="#step-1">
+                                            <span class="step_no">1</span>
+                                            <span class="step_descr">
+                                                Paso 1<br />
+                                                <small>Datos del usuario (1 de 3)</small>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#step-2">
+                                            <span class="step_no">2</span>
+                                            <span class="step_descr">
+                                                Paso 2<br />
+                                                <small>Datos del usuario (2 de 3)</small>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#step-3">
+                                            <span class="step_no">3</span>
+                                            <span class="step_descr">
+                                                Paso 3<br />
+                                                <small>Direccion del usuario (3 de 3)</small>
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                    {$ aviso $}
+                                    {$ fail $}
+                                    <div id="step-1">
+                                      <input class='form-control' placeholder='Nombre*' ng-model="RegisterForm.first_name"></input><br>{$ RegisterForm.first_name $}
+                                      <input class='form-control' placeholder='Apellidos*' ng-model="RegisterForm.last_name"></input><br>
+                                      <input class='form-control' placeholder='E-mail*' ng-model="RegisterForm.email"></input><br>
+                                      <input class='form-control' placeholder='Nombre de usuario*' ng-model="RegisterForm.username"></input><br>
+                                      <input class='form-control' placeholder='Contraseña*' ng-model="RegisterForm.password1"></input><br>
+                                      <input class='form-control' placeholder='Repita la contraseña*' ng-model="RegisterForm.password2"></input><br>
+                                    </div>
+                                    <div id="step-2">
+                                      <input class='form-control' placeholder='DNI*' ng-model="RegisterForm.dni"></input><br>
+
+                                      <div class="form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Género: </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                          <div id="gender" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-default active" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                              <input type="radio" name="gender" value="Hombre" ng-model="RegisterForm.genre"> Hombre
+                                            </label>
+                                            <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                              <input type="radio" name="gender" value="Mujer" ng-model="RegisterForm.genre"> &nbsp; Mujer
+                                            </label>
+                                          </div>
+                                        </div>{$ RegisterForm.genre $}
+                                      </div><br>
+
+                                      <input class='form-control' type='number' placeholder='Num. Seg. Social*' ng-model="RegisterForm.segSocial"></input><br>
+                                      <input class='form-control' type='number' placeholder='Telefono*' ng-model="RegisterForm.tel1"></input><br>
+                                      <input class='form-control' type='number' placeholder='Telefono alternativo' ng-model="RegisterForm.tel2"></input><br>
+                                    </div>
+                                    <div id="step-3">
+                                      <input class='form-control' placeholder='Localidad*' ng-model="RegisterForm.location"></input><br>
+                                      <input class='form-control' placeholder='Provincia*' ng-model="RegisterForm.province"></input><br>
+                                      <input class='form-control' type='number' placeholder='Código postal*' ng-model="RegisterForm.postalCode"></input><br>
+                                      <input class='form-control' placeholder='Dirección*' ng-model="RegisterForm.direction"></input><br>
+                                      <input class='form-control' placeholder='Número*' ng-model="RegisterForm.numDir"></input><br>
+                                      <input class='form-control' placeholder='Escaleras' ng-model="RegisterForm.stairs"></input><br>
+                                      <input class='form-control' type='number' placeholder='Planta' ng-model="RegisterForm.numFlat"></input><br>
+                                      <input class='form-control' placeholder='Puerta' ng-model="RegisterForm.door"></input><br>
+                                    </div>
+                                    <div>
+                                        <!--input type="hidden" name="inputInLogin" value="registerUser" ng-submit='formRegister()'-->
+                                        <!--button class="btn btn-default submit" type="submit">Registrar</a-->
+                                    </div>
+                            </div>
+                            <br><a class="btn btn-default" ng-click='formRegister()'>Registrar</a>
+                        </div>
+                        <div class="clearfix"></div>
+
+                        <div class="separator">
+
+                            <p class="change_link">¿Ya está usted registrado?
+                                <a href="/login" class="to_register"> Entra </a>
+                            </p>
+                            <div class="clearfix"></div>
+                            <br />
+                            <div>
+                                <h1>Universidad de Cordoba</h1>
+
+                                <p>Trabajo Fin de Grado por <a>Adam Mora Tortajada</a>.</p>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- form -->
+                </section>
+                <!-- content -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AngularJs -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.min.js"></script>
+    <script src="{% static "app.js" %}"></script>
+    <script src="{% static "common/controllers/controllers.js" %}"></script>
+    <script src="{% static "common/factories/factories.js" %}"></script>
+    <script src="{% static "common/services/services.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "common/templates/js/wizard/jquery.smartWizard.js"%}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Smart Wizard
+            $('#wizard').smartWizard();
+
+            function onFinishCallback() {
+                $('#wizard').smartWizard('showMessage', 'Finish Clicked');
+                //alert('Finish Clicked');
+            }
+        });
+
+        $(document).ready(function () {
+            // Smart Wizard
+            $('#wizard_horizontal').smartWizard({
+                transitionEffect: 'slide'
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>
