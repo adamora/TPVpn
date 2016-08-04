@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from TPVpnapp.models import *
+from TPVpnapp.models import (Client, FullDirection, Market, Notification,
+                             Product, ProductSale, Provider, Sale, Worker)
 
 admin.site.register(FullDirection)
 admin.site.register(Market)

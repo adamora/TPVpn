@@ -51,7 +51,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    #EVITAR PROBLEMAS CSRF
+    # EVITAR PROBLEMAS CSRF
     'TPVpnapp.disableCSRF.DisableCSRF',
     'TPVpnapp.django-crossdomainxhr-middleware.XsSharing',
     'corsheaders.middleware.CorsMiddleware',
@@ -102,7 +102,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-#Serializer to work with Angular
+# Serializer to work with Angular
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 
@@ -122,19 +122,17 @@ MEDIAFILES_DIRS = (
     'TPVpn/media',
 )
 '''
-#MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
-
-
-#STATICFILES_FINDERS = (
+# STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.FileSystemFinder',
 #    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-##    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-#)
-#MEDIA_URL = '/media/'
-#MEDIA_ROOT = (
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+# )
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = (
 #    'TPVpn/media',
-#)
+# )
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',

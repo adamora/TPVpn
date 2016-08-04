@@ -1,8 +1,8 @@
 # encoding:utf-8
 
 from TPVpnapp.models import (Client, FullDirection, GENRE, IVA, KINDPRODUCT,
-                             Market, Notification, Product, Provider, Sale,
-                             User, Worker)
+                             Market, Notification, Product, Provider, User,
+                             Worker)
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -77,7 +77,7 @@ class RegisterBusinessForm(ModelForm):
                   'secretKey2')
 
 
-class RegisterFullDirectionForm(ModelForm):
+class FullDirectionForm(ModelForm):
     # id=forms.IntegerField(widget=forms.HiddenInput(),label='')
     location = forms.CharField(required=True, label='',
                                widget=forms.TextInput(
@@ -307,15 +307,6 @@ class StockForm(forms.Form):
         fields = ('new', 'add')
 
 
-class OfferForm(forms.Form):
-    offer = forms.FloatField(required=False, label='',
-                             widget=forms.TextInput(
-                                 attrs={'class': 'form-control'}))
-
-    class Meta:
-        fields = ('offer',)
-
-
 class ClientForm(ModelForm):
     name = forms.CharField(required=True, label='',
                            widget=forms.TextInput(
@@ -362,14 +353,6 @@ class InputMoney(forms.Form):
         fields = ('new', 'add')
 
 
-class InputTrue(ModelForm):
-    done = forms.BooleanField(required=True, label='')
-
-    class Meta:
-        model = Sale
-        fields = ('done',)
-
-
 class SearchProduct(forms.Form):
     search = forms.CharField(required=True, label='',
                              widget=forms.TextInput(
@@ -382,25 +365,3 @@ class SearchProduct(forms.Form):
 
     class Meta:
         fields = ('search',)
-
-
-class AmountForm(ModelForm):
-    amount = forms.FloatField(required=True, label='',
-                              widget=forms.NumberInput(
-                                  attrs={'class':
-                                         'form-control col-md-7 col-xs-12'}))
-
-    class Meta:
-        model = Product
-        fields = ('amount',)
-
-
-class SrchCliForm(ModelForm):
-    name = forms.CharField(required=True, label='',
-                           widget=forms.TextInput(
-                               attrs={'class': 'form-control',
-                                      'placeholder': 'Buscar...'}))
-
-    class Meta:
-        model = Client
-        fields = ('name',)
