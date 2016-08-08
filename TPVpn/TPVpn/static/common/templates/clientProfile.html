@@ -16,7 +16,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Cliente de <a class='green'>{{workerNow.market}}</a> <small>Informe de actividad</small></h2>
+                        <h2>Cliente de <a class='green'>{{worker_now.market}}</a> <small>Informe de actividad</small></h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -191,7 +191,7 @@
 
                                     <div role="tabpanel" class="tab-pane" id="tab_content3" aria-labelledby="home-tab">
                                         <ul class="messages" style="list-style-type:none">
-                                        {% for i in warningsWallet %}
+                                        {% for i in warnings_wallet %}
                                           <li>
                                             <img src="/media/{{i.writer.image}}" class="avatar" alt="Avatar">
                                             <div class="message_date">

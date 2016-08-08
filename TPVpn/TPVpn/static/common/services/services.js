@@ -18,7 +18,7 @@
   .service('RegisterService', function($http,$cookies) {
     this.registerFor = function(dataObject,url) {
       return $http({
-        url: 'http://127.0.0.1:8000' + url,
+        url: 'http://localhost:8000' + url,
         method: "POST",
         data: dataObject,
         headers: {

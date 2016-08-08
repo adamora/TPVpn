@@ -7,7 +7,7 @@
 <!-- page content -->
 <div class="right_col" role="main">
   <div class="" ng-app="TPVpnapp">
-  <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{workerNow.market.pk}}','{{workerNow.user.pk}}')">
+  <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">
     <div class="clearfix"></div>
     {% csrf_token %}
     <div class="row">
@@ -102,7 +102,7 @@
               </tr>
               <tr>
                 <td></td>
-                <td><button id='endSale' class="btn btn-warning" ng-click="updateServer('{{workerNow.market.pk}}','{{workerNow.user.pk}}')">Finalizar Venta</button></td>
+                <td><button id='endSale' class="btn btn-warning" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
                 <td><big><b>Total:</b><big></td>
                 <td><big><b class="red">{$ totalPrice $}€</b><big></td>
                 <td></td>

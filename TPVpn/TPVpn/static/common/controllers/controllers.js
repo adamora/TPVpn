@@ -65,7 +65,7 @@
      * @example
        <my-directive ng-init='init(market)'></my-directive>
      */
-    $scope.init = function(marketNow,worker) {
+    $scope.init = function(marketNow, worker) {
       var dataObject = jQuery.param({
         'status': 'done',
         'user': worker,
@@ -74,7 +74,7 @@
         'market': marketNow
       });
 
-      RegisterService.registerFor(dataObject,'/initialData/')
+      RegisterService.registerFor(dataObject,'/initial_data/')
         .success(function(response){
           $scope.completeList = response;
           $scope.showProducts = response;
@@ -83,7 +83,7 @@
           $window.alert('No conectado');
         })
 
-      RegisterService.registerFor(dataObject,'/takeClients/')
+      RegisterService.registerFor(dataObject,'/take_clients/')
         .success(function(response){
           $scope.clientList = response;
         })

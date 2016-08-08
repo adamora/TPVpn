@@ -1,4 +1,5 @@
 # encoding:utf-8
+
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -30,7 +31,7 @@ urlpatterns = [
     url(r'^employer_profile/(?P<pk>.*)/$', 'TPVpnapp.views.worker_profile'),
     url(r'^modWorker/(?P<pk>.*)/$', 'TPVpnapp.views.mod_worker'),
     url(r'^index/$', 'TPVpnapp.views.index'),
-    url(r'^initialData/$', 'TPVpnapp.views.initial_data'),
+    url(r'^initial_data/$', 'TPVpnapp.views.initial_data'),
     url(r'^addSell/$', 'TPVpnapp.views.add_sell'),
     url(r'^logout/$', 'TPVpnapp.views.logout_session'),
     url(r'^new_product/$', 'TPVpnapp.views.new_product'),
@@ -45,7 +46,7 @@ urlpatterns = [
     url(r'^modProd/(?P<product_id>[0-9]+)/$', 'TPVpnapp.views.modify_product'),
     url(r'^new_client/$', 'TPVpnapp.views.new_client'),
     url(r'^clients/$', 'TPVpnapp.views.list_clients'),
-    url(r'^takeClients/$', 'TPVpnapp.views.take_clients'),
+    url(r'^take_clients/$', 'TPVpnapp.views.take_clients'),
     url(r'^modCli/(?P<pk>.*)/$', 'TPVpnapp.views.mod_client'),
     url(r'^client_profile/(?P<pk>.*)/$', 'TPVpnapp.views.client_profile'),
     url(r'^cashFlows/$', 'TPVpnapp.views.cash_flows'),

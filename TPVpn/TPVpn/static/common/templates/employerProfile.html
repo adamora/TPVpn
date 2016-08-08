@@ -124,7 +124,7 @@
                                   <a href="{{workerProfile.user.email}}" target="_blank"> E-mail: {{workerProfile.user.email}}</a>
                               </li>
                           </ul>
-                          {% if workerProfile == workerNow %}
+                          {% if workerProfile == worker_now %}
                             <a href="/modWorker/{{workerProfile.pk}}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Editar Perfil</a>
                           {% endif %}
                           <br />

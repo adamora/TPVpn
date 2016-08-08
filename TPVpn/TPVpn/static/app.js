@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   angular.module('TPVpnapp',[
-    'ngCookies'
+    'ngCookies',
   ], function($interpolateProvider){
     $interpolateProvider.startSymbol('{$');
     $interpolateProvider.endSymbol('$}');
@@ -17,7 +17,7 @@
     //$http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
     $http.defaults.xsrfCookieName = 'csrftoken';
     $http.defaults.xsrfHeaderName = 'X-CSRFToken';
-    //$http.defaults.headers.post['X-CSRFToken'] = $('input[name=csrfmiddlewaretoken]').val();
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.get('csrftoken');
   })
   .directive('ngEnter', function() {
     return function(scope, element, attrs) {

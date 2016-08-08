@@ -48,11 +48,11 @@
                     <!-- menu prile quick info -->
                     <div class="profile">
                         <div class="profile_pic">
-                            <img src="/media/{{workerNow.image}}" alt="/media/{{workerNow.image}}" class="img-circle profile_img" style="height:70px;width:70px">
+                            <img src="/media/{{worker_now.image}}" alt="/media/{{worker_now.image}}" class="img-circle profile_img" style="height:70px;width:70px">
                         </div>
                         <div class="profile_info">
                             <span>Bienvenido,</span>
-                            <h2>{{workerNow.user.first_name}}</h2>
+                            <h2>{{worker_now.user.first_name}}</h2>
                         </div>
                     </div>
                     <!-- /menu prile quick info -->
@@ -141,11 +141,11 @@
                         <ul class="nav navbar-nav navbar-right">
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                    <img src="/media/{{workerNow.image}}" alt="">{{workerNow.user.first_name}}
+                                    <img src="/media/{{worker_now.image}}" alt="">{{worker_now.user.first_name}}
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
-                                    <li><a href="/employer_profile/{{workerNow.dni}}">  Perfil</a>
+                                    <li><a href="/employer_profile/{{worker_now.dni}}">  Perfil</a>
                                     </li>
                                     <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
                                     </li>
@@ -169,10 +169,10 @@
                                     <li>
                                         <a>
                                             <span class="image">
-                                                <img src="/media/{{workerNow.image}}" alt="Profile Image" />
+                                                <img src="/media/{{worker_now.image}}" alt="Profile Image" />
                                             </span>
                                             <span>
-                                                <span>{{workerNow.user.first_name}}</span>
+                                                <span>{{worker_now.user.first_name}}</span>
                                                 <span class="time">hace 1 minuto</span>
                                             </span>
                                             <span class="message">
@@ -184,7 +184,7 @@
                                     <li>
                                         <div class="text-center">
                                             <a>
-                                                <strong><a href="/employer_profile/{{workerNow.pk}}">Ver todas mis alertas</strong>
+                                                <strong><a href="/employer_profile/{{worker_now.pk}}">Ver todas mis alertas</strong>
                                                 <i class="fa fa-angle-right"></i>
                                             </a>
                                         </div>

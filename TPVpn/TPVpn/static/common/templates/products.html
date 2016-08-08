@@ -17,7 +17,7 @@
           <form method='post' action='' id='searchBill'> {% csrf_token %}
               <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                   <div class="input-group">
-                    {{searchProduct.search}}
+                    {{search_product.search}}
                     <span class="input-group-btn">
                       <input type="hidden" name="searching" value="searchProd">
                       <button class="btn btn-default" type="submit">Ir!</button>
@@ -39,7 +39,7 @@
                     </div>
                     <div class="x_content">
 
-                        <p>Listado de productos de la tienda <big><b>{{marketNow.name}}</b></big></p>
+                        <p>Listado de productos de la tienda <big><b>{{market_now.name}}</b></big></p>
 
                         <!-- start project list -->
                         <table class="table table-striped projects ">
@@ -104,22 +104,22 @@
                                             </div>
                                             <form class="form-horizontal form-label-left" method='post' action='' id="newStock"> {% csrf_token %}
                                                 <div class="modal-body">
-                                                    <b class="red">{{ modQuantity.new.error }}</b><div class="clearfix"></div><br>
+                                                    <b class="red">{{ mod_quantity.new.error }}</b><div class="clearfix"></div><br>
                                                     <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ modQuantity.new.errors }}</span></div>
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ mod_quantity.new.errors }}</span></div>
                                                         </label>
                                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.new }}
+                                                            {{ mod_quantity.new }}
                                                         </div>
                                                     </div>
                                                     <br>
                                                     <div class="clearfix"></div>
                                                     <br>
                                                     <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ modQuantity.add.errors }}</span></div>
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ mod_quantity.add.errors }}</span></div>
                                                         </label>
                                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.add }}
+                                                            {{ mod_quantity.add }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -149,22 +149,22 @@
                                             </div>
                                             <form class="form-horizontal form-label-left" method='post' action='' id="newStock"> {% csrf_token %}
                                                 <div class="modal-body">
-                                                    <b class="red">{{ modQuantity.new.error }}</b><div class="clearfix"></div><br>
+                                                    <b class="red">{{ mod_quantity.new.error }}</b><div class="clearfix"></div><br>
                                                     <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ modQuantity.new.errors }}</span></div>
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ mod_quantity.new.errors }}</span></div>
                                                         </label>
                                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.new }}
+                                                            {{ mod_quantity.new }}
                                                         </div>
                                                     </div>
                                                     <br>
                                                     <div class="clearfix"></div>
                                                     <br>
                                                     <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ modQuantity.add.errors }}</span></div>
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ mod_quantity.add.errors }}</span></div>
                                                         </label>
                                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.add }}
+                                                            {{ mod_quantity.add }}
                                                         </div>
                                                     </div>
                                                 </div>

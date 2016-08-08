@@ -6,7 +6,7 @@
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>Empleados de {{workerNow.market.name}}</h3>
+                <h3>Empleados de {{worker_now.market.name}}</h3>
             </div>
 
             <div class="title_right">
@@ -98,7 +98,7 @@
                                                     </i> <i class="fa fa-comments-o"></i> </button>
                                                 <a href="/employer_profile/{{worker.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
                                                     </i> Perfil </a>
-                                                {% if workerNow == worker %}
+                                                {% if worker_now == worker %}
                                                 <!--a href="/modWorker/{{worker.pk}}" type="button" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i> Editar </a-->
                                                 {% endif %}
                                             </div>

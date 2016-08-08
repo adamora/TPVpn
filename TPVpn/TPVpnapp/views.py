@@ -25,9 +25,8 @@ from rest_framework.renderers import JSONRenderer
 
 
 class JSONResponse(HttpResponse):
-    """
-    An HttpResponse that renders its content into JSON.
-    """
+    """An HttpResponse that renders its content into JSON."""
+
     def __init__(self, data, **kwargs):
         content = JSONRenderer().render(data)
         kwargs['content_type'] = 'application/json'
@@ -603,7 +602,6 @@ def list_clients(request):
     return render(request, 'clients.html', to_return)
 
 
-@csrf_exempt
 def take_clients(request):
     data = {}
     if request.method == 'POST':
@@ -738,9 +736,9 @@ def index(request):
     return render(request, 'prueba-index.html', to_return)
 
 
-@csrf_exempt
 def initial_data(request):
     data = {}
+
     if request.method == 'POST':
         worker_now = Worker.objects.get(user__pk=request.POST['user'])
         if worker_now.user.is_authenticated:
@@ -750,13 +748,12 @@ def initial_data(request):
                 )
                 serializer = ProductSerializer(aux, many=True)
                 data = serializer.data
-            return HttpResponse(json.dumps(data))
+            # return HttpResponse(json.dumps(data))
         else:
             data['status'] = 'fail'
-            return HttpResponse(json.dumps(data))
+    return HttpResponse(json.dumps(data))
 
 
-@csrf_exempt
 def add_sell(request):
     data = {}
     if request.method == 'POST':
@@ -809,7 +806,7 @@ def add_sell(request):
                 sale.benefice = benefice
                 sale.save()
                 # GENERAR NOTIFICACION
-                data['location'] = request.META['HTTP_ORIGIN'] + '/index'
+                data['location'] = request.META['HTTP_REFERER']
                 return HttpResponse(json.dumps(data))
 
     data['status'] = 'fail'
