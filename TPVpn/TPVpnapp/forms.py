@@ -6,7 +6,7 @@ from TPVpnapp.models import (Client, FullDirection, GENRE, IVA, KINDPRODUCT,
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.forms import ModelForm
+from django.forms import ModelForm, extras
 
 
 class UserForm(UserCreationForm):
@@ -365,3 +365,13 @@ class SearchProduct(forms.Form):
 
     class Meta:
         fields = ('search',)
+
+
+class DateForm(forms.Form):
+    start_date = forms.DateField(required=False, label='Fecha Inicio')
+    end_date = forms.DateField(required=False, label='Fecha Fin')
+
+    def __init__(self, *args, **kwargs):
+        super(DateForm, self).__init__(*args, **kwargs)
+        self.fields['start_date'].widget = extras.SelectDateWidget()
+        self.fields['end_date'].widget = extras.SelectDateWidget()

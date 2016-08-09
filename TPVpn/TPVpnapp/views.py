@@ -2,9 +2,9 @@
 import copy
 from datetime import date, datetime
 
-from TPVpnapp.forms import (ClientForm, FullDirectionForm, InputMoney,
-                            LoginForm, NotificationForm, PasswordMarketForm,
-                            ProductForm, ProviderForm,
+from TPVpnapp.forms import (ClientForm, DateForm, FullDirectionForm,
+                            InputMoney, LoginForm, NotificationForm,
+                            PasswordMarketForm, ProductForm, ProviderForm,
                             RegisterBusinessForm, RegisterWorker,
                             SearchClientForm, SearchProduct,
                             SearchWorkerForm, StockForm, UserForm)
@@ -877,9 +877,7 @@ def take_sales(request):
                         aux.append(i)
 
                 serializer = SaleSerializer(aux, many=True)
-                print serializer
                 data = serializer.data
-                print json.dumps(data)
             else:
                 data['redirect'] = request.META['HTTP_ORIGIN']
         else:
@@ -909,6 +907,8 @@ def all_sales(request):
             if counter == 0:
                 categorys.append(i.category)
 
+    form = DateForm()
+
     to_return = {'worker_now': worker_now, 'categorys': categorys,
-                 'sales': sales}
+                 'sales': sales, 'form': form}
     return render(request, 'sales.html', to_return)

@@ -25,7 +25,7 @@ class WorkerSerializer(serializers.ModelSerializer):
     # vdirection = FullDirectionSerializer(read_only=True)
     class Meta:
         model = Worker
-        fields = ('url', 'dni', 'market')
+        fields = ('dni', 'market')
 
 
 class ProductSerializer(serializers.ModelSerializer):
