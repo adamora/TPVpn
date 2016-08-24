@@ -15,6 +15,7 @@ from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.serializers.json import json
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -889,26 +890,32 @@ def take_sales(request):
 
 @login_required(login_url='/')
 def all_sales(request):
+    if request.get_full_path() == '/sales/':
+        url_vars = '?'
+    else:
+        url_vars = '&'
+
     worker_now = Worker.objects.get(user=request.user)
-    aux = Sale.objects.filter(market=worker_now.market)
-
-    sales = list(aux)
-    sales.reverse()
-
+    sales_query = Sale.objects.filter(market=worker_now.market).order_by('-id')
     products = Product.objects.filter(market=worker_now.market)
-    categorys = []
-
+    categorys = set([])
     for i in products:
-        counter = 0
-        if i.category != '':
-            for j in categorys:
-                if i.category == j:
-                    counter = 1
-            if counter == 0:
-                categorys.append(i.category)
+        categorys.add((i.category, i.category))
 
-    form = DateForm()
+    form = DateForm(data=request.GET, categorys=categorys)
+    if form.is_valid():
+        criteria = form.get_filter(market=worker_now.market)
+        sales_query = sales_query.filter(**criteria)
 
-    to_return = {'worker_now': worker_now, 'categorys': categorys,
-                 'sales': sales, 'form': form}
+    paginator = Paginator(sales_query, 5)
+    page = request.GET.get('page', 1)
+    try:
+        sales = paginator.page(page)
+    except PageNotAnInteger:
+        sales = paginator.page(page)
+    except EmptyPage:
+        sales = paginator.page(paginator.num_pages)
+
+    to_return = {'worker_now': worker_now,
+                 'sales': sales, 'form': form, 'url_vars': url_vars}
     return render(request, 'sales.html', to_return)

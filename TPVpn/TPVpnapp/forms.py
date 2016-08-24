@@ -1,12 +1,14 @@
 # encoding:utf-8
+from datetime import datetime
 
 from TPVpnapp.models import (Client, FullDirection, GENRE, IVA, KINDPRODUCT,
                              Market, Notification, Product, Provider, User,
-                             Worker)
+                             Worker, Sale)
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.forms import ModelForm, extras
+from django.forms import ModelForm
+from django.utils.dateparse import parse_date
 
 
 class UserForm(UserCreationForm):
@@ -368,10 +370,55 @@ class SearchProduct(forms.Form):
 
 
 class DateForm(forms.Form):
-    start_date = forms.DateField(required=False, label='Fecha Inicio')
-    end_date = forms.DateField(required=False, label='Fecha Fin')
+    start_date = forms.CharField(required=False, label='Fecha Inicio')
+    end_date = forms.CharField(required=False, label='Fecha Fin')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, categorys=None, *args, **kwargs):
         super(DateForm, self).__init__(*args, **kwargs)
-        self.fields['start_date'].widget = extras.SelectDateWidget()
-        self.fields['end_date'].widget = extras.SelectDateWidget()
+        # self.fields['start_date'].widget = extras.SelectDateWidget()
+        self.fields['start_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker',
+            'placeholder': 'Fecha inicio'
+        }
+        # self.fields['end_date'].widget = extras.SelectDateWidget()
+        self.fields['end_date'].widget.attrs = {'class': 'form-control',
+                                                'id': 'datepicker_2',
+                                                'placeholder': 'Fecha fin'}
+        if categorys:
+            self.fields['categorys'] = forms.ChoiceField(required=False,
+                                                         label='Categorías',
+                                                         choices=categorys)
+            self.fields['categorys'].widget.attrs = {
+                'class': 'select2_single_category form-control'
+            }
+
+    def get_filter(self, market):
+        objects = self.cleaned_data
+        first_d = Sale.objects.first().date
+        last_d = Sale.objects.last().date
+
+        for field_name, val in objects.items():
+            if not val:
+                del self.cleaned_data[field_name]
+            else:
+                if field_name == 'start_date':
+                    val = '-'.join(reversed(val.split('/')))
+                    start_date = parse_date(val)
+                    first_d = datetime.combine(start_date, datetime.min.time())
+                    del self.cleaned_data[field_name]
+                elif field_name == 'end_date':
+                    val = '-'.join(reversed(val.split('/')))
+                    end_date = parse_date(val)
+                    last_d = datetime.combine(end_date, datetime.max.time())
+                    del self.cleaned_data[field_name]
+                elif field_name == 'categorys':
+                    products_query = Product.objects.filter(category=val)
+                    big_list = set([])
+                    for i in products_query:
+                        for j in i.productsale_set.all():
+                            big_list.add(j.sale.id)
+                    self.cleaned_data['id__in'] = big_list
+                    del self.cleaned_data[field_name]
+        self.cleaned_data['date__range'] = (first_d, last_d)
+        return self.cleaned_data
