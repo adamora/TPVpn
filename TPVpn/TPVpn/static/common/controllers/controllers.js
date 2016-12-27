@@ -185,8 +185,10 @@
       for (var i=0;i<$scope.listProd.length;i++){
         if (counter == 1 && $scope.listProd[i].pk == pk){
           $scope.totalPrice = Math.round(($scope.totalPrice - $scope.listProd[i].finalPrice)*100)/100;
+          $scope.devolution = Math.round(($scope.devolution + $scope.listProd[i].finalPrice)*100)/100;
         } else if (counter == 0 && $scope.listProd[i].pk === pk) {
           $scope.totalPrice = Math.round(($scope.totalPrice - $scope.listProd[i].finalPrice)*100)/100;
+          $scope.devolution = Math.round(($scope.devolution + $scope.listProd[i].finalPrice)*100)/100;
         }
         else {
           aux.push($scope.listProd[i]);

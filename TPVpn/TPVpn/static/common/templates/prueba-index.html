@@ -5,7 +5,6 @@
 {% block mainContent %}
 
 <!-- page content -->
-<div class="right_col" role="main">
   <div class="" ng-app="TPVpnapp">
   <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">
     <div class="clearfix"></div>
@@ -15,17 +14,20 @@
       <div class="col-md-6 col-sm-6 col-xs-12">
         <div class="x_panel">
             <div class="col-md-2 col-sm-2 col-xs-2">
-              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity'></input>
+              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity'>
             </div>
-            <div class="col-md-10 col-sm-10 col-xs-10">
-              <input id='barCodeInpt' type="text" class="form-control" ng-change="takeProd(takeBar)" ng-model='takeBar' placeholder="Código de barras"></input>
+            <div class="col-md-7">
+              <input id='barCodeInpt' type="text" class="form-control" ng-change="takeProd(takeBar)" ng-model='takeBar' placeholder="Código de barras">
             </div>
-            <br><div class="clearfix"></div><br>
+            <div class="col-md-3">
+            	<center><button class="btn btn-default" onClick="setPointer()" style="height: 34px;"><icon class="glyphicon glyphicon-barcode" aria-hidden="true" style="font-size: 20px;"></icon><icon class="glyphicon glyphicon-barcode" aria-hidden="true" style="font-size: 20px;"></icon></button></center>
+            </div>
+            <div class="clearfix"></div><br>
             <div class="col-md-2 col-sm-2 col-xs-2">
-              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity' style="height: 38px;"></input>
+              <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity' style="height: 38px;">
             </div>
             <div class="col-md-10 col-sm-10 col-xs-10">
-              <select class="select2_single_products form-control">
+              <select class="select2_single_products form-control" style="min-width: 100%">
                 <option></option>
                 <option ng-repeat='i in showProducts' value="{$ i.id $};;{$ i.name $};;{$ i.sellPrice $}">{$ i.name $}</option>
               </select>
@@ -34,10 +36,10 @@
 
             <form>
               <div class="col-md-3 col-sm-3 col-xs-3">
-                <input type="text" class="form-control" ng-model='improvisePrice' placeholder="Precio €"></input>
+                <input type="text" class="form-control" ng-model='improvisePrice' placeholder="Precio €">
               </div>
               <div class="col-md-7 col-sm-7 col-xs-7">
-                <input type="text" class="form-control" ng-model='improviseName' placeholder="Producto improvisado"></input>
+                <input type="text" class="form-control" ng-model='improviseName' placeholder="Producto improvisado">
               </div>
               <div class="col-md-2 col-sm-2 col-xs-2">
                 <button type='submit' class='btn btn-success' ng-click="addList('null' + improviseName + improvisePrice,improviseName,improvisePrice); improviseName=''; improvisePrice=0">Añadir</button>
@@ -128,7 +130,7 @@
           <div class="x_panel" ng-show="showClient">
 
             <div class="col-md-2 col-sm-2 col-xs-2">
-              <img src="{$ actualClient.image $}" title="{$ actualClient.name $}" class="avatar" style="height:70px;width:70px"></img>
+              <img src="{$ actualClient.image $}" title="{$ actualClient.name $}" class="avatar" style="height:70px;width:70px">
             </div>
             <div class="col-md-5 col-sm-5 col-xs-5">
               <small>Bienvenido,</small>
@@ -157,22 +159,16 @@
                     <td>{$ totalPrice $}€</td>
                   </tr>
                   <tr>
-                    <th>Efectivo:</th>
+                    <th>Efectivo(€):</th>
                     <td>
-                      <div class="col-md-9 col-sm-9 col-xs-11">
-                        <input type='text' class="form-control" style="height: 25px;" onClick='this.select();' ng-model='moneyFromClient' ng-change='updateDevolution()'></input>
-                      </div>
-                      <div class="col-md-1 col-sm-1 col-xs-1">€</div>
+                        <input type='text' class="form-control" style="height: 28px; max-width: 100%;" onClick='this.select();' ng-model='moneyFromClient' ng-change='updateDevolution()'>
                     </td>
                   </tr>
                   <tr>
-                    <th>Monedero:</th>
+                    <th>Monedero(€):</th>
                     <td ng-show="!showClient">0€</td>
                     <td ng-show="showClient">
-                      <div class="col-md-9 col-sm-9 col-xs-11">
-                        <input type='text' class="form-control" style="height: 25px;" onClick='this.select();' ng-model='moneyFromWallet' ng-change='updateDevolution()'></input>
-                      </div>
-                      <div class="col-md-1 col-sm-1 col-xs-1">€</div>
+                        <input type='text' class="form-control" style="height: 25px;" onClick='this.select();' ng-model='moneyFromWallet' ng-change='updateDevolution()'>
                     </td>
                   </tr>
                   <tr>
@@ -187,7 +183,7 @@
                 <thead>
                   <tr>
                     <th>IVA</th>
-                    <th>B. Impon.</th>
+                    <th>B. Im.</th>
                     <th>Cuota</th>
                   </tr>
                 </thead>
@@ -239,6 +235,7 @@
   <link href="{% static "common/templates/css/select/select2.min.css" %} " rel="stylesheet">
   <script>
       $(document).ready(function () {
+          $('#menu_toggle').click();
           $(".select2_single_products").select2({
               placeholder: "Seleccione producto",
               allowClear: true
@@ -369,6 +366,12 @@
       if(e.which == 18)
         alt = false;
     };
+
+    //setPointer()
+    function setPointer() {
+    	var input = $("#barCodeInpt");
+		$("#barCodeInpt").focus();
+    }
   </script>
   <!-- /shortcuts -->
 

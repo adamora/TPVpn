@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>TPV | Pequeño Comercio</title>
+    <title>{{worker_now.market.name.upper}}</title>
 
     <!-- Bootstrap core CSS -->
 
@@ -41,7 +41,7 @@
                 <div class="left_col scroll-view">
 
                     <div class="navbar nav_title" style="border: 0;">
-                        <a href="/index" class="site_title"><i class="fa fa-paw"></i> <span> tpvPC </span></a>
+                        <a href="/index" class="site_title"><i class="fa fa-paw"></i> <span> {{worker_now.market.name.upper}} </span></a>
                     </div>
                     <div class="clearfix"></div>
 
@@ -112,7 +112,7 @@
 
                     <!-- /menu footer buttons -->
                     <div class="sidebar-footer hidden-small">
-                        <a data-toggle="tooltip" data-placement="top" title="Configuración">
+                        <a data-toggle="tooltip" data-placement="top" title="Configuración" href="/configuration/">
                             <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                         </a>
                         <a data-toggle="tooltip" data-placement="top" title="Pantalla Completa">
@@ -151,19 +151,22 @@
                                     </li>
                                 </ul>
                             </li>
-
+                            <li>
                                 {% if not fail == None %}
                                 <li role="presentation" class="dropdown open">
                                 <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="true">
                                     <i class="fa fa-envelope-o"></i>
                                         <span class="badge bg-red">1</span>
+                                </a>
+                                </li>
                                 {% else %}
                                 <li role="presentation" class="dropdown">
                                 <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-envelope-o"></i>
                                         <span class="badge">0</span>
-                                {% endif %}
                                 </a>
+                                </li>
+                                {% endif %}
                                 <ul id="menu1" class="dropdown-menu list-unstyled msg_list animated fadeInDown" role="menu">
                                     {% if not fail == None %}
                                     <li>
@@ -184,8 +187,8 @@
                                     <li>
                                         <div class="text-center">
                                             <a>
-                                                <strong><a href="/employer_profile/{{worker_now.pk}}">Ver todas mis alertas</strong>
-                                                <i class="fa fa-angle-right"></i>
+                                                <strong><a href="/employer_profile/{{worker_now.pk}}">Ver todas mis alertas
+                                                <i class="fa fa-angle-right"></i></a></strong>
                                             </a>
                                         </div>
                                     </li>
@@ -197,8 +200,19 @@
                 </div>
 
             </div>
+        </div>
             <!-- /top navigation -->
-
+        <div class="right_col" role="main">
+            {% if messages %}
+            <div class="col-md-12">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{message.tags}}{% else %}warning{% endif %} alert-dismissible" role="alert" style="opacity: 0.60;">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b style="opacity: 10;">&times;</b></span></button>
+                  {{message}} 
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% block mainContent %}{% endblock %}
 
                <footer>

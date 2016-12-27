@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'TPVpnapp',
     'rest_framework',
     'corsheaders',
+    'django_tables2',
 )
 
 MIDDLEWARE_CLASSES = (

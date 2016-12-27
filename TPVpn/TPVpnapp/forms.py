@@ -1,9 +1,9 @@
 # encoding:utf-8
 from datetime import datetime
 
-from TPVpnapp.models import (Client, FullDirection, GENRE, IVA, KINDPRODUCT,
-                             Market, Notification, Product, Provider, User,
-                             Worker, Sale)
+from TPVpnapp.models import (Client, Configuration, FullDirection, GENRE, IVA,
+                             KINDPRODUCT, Market, Notification, Product,
+                             Provider, User, Worker, Sale)
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -233,11 +233,7 @@ class ProviderForm(ModelForm):
 
 class ProductForm(ModelForm):
     provider = forms.ModelChoiceField(required=True, label='',
-                                      queryset=Provider.objects.all(),
-                                      widget=forms.Select(
-                                          attrs={'class':
-                                                 'select2_single form-control'
-                                                 'col-md-7 col-xs-12'}))
+                                      queryset=Provider.objects.all())
     name = forms.CharField(required=True, label='',
                            widget=forms.TextInput(
                                attrs={'class':
@@ -290,6 +286,12 @@ class ProductForm(ModelForm):
         fields = ('name', 'provider', 'category', 'subcategory', 'brand',
                   'buyPrice', 'sellPrice', 'amount', 'kind', 'iva', 'barCode',
                   'image')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.fields['provider'].widget.attrs = {
+            'class': 'select2_single_provider form-control',
+        }
 
 
 class StockForm(forms.Form):
@@ -360,7 +362,7 @@ class SearchProduct(forms.Form):
                              widget=forms.TextInput(
                                  attrs={
                                      'class': 'form-control',
-                                     'placeholder': 'Buscar...',
+                                     'placeholder': 'Buscar por nombre...',
                                      'title':
                                      'Nombre, Marca, Proveedor, Categoría o '
                                      'Código de Barras'}))
@@ -368,10 +370,20 @@ class SearchProduct(forms.Form):
     class Meta:
         fields = ('search',)
 
+    def get_filter(self):
+        my_filter = {}
+        cleaned_data = self.cleaned_data
+        for key, value in cleaned_data.items():
+            if key == 'search' and value:
+                my_filter.update({'name__icontains': value})
+        return my_filter
+
 
 class DateForm(forms.Form):
     start_date = forms.CharField(required=False, label='Fecha Inicio')
     end_date = forms.CharField(required=False, label='Fecha Fin')
+    iva = forms.ChoiceField(required=False, label='IVA', choices=IVA,
+                            initial='')
 
     def __init__(self, categorys=None, *args, **kwargs):
         super(DateForm, self).__init__(*args, **kwargs)
@@ -392,11 +404,16 @@ class DateForm(forms.Form):
             self.fields['categorys'].widget.attrs = {
                 'class': 'select2_single_category form-control'
             }
+            self.fields['iva'].widget.attrs = {
+                'class': 'select2_single_iva form-control'
+            }
 
     def get_filter(self, market):
         objects = self.cleaned_data
         first_d = Sale.objects.first().date
         last_d = Sale.objects.last().date
+        big_list = None
+        big_list_two = None
 
         for field_name, val in objects.items():
             if not val:
@@ -406,19 +423,107 @@ class DateForm(forms.Form):
                     val = '-'.join(reversed(val.split('/')))
                     start_date = parse_date(val)
                     first_d = datetime.combine(start_date, datetime.min.time())
-                    del self.cleaned_data[field_name]
                 elif field_name == 'end_date':
                     val = '-'.join(reversed(val.split('/')))
                     end_date = parse_date(val)
                     last_d = datetime.combine(end_date, datetime.max.time())
-                    del self.cleaned_data[field_name]
                 elif field_name == 'categorys':
-                    products_query = Product.objects.filter(category=val)
+                    products_query = Product.objects.filter(category=val,
+                                                            market=market)
                     big_list = set([])
                     for i in products_query:
                         for j in i.productsale_set.all():
                             big_list.add(j.sale.id)
+                    if big_list_two:
+                        big_list = big_list.intersection(big_list_two)
                     self.cleaned_data['id__in'] = big_list
-                    del self.cleaned_data[field_name]
+                elif field_name == 'iva':
+                    products_query = Product.objects.filter(market=market,
+                                                            iva=val)
+                    big_list_two = set([])
+                    for i in products_query:
+                        for j in i.productsale_set.all():
+                            big_list_two.add(j.sale.id)
+                    if big_list:
+                        big_list = big_list.intersection(big_list_two)
+                    else:
+                        big_list = big_list_two
+                    self.cleaned_data['id__in'] = big_list
+                del self.cleaned_data[field_name]
         self.cleaned_data['date__range'] = (first_d, last_d)
+        return self.cleaned_data
+
+
+class ConfigurationForm(forms.ModelForm):
+
+    class Meta:
+        model = Configuration
+        exclude = ('worker', )
+
+    def __init__(self, worker_now=None, *args, **kwargs):
+        super(ConfigurationForm, self).__init__(*args, **kwargs)
+        self.fields['max_negative_wallet'].initial = 0.0
+
+    def clean_stock_enabled(self):
+        val = self.cleaned_data.get('stock_enabled', None)
+        if not val:
+            self.cleaned_data['stock_enabled'] = False
+        else:
+            self.cleaned_data['stock_enabled'] = True
+
+        return self.cleaned_data['stock_enabled']
+
+    def clean_max_negative_wallet(self):
+        val = self.cleaned_data.get('max_negative_wallet', None)
+        if not val:
+            self.cleaned_data['max_negative_wallet'] = None
+        else:
+            self.cleaned_data['max_negative_wallet'] = float(val)
+
+        return self.cleaned_data['max_negative_wallet']
+
+    def full_save(self, worker_now):
+        instance = self.save(commit=False)
+        instance.worker = worker_now
+        instance.save()
+
+        return instance
+
+
+class ProductFilterForm(forms.Form):
+    bar_code = forms.CharField(required=False, label='Código de barras')
+    provider = forms.CharField(required=False, label='Proveedor')
+    brand = forms.CharField(required=False, label='Marca')
+    iva = forms.ChoiceField(required=False, label='IVA', choices=IVA,
+                            initial='')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductFilterForm, self).__init__(*args, **kwargs)
+        self.fields['bar_code'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Código de Barras'}
+        self.fields['provider'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Proveedor'}
+        self.fields['brand'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Marca'}
+        self.fields['iva'].widget.attrs = {
+            'class': 'select2_single_iva form-control'
+        }
+
+    def get_filter(self):
+        for key, value in self.cleaned_data.items():
+            del self.cleaned_data[key]
+            if value:
+                if key == 'bar_code':
+                    self.cleaned_data.update(
+                        {'barCode__icontains': value})
+                elif key == 'provider':
+                    self.cleaned_data.update(
+                        {'provider__namePro__icontains': value})
+                elif key == 'brand':
+                    self.cleaned_data.update({'brand__icontains': value})
+                elif key == 'iva':
+                    self.cleaned_data.update({'iva': value})
         return self.cleaned_data

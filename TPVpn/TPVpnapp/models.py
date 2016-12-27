@@ -50,6 +50,7 @@ KINDPRODUCT = (
 )
 
 IVA = (
+    ('', 'IVA'),
     (21, '21%'),
     (10, '10%'),
     (4, '4%'),
@@ -87,6 +88,7 @@ class Product(models.Model):
         return unicode(self.name)
 
 GENRE = (
+    ('', '------'),
     ('Hombre', 'Hombre'),
     ('Mujer', 'Mujer'),
 )
@@ -109,6 +111,9 @@ class Worker(models.Model):
 
     def __unicode__(self):
         return unicode(self.user.username)
+
+    def get_full_name(self):
+        return unicode(user.first_name + ' ' + user.last_name)
 
 
 class Client(models.Model):
@@ -181,3 +186,15 @@ class Notification(models.Model):
 
     def __unicode__(self):
         return unicode(self.pk)
+
+
+class Configuration(models.Model):
+    worker = models.OneToOneField(Worker)
+    stock_enabled = models.BooleanField(default=True)
+    max_negative_wallet = models.FloatField(
+        blank=True, null=True,
+        verbose_name='¿Valor tope minimo del monedero?'
+    )
+
+    def __unicode__(self):
+        return self.worker.get_full_name()

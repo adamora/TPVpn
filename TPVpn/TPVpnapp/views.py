@@ -2,25 +2,30 @@
 import copy
 from datetime import date, datetime
 
-from TPVpnapp.forms import (ClientForm, DateForm, FullDirectionForm,
-                            InputMoney, LoginForm, NotificationForm,
-                            PasswordMarketForm, ProductForm, ProviderForm,
-                            RegisterBusinessForm, RegisterWorker,
+from TPVpnapp.forms import (ClientForm, ConfigurationForm, DateForm,
+                            FullDirectionForm, InputMoney, LoginForm,
+                            NotificationForm, PasswordMarketForm, ProductForm,
+                            ProviderForm, RegisterBusinessForm, RegisterWorker,
                             SearchClientForm, SearchProduct,
-                            SearchWorkerForm, StockForm, UserForm)
-from TPVpnapp.models import (Client, Market, Notification, Product,
-                             ProductSale, Provider, Sale, Worker)
+                            SearchWorkerForm, StockForm, UserForm,
+                            ProductFilterForm)
+from TPVpnapp.models import (Client, Configuration, Market, Notification,
+                             Product, ProductSale, Provider, Sale, Worker)
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
                                   SaleSerializer)
+from .tables import ProductTable
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.serializers.json import json
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template import RequestContext
-from django.views.decorators.csrf import csrf_exempt
+from django_tables2.config import RequestConfig
+# from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.renderers import JSONRenderer
 
@@ -332,99 +337,54 @@ def new_product(request):
     return render(request, 'productForm.html', to_return)
 
 
+def get_worker_market(request):
+    try:
+        worker = Worker.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        messages.error(
+            request,
+            'El trabajador no está registrado en la plataforma.')
+
+    return worker, worker.market
+
+
 @login_required(login_url='/')
 def list_products(request):
-    worker_now = Worker.objects.get(user=request.user)
-    market_now = worker_now.market
+    worker_now, market_now = get_worker_market(request)
     products = Product.objects.filter(market=market_now)
     fail = None
-
-    if request.method == 'POST':
-        search_product = SearchProduct(request.POST)
-        mod_quantity = StockForm(request.POST)
-        if 'searching' in request.POST:
-            if request.POST['searching'] == 'searchProd':
-                if search_product.is_valid():
-                    aux = search_product['search'].value()
-                    if aux != '':
-                        cad = aux.split(' ')
-                        aux_cad = []
-                        for word in cad:
-                            aux_n = Product.objects.filter(
-                                market=market_now,
-                                name__icontains=word)
-                            aux_b = Product.objects.filter(
-                                brand__icontains=word, market=market_now)
-                            aux_p = Product.objects.filter(
-                                market=market_now,
-                                provider__namePro__icontains=word)
-                            aux_c = Product.objects.filter(
-                                category__icontains=word, market=market_now)
-                            aux_sc = Product.objects.filter(
-                                subcategory__icontains=word, market=market_now)
-                            aux_bc = Product.objects.filter(
-                                barCode__icontains=word, market=market_now)
-                            if (aux_n or aux_b or aux_p or aux_c or aux_sc or
-                                    aux_bc):
-                                for i in (list(aux_n) + list(aux_b) +
-                                          list(aux_p) + list(aux_c) +
-                                          list(aux_sc) + list(aux_bc)):
-                                    counter = 0
-                                    for j in aux_cad:
-                                        if i == j:
-                                            counter = 1
-                                    if counter == 0:
-                                        if i:
-                                            aux_cad.append(i)
-                        if not aux_cad:
-                            fail = "title: 'Error', type: 'error', text: 'No \
-                                    se han encontrado productos.'"
-                        else:
-                            products = aux_cad
-        if 'newQuantity' in request.POST:
-            for i in products:
-                if request.POST['newQuantity'] == str(i.pk):
-                    if mod_quantity.is_valid():
-                        if (mod_quantity['new'].value() and
-                                mod_quantity['add'].value()):
-                            mod_quantity['new'].error = '¡Error! Ambos campos \
-                                                        no pueden ser \
-                                                        cumplimentados.'
-                            fail = "title: 'Error', type: 'error', text: \
-                                    'Ambos campos de stock en \
-                                    <big><b>" + i.name + "</b></big> \
-                                    no pueden ser cumplimentados.'"
-                        elif mod_quantity['new'].value() != '':
-                            if float(mod_quantity['new'].value()) < 0:
-                                mod_quantity['new'].error = '¡Error! El valor \
-                                                            debe ser mayor o \
-                                                            igual a cero.'
-                                fail = "title: 'Error', type: 'error', \
-                                        text: 'El valor introducido en \
-                                        <big><b>" + i.name + "</b></big> debe \
-                                        ser mayor o igual a cero.'"
-                            else:
-                                i.amount = mod_quantity['new'].value()
-                                i.save()
-                        elif mod_quantity['add'].value() != '':
-                            i.amount += float(mod_quantity['add'].value())
-                            i.save()
-                        else:
-                            mod_quantity['new'].error = '¡Error! Uno de los \
-                                                        campos debe ser \
-                                                        cumplimentado.'
-                            fail = "title: 'Aviso', type: 'warning', \
-                                    text: 'Uno de los campos de stock en \
-                                    <big><b>" + i.name + "</b></big> \
-                                    debe ser cumplimentado.'"
-
+    search_product = SearchProduct(request.GET)
+    filter_products = ProductFilterForm(request.GET)
+    if search_product.is_valid():
+        criteria = search_product.get_filter()
+        if criteria:
+            products_filtered = products.filter(**criteria)
+            if not products_filtered:
+                messages.warning(request,
+                                 ('No se han encontrado resultados ' +
+                                  'con el nombre especificado'))
+            else:
+                products = products_filtered
+    if filter_products.is_valid():
+        criteria = filter_products.get_filter()
+        if criteria:
+            products_filtered = products.filter(**criteria)
+            if not products_filtered:
+                messages.warning(request,
+                                 ('No se han encontrado resultados ' +
+                                  'con los filtros aplicados'))
+            else:
+                products = products_filtered
+    mod_quantity = StockForm(request.POST)
+    if products:
+        table = ProductTable(products)
+        RequestConfig(request, paginate={'per_page': 5}).configure(table)
     else:
-        search_product = SearchProduct()
-        mod_quantity = StockForm()
-
+        table = None
     to_return = {'worker_now': worker_now, 'market_now': market_now,
-                 'products': products, 'search_product': search_product,
-                 'mod_quantity': mod_quantity, 'fail': fail}
+                 'search_product': search_product,
+                 'mod_quantity': mod_quantity, 'fail': fail, 'table': table,
+                 'filter_products': filter_products}
 
     return render(request, 'products.html', to_return)
 
@@ -861,7 +821,7 @@ def cash_flows(request):
 
 
 # Only takes last 7 days (Optimal For Graph)
-@csrf_exempt
+# @csrf_exempt
 def take_sales(request):
     if request.method == 'POST':
         if request.POST['operation'] == 'takeSales':
@@ -874,7 +834,7 @@ def take_sales(request):
                 sales = Sale.objects.filter(market=market_now)
                 aux = []
                 for i in sales:
-                    if abs(sales.last().date - i.date).days <= 7:
+                    if abs(sales.last().date - i.date).days <= 30:
                         aux.append(i)
 
                 serializer = SaleSerializer(aux, many=True)
@@ -888,8 +848,25 @@ def take_sales(request):
     return HttpResponse(json.dumps(data))
 
 
+def redirect_sales_by_page(request):
+    complete_path = request.GET.get('complete_path', None)
+    page_number = request.GET.get('page_number', None)
+
+    if page_number and complete_path:
+        if '?page=' in complete_path or complete_path == '/sales/':
+            return redirect(
+                complete_path.split('?page=')[0] + '?page=' + page_number)
+        else:
+            return redirect(
+                complete_path.split('&page=')[0] + '&page=' + page_number)
+
+
 @login_required(login_url='/')
 def all_sales(request):
+    action = redirect_sales_by_page(request)
+    if action:
+        return action
+
     if request.get_full_path() == '/sales/':
         url_vars = '?'
     else:
@@ -898,7 +875,7 @@ def all_sales(request):
     worker_now = Worker.objects.get(user=request.user)
     sales_query = Sale.objects.filter(market=worker_now.market).order_by('-id')
     products = Product.objects.filter(market=worker_now.market)
-    categorys = set([])
+    categorys = set([('', '*Categorías*'), ])
     for i in products:
         categorys.add((i.category, i.category))
 
@@ -919,3 +896,28 @@ def all_sales(request):
     to_return = {'worker_now': worker_now,
                  'sales': sales, 'form': form, 'url_vars': url_vars}
     return render(request, 'sales.html', to_return)
+
+
+@login_required(login_url='/')
+def configuration(request):
+    worker_now = Worker.objects.get(user=request.user)
+    message = ''
+    if request.method == 'GET':
+        try:
+            instance_conf = Configuration.objects.get(worker=worker_now)
+            form = ConfigurationForm(worker_now=worker_now,
+                                     instance=instance_conf)
+        except ObjectDoesNotExist:
+            form = ConfigurationForm()
+    elif request.method == 'POST':
+        if request.POST.get('stock_enabled', None):
+            form = ConfigurationForm(data=request.POST)
+        else:
+            form = ConfigurationForm(data=request.POST,
+                                     initial={'stock_enabled': False})
+        if form.is_valid():
+            form.full_save(worker_now)
+            message = 'Configuración actualiada satisfactoriamente.'
+
+    to_return = {'worker_now': worker_now, 'form': form, 'message': message}
+    return render(request, 'configuration.html', to_return)

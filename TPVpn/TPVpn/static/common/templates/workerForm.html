@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
     {% load staticfiles %}
 {% block mainContent %}
-  <div class="right_col" role="main">
-
-      <div class="">
+      <div class="row">
           <div class="page-title">
               <div class="title_left">
                   <h3>Registrar trabajador en {{ worker_now.market }}</h3>
@@ -299,17 +297,20 @@
 
 
   {% block scripts %}
+    <!--
     <script src="{% static "common/templates/js/bootstrap.min.js" %}"></script>
 
-    <!-- chart js -->
+
     <script src="{% static "common/templates/js/chartjs/chart.min.js" %}"></script>
-    <!-- bootstrap progress js -->
+
     <script src="{% static "common/templates/js/progressbar/bootstrap-progressbar.min.js" %}"></script>
     <script src="{% static "common/templates/js/nicescroll/jquery.nicescroll.min.js" %}"></script>
-    <!-- icheck -->
+
     <script src="{% static "common/templates/js/icheck/icheck.min.js" %}"></script>
 
     <script src="{% static "common/templates/js/custom.js" %}"></script>
+    -->
+    
     <!-- form wizard -->
     <script type="text/javascript" src="{% static "common/templates/js/wizard/jquery.smartWizard.js" %}"></script>
     <script type="text/javascript">
