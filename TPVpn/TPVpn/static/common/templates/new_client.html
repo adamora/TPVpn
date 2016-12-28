@@ -18,7 +18,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Nuevo cliente <small>(introduzca los datos para agregar un cliente al comercio)</small></h2>
+                        <h2><small>Introduzca los datos para agregar un cliente al comercio</small></h2>
 
                         <div class="clearfix"></div>
                     </div>
@@ -73,6 +73,12 @@
                                         </label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
                                             {{ new_client.image }}
+                                            <label for="id_image">
+                                                <a class="btn btn-default">Seleccione un archivo</a>
+                                                <a id="modal-button" data-toggle="modal" data-target="#myModal" hidden="">
+                                                 ó Previsualizar Imagen
+                                                </a>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -96,6 +102,23 @@
 
     <div class="clearfix"></div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Previsualizar Imagen</h4>
+          </div>
+          <div class="modal-body col-md-12">
+            <img id="image_to_show" style="max-width: 100%" />  
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% block scripts %}
         <!-- switchery -->
@@ -105,6 +128,20 @@
         <script type="text/javascript">
             $(document).ready(function () {
             	autosize($('.resizable_textarea'));
+                $('#id_image').hide();
+                document.getElementById("id_image").onchange = function () {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        // get loaded data and render thumbnail.
+                        document.getElementById("image_to_show").src = e.target.result;
+                    };
+
+                    // read the image file as a data URL.
+                    reader.readAsDataURL(this.files[0]);
+                    $('#myModal').modal('show');
+                    $('#modal-button').show();
+                };
             });
         </script>
 
