@@ -137,6 +137,12 @@
                                                 </label>
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                     {{ newprod.image }}
+                                                    <label for="id_image">
+                                                        <a class="btn btn-default"><icon class="glyphicon glyphicon-open"></icon> Seleccione un archivo</a>
+                                                        <a id="modal-button" data-toggle="modal" data-target="#myModal" hidden="">
+                                                         ó Previsualizar Imagen
+                                                        </a>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
@@ -202,6 +208,24 @@
         </div>
         <!-- /END MODAL -->
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Previsualizar Imagen</h4>
+          </div>
+          <div class="modal-body col-md-12">
+            <img id="image_to_show" style="max-width: 100%" />  
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="clearfix"></div>
 
 
@@ -210,6 +234,27 @@
         <script src="{% static "common/templates/js/switchery/switchery.min.js" %} "></script>
         <!-- textarea resize -->
         <script src="{% static "common/templates/js/textarea/autosize.min.js" %} "></script>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                autosize($('.resizable_textarea'));
+                $('#id_image').hide();
+                document.getElementById("id_image").onchange = function () {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        // get loaded data and render thumbnail.
+                        document.getElementById("image_to_show").src = e.target.result;
+                    };
+
+                    // read the image file as a data URL.
+                    reader.readAsDataURL(this.files[0]);
+                    $('#myModal').modal('show');
+                    $('#modal-button').show();
+                };
+            });
+        </script>
+
         <script>
             autosize($('.resizable_textarea'));
         </script>

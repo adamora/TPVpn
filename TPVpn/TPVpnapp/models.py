@@ -43,6 +43,15 @@ class Provider(models.Model):
     def __unicode__(self):
         return unicode(self.namePro)
 
+
+class Offer(models.Model):
+    offer = models.FloatField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __unicode__(self):
+        return unicode(self.pk)
+
 KINDPRODUCT = (
     ('Unidades', 'Unidades'),
     ('Kilos', 'Kilos'),
@@ -68,7 +77,7 @@ class Product(models.Model):
     )
     buyPrice = models.FloatField(max_length=10, blank=True, null=True)
     sellPrice = models.FloatField(max_length=10, blank=False, null=False)
-    offer = models.FloatField(blank=True, null=True)
+    offer = models.ForeignKey(Offer, blank=True, null=True)
     amount = models.FloatField(max_length=10, blank=True, null=True)
     kind = models.CharField(
         max_length=20, blank=False, null=False,
@@ -113,7 +122,7 @@ class Worker(models.Model):
         return unicode(self.user.username)
 
     def get_full_name(self):
-        return unicode(user.first_name + ' ' + user.last_name)
+        return unicode(self.user.first_name + ' ' + self.user.last_name)
 
 
 class Client(models.Model):

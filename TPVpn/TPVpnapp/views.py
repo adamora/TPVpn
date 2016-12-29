@@ -8,7 +8,7 @@ from TPVpnapp.forms import (ClientForm, ConfigurationForm, DateForm,
                             ProviderForm, RegisterBusinessForm, RegisterWorker,
                             SearchClientForm, SearchProduct,
                             SearchWorkerForm, StockForm, UserForm,
-                            ProductFilterForm)
+                            ProductFilterForm, OfferForm)
 from TPVpnapp.models import (Client, Configuration, Market, Notification,
                              Product, ProductSale, Provider, Sale, Worker)
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
@@ -310,7 +310,7 @@ def new_product(request):
             if newprod.is_valid():
                 prod = newprod.save(commit=False)
                 prod.market = worker_now.market
-                prod.offer = prod.sellPrice
+                # prod.offer = prod.sellPrice
                 if not prod.barCode:
                     prod.barCode = 'Vacio'
                 if newprod['image'].value():
@@ -323,6 +323,9 @@ def new_product(request):
                                                ser mayor a 0!'
                 else:
                     prod.save()
+                    messages.success(request, ('Se ha registrado el producto' +
+                                               ' "%(prod)s" satisfactoriamente'
+                                               % {'prod': prod.name}))
                     return redirect('/new_product')
             else:
                 print "¡Error!: No se han cumplimentado correctamente los \
@@ -355,6 +358,36 @@ def list_products(request):
     fail = None
     search_product = SearchProduct(request.GET)
     filter_products = ProductFilterForm(request.GET)
+    mod_quantity = StockForm(request.POST)
+    offer_form = OfferForm(request.POST)
+
+    if request.method == 'POST':
+        if offer_form.is_valid(request):
+            instance_offer = offer_form.save()
+            inst_prod = products.get(id=request.POST['o_prod_id'])
+            try:
+                if inst_prod.offer:
+                    inst_prod.offer.delete()
+                    inst_prod.save()
+            except ObjectDoesNotExist:
+                pass
+            inst_prod.offer = instance_offer
+            inst_prod.save()
+            products = Product.objects.filter(market=market_now)
+            offer_form = OfferForm()
+        id_prod_q = request.POST.get('q_prod_id', None)
+        if id_prod_q:
+            q_instance_prod = products.get(id=id_prod_q)
+            if mod_quantity.is_valid(request, instance_prod=q_instance_prod):
+                cleaned_quantity = mod_quantity.cleaned_data
+                for key, value in cleaned_quantity.items():
+                    if value and key == 'new':
+                        q_instance_prod.amount = float(value)
+                    elif value:
+                        q_instance_prod.amount += float(value)
+                q_instance_prod.save()
+                products = Product.objects.filter(market=market_now)
+                mod_quantity = StockForm()
     if search_product.is_valid():
         criteria = search_product.get_filter()
         if criteria:
@@ -375,7 +408,6 @@ def list_products(request):
                                   'con los filtros aplicados'))
             else:
                 products = products_filtered
-    mod_quantity = StockForm(request.POST)
     if products:
         table = ProductTable(products)
         RequestConfig(request, paginate={'per_page': 5}).configure(table)
@@ -384,7 +416,8 @@ def list_products(request):
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'search_product': search_product,
                  'mod_quantity': mod_quantity, 'fail': fail, 'table': table,
-                 'filter_products': filter_products}
+                 'filter_products': filter_products,
+                 'offer_form': offer_form}
 
     return render(request, 'products.html', to_return)
 
@@ -397,6 +430,19 @@ def delete_product(request, product_id):
 
     if product:
         product.delete()
+    # else:
+        # AGREGAR UNA NOTIFICACION AL USUARIO
+    return redirect('/products')
+
+
+@login_required(login_url='/')
+def delete_offer(request, product_id):
+    worker, market_now = get_worker_market(request)
+    product = Product.objects.get(id=product_id, market=market_now)
+
+    if product:
+        product.offer.delete()
+        product.save()
     # else:
         # AGREGAR UNA NOTIFICACION AL USUARIO
     return redirect('/products')
@@ -421,7 +467,7 @@ def modify_product(request, product_id):
         if request.POST['inputInNewProd'] == 'newProd':
             if newprod.is_valid():
                 prod = newprod.save(commit=False)
-                prod.offer = prod.sellPrice
+                # prod.offer = prod.sellPrice
                 if not prod.barCode:
                     prod.barCode = 'Vacio'
                 if prod.buyPrice > prod.sellPrice:

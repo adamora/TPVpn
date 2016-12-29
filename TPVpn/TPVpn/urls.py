@@ -53,6 +53,8 @@ urlpatterns = [
     url(r'^takeSales/$', 'TPVpnapp.views.take_sales'),
     url(r'^sales/$', 'TPVpnapp.views.all_sales'),
     url(r'^configuration/$', 'TPVpnapp.views.configuration'),
+    url(r'^offer/delete/(?P<product_id>[0-9]+)/$',
+        'TPVpnapp.views.delete_offer'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

@@ -3,9 +3,10 @@ from datetime import datetime
 
 from TPVpnapp.models import (Client, Configuration, FullDirection, GENRE, IVA,
                              KINDPRODUCT, Market, Notification, Product,
-                             Provider, User, Worker, Sale)
+                             Provider, User, Worker, Sale, Offer)
 
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.forms import ModelForm
 from django.utils.dateparse import parse_date
@@ -251,11 +252,12 @@ class ProductForm(ModelForm):
                             widget=forms.TextInput(
                                 attrs={'class':
                                        'form-control col-md-7 col-xs-12'}))
-    buyPrice = forms.FloatField(required=True, label='',
-                                widget=forms.TextInput(
-                                    attrs={'class':
-                                           'form-control col-md-7 col-xs-12',
-                                           'placeholder': 'Ej: 5,50'}))
+    buyPrice = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "any",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     kind = forms.ChoiceField(required=True, choices=KINDPRODUCT, label='',
                              widget=forms.Select(
                                  attrs={'class':
@@ -263,23 +265,26 @@ class ProductForm(ModelForm):
     iva = forms.ChoiceField(required=True, choices=IVA, label='',
                             widget=forms.Select(attrs={
                                 'class': 'form-control'}))
-    amount = forms.FloatField(required=True, label='',
-                              widget=forms.TextInput(
-                                  attrs={'class':
-                                         'form-control col-md-7 col-xs-12',
-                                         'placeholder': 'Ej: 10,3'}))
-    sellPrice = forms.FloatField(required=True, label='',
-                                 widget=forms.TextInput(
-                                     attrs={'placeholder': 'Ej: 5,50',
-                                            'class':
-                                            'form-control col-md-7 col-xs-12'
-                                            }))
+    amount = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "any",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    sellPrice = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "any",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     barCode = forms.CharField(required=False, label='',
                               widget=forms.TextInput(
                                   attrs={
                                       'class':
                                       'form-control col-md-7 col-xs-12'}))
-    image = forms.ImageField(required=False, widget=forms.FileInput, label='')
+    image = forms.ImageField(
+        required=False, label='',
+        widget=forms.FileInput(attrs={'hide': ''}))
 
     class Meta:
         model = Product
@@ -295,20 +300,48 @@ class ProductForm(ModelForm):
 
 
 class StockForm(forms.Form):
-    new = forms.CharField(required=False, label='',
-                          widget=forms.TextInput(
-                              attrs={'placeholder': '', 'title': '', 'class':
-                                     'form-control col-md-7 col-xs-12'}))
-    add = forms.CharField(required=False, label='',
-                          widget=forms.TextInput(
-                              attrs={'class':
-                                     'form-control col-md-7 col-xs-12',
-                                     'placeholder':
-                                     'Ejemplo: 1, -5, 1.5, etc.',
-                                     'title': ''}))
+    new = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'type': 'number',
+                   'class': 'form-control',
+                   'step': "any",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    add = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'type': 'number',
+                   'class': 'form-control',
+                   'step': "any",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
 
     class Meta:
         fields = ('new', 'add')
+
+    def is_valid(self, request, instance_prod):
+        if super(StockForm, self).is_valid():
+            cleaned_data = self.cleaned_data
+            try:
+                data = [float(i) for i in cleaned_data.values() if i]
+            except:
+                messages.error(request,
+                               ("El formato de los campos " +
+                                "introducidos no es correcto. " +
+                                "Solo valores numéricos."))
+                return False
+            if data:
+                if len(data) > 1:
+                    messages.error(
+                        request,
+                        ("Ha rellenado los dos campos de Stock " +
+                         "en el producto '%(prod)s'" %
+                         {'prod': instance_prod.name}))
+                    return False
+            else:
+                return False
+            return True
+        else:
+            return False
 
 
 class ClientForm(ModelForm):
@@ -527,3 +560,38 @@ class ProductFilterForm(forms.Form):
                 elif key == 'iva':
                     self.cleaned_data.update({'iva': value})
         return self.cleaned_data
+
+
+class OfferForm(forms.ModelForm):
+    class Meta:
+        model = Offer
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(OfferForm, self).__init__(*args, **kwargs)
+        self.fields['offer'].widget.attrs = {
+            'class': 'form-control',
+            'step': "any",
+            'placeholder': "Usar ',' en decimales. Ej.: 11,5"}
+        self.fields['start_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker'}
+        self.fields['end_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker_2'}
+
+    def is_valid(self, request):
+        is_true = super(OfferForm, self).is_valid()
+        if is_true:
+            cleaned_data = self.cleaned_data
+            if cleaned_data['start_date'] <= cleaned_data['end_date']:
+                return True
+            else:
+                messages.error(request,
+                               ('La fecha de fin de la oferta debe ' +
+                                'ser mayor o igual a la fecha inicial'))
+                return False
+        else:
+            if self.cleaned_data:
+                messages.error(request, 'Oferta erronea')
+            return is_true
