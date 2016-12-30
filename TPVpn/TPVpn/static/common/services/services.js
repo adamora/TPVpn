@@ -15,10 +15,11 @@
 (function() {
   'use strict';
   angular.module('TPVpnapp')
-  .service('RegisterService', function($http,$cookies) {
+  .service('RegisterService', function($http,$cookies,$location) {
     this.registerFor = function(dataObject,url) {
+      var orig_url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
       return $http({
-        url: 'http://localhost:8000' + url,
+        url: orig_url + url,
         method: "POST",
         data: dataObject,
         headers: {

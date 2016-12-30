@@ -3,6 +3,14 @@
 {% block style %}
     <!-- switchery -->
     <link rel="stylesheet" href="{% static "common/templates/css/switchery/switchery.min.css" %}" />
+    <style type="text/css">
+        .spec-padding {
+            padding-left: 0px;
+        }
+        .padding-right {
+            padding-right: 0px;
+        }
+    </style>
 {% endblock %}
 {% block mainContent %}
 
@@ -40,11 +48,11 @@
                                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Nombre del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprod.provider.errors }}</span></div>
                                                 </label>
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="col-xs-6">
+                                                    <div class="col-md-6 spec-padding">
                                                         {{ newprod.provider }}
                                                     </div>
-                                                    <div class="col-xs-6">
-                                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Agregar Proveedor</button>
+                                                    <div class="col-md-6">
+                                                        <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Agregar Proveedor</button></center>
                                                     </div>
                                                 </div>
                                             </div>
@@ -72,15 +80,35 @@
                                             <div class="form-group">
                                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Categoría del producto <span class="required"></span><div class='byline'><span class='red'>{{ newprod.category.errors }}</span></div>
                                                 </label>
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    {{ newprod.category }}
+                                                <div class="col-md-6">
+                                                    <div class="col-md-6 spec-padding">
+                                                        {{ newprod.category }} 
+                                                    </div>
+                                                    <div class="col-md-6 padding-right">
+                                                        <select id="category" class='select2_single_subcategorys form-control'>
+                                                            <option value='' disabled selected>ó seleccione categoría</option>
+                                                            {% for cat in categorys %}
+                                                                <option value='{{cat}}'>{{cat}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Subcategoría del producto <span class="required"></span><div class='byline'><span class='red'>{{ newprod.subcategory.errors }}</span></div>
                                                 </label>
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <div class="col-md-6">
+                                                    <div class="col-md-6 spec-padding">
                                                     {{ newprod.subcategory }}
+                                                    </div>
+                                                    <div class="col-md-6 padding-right">
+                                                        <select id="subcategory" class='select2_single_subcategorys form-control col-md-6'>
+                                                            <option value='' disabled selected>ó seleccione subcategoría</option>
+                                                            {% for cat in subcategorys %}
+                                                                <option value='{{cat}}'>{{cat}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -252,6 +280,13 @@
                     $('#myModal').modal('show');
                     $('#modal-button').show();
                 };
+                
+                $('#category').on('change', function() {
+                  $('#id_category').val($('#category').val())
+                });
+                $('#subcategory').on('change', function() {
+                  $('#id_subcategory').val($('#subcategory').val())
+                });
             });
         </script>
 

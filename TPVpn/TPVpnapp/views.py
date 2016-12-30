@@ -14,6 +14,8 @@ from TPVpnapp.models import (Client, Configuration, Market, Notification,
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
                                   SaleSerializer)
 from .tables import ProductTable
+from .utils import (get_categorys_subcategorys, get_worker_market,
+                    update_offers, search_clients)
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -83,17 +85,17 @@ def log_and_reg(request):
 
 @login_required(login_url='/')
 def new_worker(request):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
-    market_now = worker_now.market
+    worker_now, market_now = get_worker_market(request)
     if request.method == 'POST':
+        data = request.POST
         newuser = UserForm(request.POST)
-        neworker = RegisterWorker(request.POST, request.FILES)
+        neworker = RegisterWorker(data, request.FILES)
         new_address = FullDirectionForm(request.POST)
         password = PasswordMarketForm(request.POST)
         if request.POST['neWorkerForm'] == 'registerUser':
+            data['tel1'] = int(data['tel1'])
             if (newuser.is_valid() * new_address.is_valid() *
-                    neworker.is_valid() * password.is_valid()):
+                    neworker.is_valid(request) * password.is_valid()):
                 if (request.POST.get('secretKey', False) ==
                         market_now.secretKey):
                     user_aux = newuser.save()
@@ -270,6 +272,7 @@ def new_login(request, user, key):
         print 'Autenticado'
         if access.is_active:
             login(request, access)
+            update_offers(market=Worker.objects.get(user=request.user).market)
             return redirect('/index')
         else:
             return False
@@ -285,8 +288,9 @@ def logout_session(request):
 
 @login_required(login_url='/')
 def new_product(request):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
+    worker_now, market = get_worker_market(request)
+    products = Product.objects.filter(market=market)
+    categorys, subcategorys = get_categorys_subcategorys(products)
     if request.method == 'POST':
         newprovider = ProviderForm(request.POST)
         newprod = ProductForm(request.POST, request.FILES)
@@ -317,7 +321,7 @@ def new_product(request):
                     newprod['image'].error = 'Vuelva a seleccionar la imagen.'
                 if prod.buyPrice > prod.sellPrice:
                     newprod['sellPrice'].error = "¡El precio de venta no puede \
-                                                  ser superior al de compra!"
+                                                  ser inferior al de compra!"
                 elif prod.amount < 0:
                     newprod['amount'].error = '¡La cantidad de producto debe \
                                                ser mayor a 0!'
@@ -335,20 +339,10 @@ def new_product(request):
         newprod = ProductForm()
 
     to_return = {'worker_now': worker_now, 'newprovider': newprovider,
-                 'newprod': newprod}
+                 'newprod': newprod, 'categorys': categorys,
+                 'subcategorys': subcategorys}
 
     return render(request, 'productForm.html', to_return)
-
-
-def get_worker_market(request):
-    try:
-        worker = Worker.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        messages.error(
-            request,
-            'El trabajador no está registrado en la plataforma.')
-
-    return worker, worker.market
 
 
 @login_required(login_url='/')
@@ -450,8 +444,9 @@ def delete_offer(request, product_id):
 
 @login_required(login_url='/')
 def modify_product(request, product_id):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
+    worker_now, market_now = get_worker_market(request)
+    products = Product.objects.filter(market=market_now)
+    categorys, subcategorys = get_categorys_subcategorys(products)
     product = Product.objects.get(id=product_id, market=worker_now.market)
     if request.method == 'POST':
         newprovider = ProviderForm(request.POST)
@@ -463,6 +458,9 @@ def modify_product(request, product_id):
                 provider.save()
                 product.provider = provider
                 product.save()
+                messages.success(request,
+                                 ('Proveedor agregado ' +
+                                  'satisfactoriamente.'))
                 return redirect('/modProd/' + product_id)
         if request.POST['inputInNewProd'] == 'newProd':
             if newprod.is_valid():
@@ -479,6 +477,9 @@ def modify_product(request, product_id):
                                                ser mayor a 0!'
                 else:
                     prod.save()
+                    messages.success(request,
+                                     ('Producto modificado ' +
+                                      'satisfactoriamente.'))
                     return redirect('/products')
             else:
                 print "¡Error!: No se han cumplimentado correctamente los \
@@ -488,7 +489,8 @@ def modify_product(request, product_id):
         newprod = ProductForm(instance=product)
     return render(request, 'productForm.html',
                   {'worker_now': worker_now, 'newprovider': newprovider,
-                   'newprod': newprod},
+                   'newprod': newprod, 'categorys': categorys,
+                   'subcategorys': subcategorys},
                   context_instance=RequestContext(request))
 
 
@@ -529,33 +531,8 @@ def list_clients(request):
         if 'searchCli' in request.POST:
             if request.POST['searchCli'] == 'newSearch':
                 if search_clie.is_valid():
-                    aux = search_clie['array'].value()
-                    if aux != '':
-                        cad = aux.split(' ')
-                        list_aux = []
-                        for word in cad:
-                            aux_n = Client.objects.filter(name__icontains=word,
-                                                          market=market_now)
-                            aux_d = Client.objects.filter(dni__icontains=word,
-                                                          market=market_now)
-                            aux_e = Client.objects.filter(market=market_now,
-                                                          email__icontains=word
-                                                          )
-                            if aux_n or aux_d or aux_e:
-                                for i in (list(aux_n) + list(aux_d) +
-                                          list(aux_e)):
-                                    counter = 0
-                                    for j in list_aux:
-                                        if i == j:
-                                            counter = 1
-                                    if counter == 0:
-                                        if i:
-                                            list_aux.append(i)
-                        if not list_aux:
-                            fail = "title: 'Error', type: 'error', text: 'No \
-                                    se han encontrado clientes.'"
-                        else:
-                            clients = list_aux
+                    clients = search_clients(
+                        request, search_clie, market_now, clients)
         if 'newNotification' in request.POST:
             for i in clients:
                 if request.POST['newNotification'] == i.pk:
@@ -602,6 +579,14 @@ def list_clients(request):
         notification = NotificationForm()
         wallet = InputMoney()
 
+    paginator = Paginator(clients, 4)
+    page = request.GET.get('page', 1)
+    try:
+        clients = paginator.page(page)
+    except PageNotAnInteger:
+        clients = paginator.page(page)
+    except EmptyPage:
+        clients = paginator.page(paginator.num_pages)
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'clients': clients, 'search_clie': search_clie,
                  'notification': notification, 'wallet': wallet,
@@ -616,7 +601,7 @@ def take_clients(request):
                                         market=request.POST['market'])
         if worker_now.user.is_authenticated:
             if request.POST['operation'] == 'nothing':
-                market_now = Market.objects.get(market=request.POST['market'])
+                market_now = Market.objects.get(id=request.POST['market'])
                 clients = Client.objects.filter(market=market_now)
                 serializer = ClientSerializer(clients, many=True)
                 data = serializer.data
@@ -716,9 +701,9 @@ def index(request):
 
     providers = Provider.objects.filter(market=market_now)
 
-    categorys = []
-    subcategorys = []
+    categorys, subcategorys = get_categorys_subcategorys(products)
 
+    '''
     for i in products:
         counter = 0
         if i.category != '':
@@ -735,12 +720,13 @@ def index(request):
                     counter = 1
             if counter == 0:
                 subcategorys.append(i.subcategory)
+    '''
 
-    to_return = {'worker_now': worker_now, 'clients': clients,
-                 'products': products, 'providers': providers,
-                 'categorys': categorys, 'subcategorys': subcategorys}
+    context = {'worker_now': worker_now, 'clients': clients,
+               'products': products, 'providers': providers,
+               'categorys': categorys, 'subcategorys': subcategorys}
 
-    return render(request, 'prueba-index.html', to_return)
+    return render(request, 'prueba-index.html', context)
 
 
 def initial_data(request):

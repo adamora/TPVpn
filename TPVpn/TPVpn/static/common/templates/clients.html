@@ -30,33 +30,10 @@
                     <div class="x_content">
 
                         <div class="row">
-
-                            <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:center;">
-                                <ul class="pagination pagination-split">
-                                    <li><a href="#">A~C</a>
-                                    </li>
-                                    <li><a href="#">D~F</a>
-                                    </li>
-                                    <li><a href="#">G~I</a>
-                                    </li>
-                                    <li><a href="#">J~L</a>
-                                    </li>
-                                    <li><a href="#">M~Ñ</a>
-                                    </li>
-                                    <li><a href="#">O~Q</a>
-                                    </li>
-                                    <li><a href="#">R~T</a>
-                                    </li>
-                                    <li><a href="#">U~W</a>
-                                    </li>
-                                    <li><a href="#">X~Z</a>
-                                    </li>
-                                </ul>
-                            </div>
                             <div class="clearfix"></div>
 
                             {% for client in clients %}
-                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                <div class="col-md-6 animated fadeInDown">
                                     <div class="well profile_view">
                                         <div class="col-sm-12">
                                             <h4 class="brief"><i>Cliente de <b>{{market_now.name}}</b></i></h4>
@@ -182,6 +159,7 @@
                                 </div>
                                 <!-- /END MODAL -->
                             {% endfor %}
+                            <a class="btn btn-default">Página {{clients.number}} de {{clients.paginator.num_pages}}</a>
                         </div>
                     </div>
                 </div>

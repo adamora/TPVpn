@@ -150,6 +150,15 @@ class RegisterWorker(ModelForm):
         model = Worker
         fields = ('dni', 'genre', 'segSocial', 'tel1', 'tel2', 'image')
 
+    def is_valid(self, request):
+        super(RegisterWorker, self).is_valid()
+        if self.errors:
+            for msg in self.errors.values():
+                messages.error(request, msg)
+            return False
+        else:
+            return True
+
 
 class PasswordMarketForm(ModelForm):
     secretKey = forms.CharField(required=True, label='',
@@ -235,23 +244,29 @@ class ProviderForm(ModelForm):
 class ProductForm(ModelForm):
     provider = forms.ModelChoiceField(required=True, label='',
                                       queryset=Provider.objects.all())
-    name = forms.CharField(required=True, label='',
-                           widget=forms.TextInput(
-                               attrs={'class':
-                                      'form-control col-md-7 col-xs-12'}))
-    category = forms.CharField(required=False, label='',
-                               widget=forms.TextInput(
-                                   attrs={'class':
-                                          'form-control col-md-7 col-xs-12'}))
-    subcategory = forms.CharField(required=False,
-                                  widget=forms.TextInput(
-                                      attrs={'class':
-                                             'form-control col-md-7 col-xs-12'}
-                                  ), label='')
-    brand = forms.CharField(required=True, label='',
-                            widget=forms.TextInput(
-                                attrs={'class':
-                                       'form-control col-md-7 col-xs-12'}))
+    name = forms.CharField(
+        required=True, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}))
+    category = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Crear nueva categoría'}
+        )
+    )
+    subcategory = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Crear nueva subcategoría'}
+        )
+    )
+    brand = forms.CharField(
+        required=True, label='',
+        widget=forms.TextInput(
+            attrs={'class':
+                   'form-control'}))
     buyPrice = forms.FloatField(
         required=True, label='',
         widget=forms.NumberInput(
