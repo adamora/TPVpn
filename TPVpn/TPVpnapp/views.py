@@ -194,6 +194,15 @@ def list_workers(request):
         search = SearchWorkerForm()
         notification = NotificationForm()
 
+    paginator = Paginator(workers, 4)
+    page = request.GET.get('page', 1)
+    try:
+        workers = paginator.page(page)
+    except PageNotAnInteger:
+        workers = paginator.page(page)
+    except EmptyPage:
+        workers = paginator.page(paginator.num_pages)
+
     to_return = {'worker_now': worker_now, 'workers': workers,
                  'search': search, 'notification': notification, 'fail': fail}
 

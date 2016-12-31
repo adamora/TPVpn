@@ -111,8 +111,24 @@
                                     </div>
                                 </div>
                                 <!-- /END MODAL -->
-
                             {% endfor %}
+                            <nav aria-label="Page navigation" class="col-md-12">
+                                <ul class="pagination">
+                                    {% if workers.has_previous %}
+                                    <li class="previous">
+                                        <a href="?page={{ workers.previous_page_number }}">Anterior</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="cardinality">
+                                        <a>Página {{workers.number}} de {{workers.paginator.num_pages}}</a>
+                                    </li>
+                                    {% if workers.has_next %}
+                                    <li class="next">
+                                        <a href="?page={{ workers.next_page_number }}">Siguiente</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
