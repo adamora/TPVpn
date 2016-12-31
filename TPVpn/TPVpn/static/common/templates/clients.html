@@ -78,14 +78,26 @@
                                             </div>
                                             <div class="clearfix"></div><p></p>
                                             <center class="">
-                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{client.pk}}">
+                                                <a type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{client.pk}}">
                                                   <i class="fa fa-comments-o"></i>
-                                                </button>
-                                                <a href="/client_profile/{{client.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
-                                                    </i> Perfil </a>
-                                                <a href="/modCli/{{client.pk}}" type="button" class="btn btn-warning btn-xs"> <i class="fa fa-pencil"></i> Editar </a>
-                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-money-{{client.pk}}"> <i class="fa fa-eur"></i> Monedero </button>
-                                                <a href="javascript:void(0);" onclick="delete_client('{{client.name}}','{{client.pk}}')" type="button" class="btn btn-danger btn-xs"> <i class="fa fa-close"></i> Eliminar </a>
+                                                  Notificación
+                                                </a>
+                                                <a href="/client_profile/{{client.pk}}" type="button" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-user"></i>
+                                                    Perfil 
+                                                </a>
+                                                <a href="/modCli/{{client.pk}}" type="button" class="btn btn-warning btn-xs">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Editar 
+                                                </a>
+                                                <a type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-money-{{client.pk}}">
+                                                    <i class="fa fa-eur"></i>
+                                                    Monedero
+                                                </a>
+                                                <a href="javascript:void(0);" onclick="delete_client('{{client.name}}','{{client.pk}}')" type="button" class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-close"></i>
+                                                    Eliminar
+                                                </a>
                                             </center>
                                         </div>
                                     </div>

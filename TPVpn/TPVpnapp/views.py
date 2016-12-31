@@ -536,7 +536,7 @@ def list_clients(request):
         if 'newNotification' in request.POST:
             for i in clients:
                 if request.POST['newNotification'] == i.pk:
-                    if notification.is_valid():
+                    if notification.is_valid(request):
                         note_aux = notification.save(commit=False)
                         note_aux.writer = worker_now
                         note_aux.reciverCli = i
@@ -546,35 +546,14 @@ def list_clients(request):
         if 'modWallet' in request.POST:
             for i in clients:
                 if request.POST['modWallet'] == i.pk:
-                    if wallet.is_valid():
-                        new = wallet['new'].value()
-                        add = wallet['add'].value()
-                        aux = copy.copy(i)
-                        if new != '0.0' or add != '0.0':
-                            if new != '0.0' and add != '0.0':
-                                messages.error(
-                                    request,
-                                    ('Solo uno de los campos de monedero' +
-                                     'puede ser rellenado.'))
-                            else:
-                                if new != '0.0':
-                                    i.wallet = new
-                                    i.save()
-                                else:
-                                    i.wallet = float(i.wallet) + float(add)
-                                    i.save()
-                        else:
-                            i.wallet = 0.0
-                            i.save()
-                        note2 = Notification(reciverCli=i, writer=worker_now,
-                                             content="Se ma modificado el \
-                                                      monedero del cliente de \
-                                                      " + str(aux.wallet) + " \
-                                                      a " + str(float(i.wallet)
-                                                                ),
-                                             typeNote='warning')
-                        note2.save()
-            wallet = InputMoney()
+                    if wallet.is_valid(request):
+                        for key, value in wallet.cleaned_data.items():
+                            if value and key == 'new':
+                                i.wallet = float(value)
+                            elif value and key == 'add':
+                                i.wallet += float(value)
+                        i.save()
+                        wallet = InputMoney()
     else:
         search_clie = SearchClientForm()
         notification = NotificationForm()

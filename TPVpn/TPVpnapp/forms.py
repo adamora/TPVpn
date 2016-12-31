@@ -206,6 +206,13 @@ class NotificationForm(ModelForm):
         model = Notification
         fields = ('content',)
 
+    def is_valid(self, request):
+        is_valid = super(NotificationForm, self).is_valid()
+        if not is_valid:
+            messages.warning(request,
+                             'Rellene el campo de Mensaje para notificar.')
+        return is_valid
+
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(required=True, label='',
@@ -271,7 +278,7 @@ class ProductForm(ModelForm):
         required=True, label='',
         widget=forms.NumberInput(
             attrs={'class': 'form-control',
-                   'step': "any",
+                   'step': "0.01",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     kind = forms.ChoiceField(required=True, choices=KINDPRODUCT, label='',
                              widget=forms.Select(
@@ -284,13 +291,13 @@ class ProductForm(ModelForm):
         required=True, label='',
         widget=forms.NumberInput(
             attrs={'class': 'form-control',
-                   'step': "any",
+                   'step': "0.001",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     sellPrice = forms.FloatField(
         required=True, label='',
         widget=forms.NumberInput(
             attrs={'class': 'form-control',
-                   'step': "any",
+                   'step': "0.01",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     barCode = forms.CharField(required=False, label='',
                               widget=forms.TextInput(
@@ -320,14 +327,14 @@ class GenericTwoRowsForm(forms.Form):
         widget=forms.TextInput(
             attrs={'type': 'number',
                    'class': 'form-control',
-                   'step': "any",
+                   'step': "0.01",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
     add = forms.CharField(
         required=False, label='',
         widget=forms.TextInput(
             attrs={'type': 'number',
                    'class': 'form-control',
-                   'step': "any",
+                   'step': "0.01",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
 
 
@@ -335,6 +342,11 @@ class StockForm(GenericTwoRowsForm):
 
     class Meta:
         fields = ('new', 'add')
+
+    def __init__(self, *args, **kwargs):
+        super(StockForm, self).__init__(*args, **kwargs)
+        self.fields['new'].widget.attrs['step'] = '0.001'
+        self.fields['add'].widget.attrs['step'] = '0.001'
 
     def is_valid(self, request, instance_prod):
         if super(StockForm, self).is_valid():
@@ -366,12 +378,10 @@ class ClientForm(ModelForm):
     name = forms.CharField(required=True, label='',
                            widget=forms.TextInput(
                                attrs={'placeholder': 'Nombre Completo',
-                                      'class':
-                                      'form-control col-md-7 col-xs-12'}))
+                                      'class': 'form-control'}))
     dni = forms.CharField(required=True,
                           widget=forms.TextInput(
-                              attrs={'class':
-                                     'form-control col-md-7 col-xs-12',
+                              attrs={'class': 'form-control',
                                      'placeholder': 'DNI'}), label='')
     tel = forms.IntegerField(required=False,
                              widget=forms.TextInput(
@@ -380,14 +390,12 @@ class ClientForm(ModelForm):
                                         'type': 'tel'}), label='')
     email = forms.EmailField(required=False,
                              widget=forms.EmailInput(
-                                 attrs={'class':
-                                        'form-control col-md-7 col-xs-12',
+                                 attrs={'class': 'form-control',
                                         'placeholder': 'E-mail'}), label='')
     wallet = forms.FloatField(
-        required=True, label='', initial='0.0',
+        required=True, label='',
         widget=forms.NumberInput(
-            attrs={'class':
-                   'form-control',
+            attrs={'class': 'form-control',
                    'placeholder': "Cuantía. Usar ',' en decimales. Ej.: 11,5"})
     )
     image = forms.FileField(required=False, label='', widget=forms.FileInput)
@@ -400,6 +408,24 @@ class ClientForm(ModelForm):
 class InputMoney(GenericTwoRowsForm):
     class Meta:
         exclude = []
+
+    def is_valid(self, request):
+        is_valid = super(InputMoney, self).is_valid()
+        if is_valid:
+            len_values = len([i for i in self.cleaned_data.values() if i])
+            if len_values == 1:
+                return True
+            elif len_values > 1:
+                messages.error(
+                    request,
+                    'Solo puede rellenar un campo en los valores de Monedero.')
+            elif len_values < 1:
+                messages.warning(
+                    request,
+                    'Rellene al menos un campo del Monedero editado.')
+        else:
+            messages.error(request, 'Datos de Monedero invalidos.')
+        return False
 
 
 class SearchProduct(forms.Form):
@@ -583,7 +609,7 @@ class OfferForm(forms.ModelForm):
         super(OfferForm, self).__init__(*args, **kwargs)
         self.fields['offer'].widget.attrs = {
             'class': 'form-control',
-            'step': "any",
+            'step': "0.01",
             'placeholder': "Usar ',' en decimales. Ej.: 11,5"}
         self.fields['start_date'].widget.attrs = {
             'class': 'form-control',
