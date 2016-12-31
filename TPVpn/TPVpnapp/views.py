@@ -552,9 +552,10 @@ def list_clients(request):
                         aux = copy.copy(i)
                         if new != '0.0' or add != '0.0':
                             if new != '0.0' and add != '0.0':
-                                fail = "title: 'Error', type: 'error', \
-                                    text: 'Solo uno de los campos de monedero \
-                                    puede ser rellenado.'"
+                                messages.error(
+                                    request,
+                                    ('Solo uno de los campos de monedero' +
+                                     'puede ser rellenado.'))
                             else:
                                 if new != '0.0':
                                     i.wallet = new

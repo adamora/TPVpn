@@ -3,6 +3,16 @@
 {% block style %}
     <!-- switchery -->
     <link rel="stylesheet" href="{% static "common/templates/css/switchery/switchery.min.css" %}" />
+    <style type="text/css">
+        input[type='number'] {
+            -moz-appearance:textfield;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+    </style>
 {% endblock %}
 {% block mainContent %}
 

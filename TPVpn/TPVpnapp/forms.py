@@ -314,7 +314,7 @@ class ProductForm(ModelForm):
         }
 
 
-class StockForm(forms.Form):
+class GenericTwoRowsForm(forms.Form):
     new = forms.CharField(
         required=False, label='',
         widget=forms.TextInput(
@@ -329,6 +329,9 @@ class StockForm(forms.Form):
                    'class': 'form-control',
                    'step': "any",
                    'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+
+
+class StockForm(GenericTwoRowsForm):
 
     class Meta:
         fields = ('new', 'add')
@@ -372,19 +375,21 @@ class ClientForm(ModelForm):
                                      'placeholder': 'DNI'}), label='')
     tel = forms.IntegerField(required=False,
                              widget=forms.TextInput(
-                                 attrs={'class':
-                                        'form-control col-md-7 col-xs-12',
-                                        'placeholder': 'Teléfono'}), label='')
+                                 attrs={'class': 'form-control',
+                                        'placeholder': 'Teléfono',
+                                        'type': 'tel'}), label='')
     email = forms.EmailField(required=False,
                              widget=forms.EmailInput(
                                  attrs={'class':
                                         'form-control col-md-7 col-xs-12',
                                         'placeholder': 'E-mail'}), label='')
-    wallet = forms.FloatField(required=True, label='', initial='0.0',
-                              widget=forms.TextInput(
-                                  attrs={'class':
-                                         'form-control col-md-7 col-xs-12',
-                                         'placeholder': 'Cuantía'}))
+    wallet = forms.FloatField(
+        required=True, label='', initial='0.0',
+        widget=forms.NumberInput(
+            attrs={'class':
+                   'form-control',
+                   'placeholder': "Cuantía. Usar ',' en decimales. Ej.: 11,5"})
+    )
     image = forms.FileField(required=False, label='', widget=forms.FileInput)
 
     class Meta:
@@ -392,17 +397,9 @@ class ClientForm(ModelForm):
         fields = ('name', 'dni', 'tel', 'email', 'wallet', 'image')
 
 
-class InputMoney(forms.Form):
-    new = forms.FloatField(required=False, label='', initial=0.0,
-                           widget=forms.TextInput(
-                               attrs={'class': 'form-control'}))
-    add = forms.FloatField(required=False, label='', initial=0.0,
-                           widget=forms.TextInput(attrs={'class':
-                                                         'form-control'}))
-
+class InputMoney(GenericTwoRowsForm):
     class Meta:
-        model = Client
-        fields = ('new', 'add')
+        exclude = []
 
 
 class SearchProduct(forms.Form):

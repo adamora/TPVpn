@@ -159,7 +159,23 @@
                                 </div>
                                 <!-- /END MODAL -->
                             {% endfor %}
-                            <a class="btn btn-default">Página {{clients.number}} de {{clients.paginator.num_pages}}</a>
+                            <nav aria-label="Page navigation" class="col-md-12">
+                                <ul class="pagination">
+                                    {% if clients.has_previous %}
+                                    <li class="previous">
+                                        <a href="?page={{ clients.previous_page_number }}">Anterior</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="cardinality">
+                                        <a>Página {{clients.number}} de {{clients.paginator.num_pages}}</a>
+                                    </li>
+                                    {% if clients.has_next %}
+                                    <li class="next">
+                                        <a href="?page={{ clients.next_page_number }}">Siguiente</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>

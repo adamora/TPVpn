@@ -151,49 +151,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li>
-                                {% if not fail == None %}
-                                <li role="presentation" class="dropdown open">
-                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="true">
-                                    <i class="fa fa-envelope-o"></i>
-                                        <span class="badge bg-red">1</span>
-                                </a>
-                                </li>
-                                {% else %}
-                                <li role="presentation" class="dropdown">
-                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-envelope-o"></i>
-                                        <span class="badge">0</span>
-                                </a>
-                                </li>
-                                {% endif %}
-                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list animated fadeInDown" role="menu">
-                                    {% if not fail == None %}
-                                    <li>
-                                        <a>
-                                            <span class="image">
-                                                <img src="/media/{{worker_now.image}}" alt="Profile Image" />
-                                            </span>
-                                            <span>
-                                                <span>{{worker_now.user.first_name}}</span>
-                                                <span class="time">hace 1 minuto</span>
-                                            </span>
-                                            <span class="message">
-                                                {{fail}}
-                                            </span>
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                    <li>
-                                        <div class="text-center">
-                                            <a>
-                                                <strong><a href="/employer_profile/{{worker_now.pk}}">Ver todas mis alertas
-                                                <i class="fa fa-angle-right"></i></a></strong>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
+
 
                         </ul>
                     </nav>
@@ -203,16 +161,7 @@
         </div>
             <!-- /top navigation -->
         <div class="right_col" role="main">
-            {% if messages %}
-            <div class="col-md-12">
-                {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{message.tags}}{% else %}warning{% endif %} alert-dismissible" role="alert" style="opacity: 0.60;">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b style="opacity: 10;">&times;</b></span></button>
-                  {{message}} 
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+
             {% block mainContent %}{% endblock %}
 
                <footer>
@@ -320,10 +269,12 @@
     <script type="text/javascript">
         var permanotice, tooltip, _alert;
         $(function () {
+            {% if messages %}
+            {% for message in messages %}
             new PNotify({
-                {% autoescape off %}
-                {{fail}}
-                {% endautoescape %},
+                title: '{{message.tags|title}}',
+                type: '{{message.tags}}',
+                text: '{{message}}',
                 before_close: function (PNotify) {
                     // You can access the notice's options with this. It is read only.
                     //PNotify.options.text;
@@ -337,7 +288,8 @@
                     return false;
                 }
             });
-
+            {% endfor %}
+            {% endif %}
         });
     </script>
     <script>
