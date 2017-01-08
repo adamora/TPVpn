@@ -16,7 +16,7 @@ from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
 from .tables import ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
-                    paginator_function)
+                    paginator_function, get_ivas)
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -219,11 +219,24 @@ def worker_profile(request, pk):
     worker_now, market = get_worker_market(request)
 
     worker_profile = Worker.objects.get(dni=pk, market=market)
-    notifications = Notification.objects.filter(reciver=worker_profile)
-    sales = Sale.objects.filter(market=market, seller=worker_profile)
-
+    notifications = Notification.objects.filter(
+        reciver=worker_profile).order_by("-date")
+    sales = Sale.objects.filter(
+        market=market, seller=worker_profile).order_by("-date")
+    notifi = NotificationForm()
+    if request.method == 'POST':
+        notifi = NotificationForm(request.POST)
+        if notifi.is_valid(request):
+            notifi.save(commit=False)
+            notifi.writer = worker_now
+            notifi.reciver = Worker.objects.get(
+                market=market, dni=request.POST['dni_reciver'])
+            notifi.typeNote = 'normal'
+            notifi.save()
+            notifi = NotificationForm()
     to_return = {'worker_now': worker_now, 'workerProfile': worker_profile,
-                 'notifications': notifications, 'sales': sales}
+                 'notifications': notifications, 'sales': sales,
+                 'notifi': notifi}
 
     return render(request, 'employerProfile.html', to_return)
 
@@ -866,20 +879,18 @@ def all_sales(request):
         criteria = form.get_filter(market=worker_now.market)
         sales_query = sales_query.filter(**criteria)
 
-    '''
-    paginator = Paginator(sales_query, 5)
-    page = request.GET.get('page', 1)
-    try:
-        sales = paginator.page(page)
-    except PageNotAnInteger:
-        sales = paginator.page(page)
-    except EmptyPage:
-        sales = paginator.page(paginator.num_pages)
-    '''
+    iva21, iva10, iva4 = get_ivas(sales_query)
+
     sales, page = paginator_function(request, query=sales_query)
 
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    fil_category = request.GET.get('categorys', None)
     to_return = {'worker_now': worker_now,
-                 'sales': sales, 'form': form, 'url_vars': url_vars}
+                 'sales': sales, 'form': form, 'url_vars': url_vars,
+                 'iva21': iva21, 'iva10': iva10, 'iva4': iva4,
+                 'start_date': start_date, 'end_date': end_date,
+                 'fil_category': fil_category}
     return render(request, 'sales.html', to_return)
 
 

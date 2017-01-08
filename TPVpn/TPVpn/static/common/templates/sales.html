@@ -12,29 +12,17 @@
 				</div>
 				<div class="x_content">
 					<form action='.' method="GET">
-					<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="col-md-4 col-sm-6 col-xs-12">
 						{{form.start_date}}<br>
 						<span class="fa fa-calendar form-control-feedback right" aria-hidden="true"></span>
-						<!--p>Fecha: <input type="text" id="datepicker"></p-->
 					</div>
-					<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="col-md-4 col-sm-6 col-xs-12">
 						{{form.end_date}}<br>
 						<span class="fa fa-calendar form-control-feedback right" aria-hidden="true"></span>
 					</div>
-					<div class="col-md-3 col-sm-6 col-xs-12">
-						{{form.iva}}
+					<div class="col-md-4 col-sm-6 col-xs-12">
+						{{form.categorys}}<br>
 					</div>
-					<div class="col-md-3 col-sm-6 col-xs-12">
-						{{form.categorys}}
-					</div>
-					<!--div class="col-md-3 col-sm-6 col-xs-12">
-						<div class="filter">
-							<div id="reportrange" style="line-height: 28px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
-								<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-								<span>Not Working</span> <b class="caret"></b>
-							</div>
-						</div>
-					</div-->
 					<div class="col-md-12 col-sm-6 col-xs-12">
 						<a href="{{request.path}}" class="btn btn-default" style="float: right">Restablecer Criterios</a>
 						<button type="submit" class="btn btn-primary" style="float: right"><i class="glyphicon glyphicon-search"></i> Buscar</button>
@@ -57,10 +45,10 @@
 			            {% for sale in sales %}
 			            <div class="panel">
 			                <a class="panel-heading" role="tab" id="heading{{sale.id}}" data-toggle="collapse" data-parent="#accordion" href="#{{sale.id}}" aria-expanded="false" aria-controls="{{sale.id}}">
-			                    <div class="col-md-9 col-sm-9 col-xs-9">
+			                    <div class="col-md-8 col-sm-8 col-xs-8">
 			                    	<h4 class="panel-title"><b>{{sale.sale_code}}</b></h4>
 			                    </div>
-			                    <div class="col-md-3 col-sm-3 col-xs-3">
+			                    <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: right;">
 			                    	<h4 class="panel-title">{{sale.date}}</h4>
 			                    </div>
 			                    <br>
@@ -131,6 +119,7 @@
 					    </span>
 					</div-->
 					<nav aria-label="Page navigation">
+					  <div class="col-md-4">
 					  <ul class="pagination" style="float: left;">
 					    {% if sales.has_previous %}
 					    <li>
@@ -172,12 +161,70 @@
 					    </li>
 					    {% endif %}
 					  </ul>
+					  </div>
+					  <div class="col-md-4" style="text-align: center;">
+					  	<ul class="pagination">
+					  	<li><a class="btn btn-default" data-toggle="modal" data-target="#myModal"> <i class="glyphicon glyphicon-book"></i> Obtener Informe de Facturación</a>
+
+					  		<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Importe total según IVA</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped projects">
+        <b>Período del calculo: </b>
+        {% if start_date %}
+        	Desde el {{start_date}}
+        {% endif %}
+        {% if end_date %}
+        	Hasta el {{end_date}}
+        {% endif %}
+        {% if not start_date and not end_date %}
+        	Total Facturado
+        {% endif %}
+        {% if fil_category %}
+        	<br><b>Para la categoría:</b> {{fil_category}}
+        {% endif %}
+        	<thead>
+        		<tr>
+        			<th><center>21%</center></th>
+        			<th><center>10%</center></th>
+        			<th><center>4%</center></th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr>
+        			<td>{{iva21}}€</td>
+        			<td>{{iva10}}€</td>
+        			<td>{{iva4}}€</td>
+        		</tr>
+        	</tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+					  	</li>
+					  	</ul>
+					  </div>
+					  <div class="col-md-4" style="text-align: right;">
+					  <ul class="pagination">
+					  <li>
 					  <form method="GET" action=".">
-					  	<div style="float: right;"><br>
-					  		Pagina <input name="page_number" value="{{sales.number}}" style="width: 15%" /> de {{sales.paginator.num_pages}} 
+					  		Página <input name="page_number" value="{{sales.number}}" style="width: 35px" /> de {{sales.paginator.num_pages}} 
 					  		<button type="submit" class="btn btn-default" name="complete_path" value="{{request.get_full_path}}">Ir!</button>
-					  	</div>
 					  </form>
+					  </li>
+					  </ul>
+					  </div>
 					</nav>
 
 			        <!-- fin paginador -->

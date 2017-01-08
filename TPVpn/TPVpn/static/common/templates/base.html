@@ -31,6 +31,7 @@
     <script>
         NProgress.start();
     </script>
+
     {% block style %}{% endblock %}
 </head>
 
@@ -41,14 +42,14 @@
                 <div class="left_col scroll-view">
 
                     <div class="navbar nav_title" style="border: 0;">
-                        <a href="/index" class="site_title"><i class="fa fa-paw"></i> <span> {{worker_now.market.name.upper}} </span></a>
+                        <a href="/index/" class="site_title"><i class="fa fa-paw"></i> <span> {{worker_now.market.name.upper}} </span></a>
                     </div>
                     <div class="clearfix"></div>
 
                     <!-- menu prile quick info -->
                     <div class="profile">
                         <div class="profile_pic">
-                            <img src="/media/{{worker_now.image}}" alt="/media/{{worker_now.image}}" class="img-circle profile_img" style="height:70px;width:70px">
+                            <img src="/media/{{worker_now.image}}" class="img-circle profile_img" style="height:70px;width:70px">
                         </div>
                         <div class="profile_info">
                             <span>Bienvenido,</span>
@@ -97,21 +98,28 @@
                                 </li>
                                 <li><a><i class="fa fa-money"></i> Movimientos de Caja <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
-                                        <li>
+                                        <!--li>
                                             <a href="/cashFlows/">Ver Movimientos</a>
-                                        </li>
+                                        </li-->
                                         <li>
                                             <a href="/sales/">Ventas</a>
                                         </li>
                                     </ul>
                                 </li>
+                                <!--li><a><i class="glyphicon glyphicon-book"></i> Informes <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li>
+                                            <a href="/invoice-report/">Informes de facturas</a>
+                                        </li>
+                                    </ul>
+                                </li-->
                             </ul>
                         </div>
                     </div>
                     <!-- /sidebar menu -->
 
                     <!-- /menu footer buttons -->
-                    <div class="sidebar-footer hidden-small">
+                    <!--div class="sidebar-footer hidden-small">
                         <a data-toggle="tooltip" data-placement="top" title="Configuración" href="/configuration/">
                             <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                         </a>
@@ -124,7 +132,7 @@
                         <a data-toggle="tooltip" data-placement="top" title="Cerrar Sesión" href="/logout/">
                             <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                         </a>
-                    </div>
+                    </div-->
                     <!-- /menu footer buttons -->
                 </div>
             </div>
@@ -299,7 +307,43 @@
         });
     </script>
     <!-- /PNotity -->
+    <script>
+        function toggleFullScreen(elem) {
+            // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+            if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) || (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) || (document.mozFullScreen !== undefined && !document.mozFullScreen) || (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
+                if (elem.requestFullScreen) {
+                    elem.requestFullScreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullScreen) {
+                    elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                if (document.cancelFullScreen) {
+                    document.cancelFullScreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
 
+        function mKeyF11(){
+            var e = new Event('keypress');
+            e.which = 122; // Character F11 equivalent.
+            e.altKey=false;
+            e.ctrlKey=false;
+            e.shiftKey=false;
+            e.metaKey=false;
+            e.bubbles=true;
+            document.dispatchEvent(e);
+        }
+    </script>
     {% block scripts %}{% endblock %}
     <!-- /footer content -->
 

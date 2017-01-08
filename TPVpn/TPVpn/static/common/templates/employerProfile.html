@@ -154,7 +154,7 @@
                                                     <blockquote class="message">
                                                         <b>Venta realizada a:
                                                         {% if sale.buyer %}
-                                                          <a class="green" href="/client_profile/{{sale.buyer.dni}}">{{sale.buyer.name}}</a>
+                                                          <a class="green" href="/client_profile/{{sale.buyer.pk}}">{{sale.buyer.name}}</a>
                                                         {% else %}
                                                           <a class="green" >Anónimo</a>
                                                         {% endif %}
@@ -225,21 +225,27 @@
                                       {% if notifications %}
                                       <ul class="messages" style="list-style-type:none">
                                       {% for notification in notifications %}
+                                        <form method="POST" action=".">
                                         <li>
                                           <img src="/media/{{notification.writer.image}}" class="avatar" alt="Avatar">
                                           <div class="message_date" style="margin-right: 10px">
                                             {{notification.date}}
                                           </div>
                                           <div class="message_wrapper">
-                                            <h4 class="heading">Mensaje de {{notification.writer.user.first_name}}</h4>
+                                            <h4 class="heading">Mensaje de <a class="green" href="/employer_profile/{{notification.writer.dni}}">{{notification.writer.user.first_name}}</a></h4>
                                             <blockquote class="message">{{notification.content}}</blockquote>
+                                            {% if worker_now == workerProfile and workerProfile != notification.writer %}
                                             <br />
                                             <p class="url">
+                                              <input type="hidden" name="dni_reciver" value="{{notification.writer.dni}}">
+                                              {{notifi.as_p}}
                                               <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
-                                              <a href="#"><i class="fa fa-paperclip"></i> Responder </a>
+                                              <a onclick="$(this).closest('form').submit();">Responder <i class="glyphicon glyphicon-arrow-right"></i></a>
                                             </p>
+                                            {% endif %}
                                           </div>
                                         </li>
+                                        </form>
                                       {% endfor %}
                                       </ul>
                                       {% else %}

@@ -468,10 +468,9 @@ class SearchProduct(forms.Form):
 class DateForm(forms.Form):
     start_date = forms.CharField(required=False, label='Fecha Inicio')
     end_date = forms.CharField(required=False, label='Fecha Fin')
-    iva = forms.ChoiceField(required=False, label='IVA', choices=IVA,
-                            initial='')
+    categorys = forms.ChoiceField(required=False, label='Categoría')
 
-    def __init__(self, categorys=None, *args, **kwargs):
+    def __init__(self, categorys, *args, **kwargs):
         super(DateForm, self).__init__(*args, **kwargs)
         # self.fields['start_date'].widget = extras.SelectDateWidget()
         self.fields['start_date'].widget.attrs = {
@@ -480,19 +479,14 @@ class DateForm(forms.Form):
             'placeholder': 'Fecha inicio'
         }
         # self.fields['end_date'].widget = extras.SelectDateWidget()
-        self.fields['end_date'].widget.attrs = {'class': 'form-control',
-                                                'id': 'datepicker_2',
-                                                'placeholder': 'Fecha fin'}
-        if categorys:
-            self.fields['categorys'] = forms.ChoiceField(required=False,
-                                                         label='Categorías',
-                                                         choices=categorys)
-            self.fields['categorys'].widget.attrs = {
-                'class': 'select2_single_category form-control'
-            }
-            self.fields['iva'].widget.attrs = {
-                'class': 'select2_single_iva form-control'
-            }
+        self.fields['end_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker_2',
+            'placeholder': 'Fecha fin'
+        }
+        self.fields['categorys'].widget = forms.Select(
+            attrs={'class': 'select2_single_categorias form-control'})
+        self.fields['categorys'].choices = categorys
 
     def get_filter(self, market):
         objects = self.cleaned_data
