@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from TPVpnapp.forms import (ClientForm, ConfigurationForm, DateForm,
                             FullDirectionForm, InputMoney, LoginForm,
-                            NotificationForm, PasswordMarketForm, ProductForm,
+                            NotificationForm, ProductForm,
                             ProviderForm, RegisterBusinessForm, RegisterWorker,
                             SearchClientForm, SearchProduct,
                             SearchWorkerForm, StockForm, UserForm,
@@ -15,18 +15,19 @@ from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
                                   SaleSerializer)
 from .tables import ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
-                    update_offers, search_clients)
-
+                    update_offers, search_clients, search_workers,
+                    paginator_function)
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.serializers.json import json
 from django.http import HttpResponse
+# , HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import RequestContext
 from django_tables2.config import RequestConfig
+# from django.core.urlresolvers import reverse
 # from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.renderers import JSONRenderer
@@ -64,14 +65,10 @@ def log_and_reg(request):
             else:
                 print "NO SE HA PODIDO GUARDAR DIRECCION"
             if newbusiness.is_valid():
-                if (request.POST.get('secretKey', True) ==
-                        request.POST.get('secretKey2', True)):
-                    business = newbusiness.save(commit=False)
-                    business.direction = addr
-                    business.save()
-                    return redirect('/login')
-                else:
-                    return "NO SE HA PODIDO CREAR MERCADO"
+                business = newbusiness.save(commit=False)
+                business.direction = addr
+                business.save()
+                return redirect('/login')
     else:
         # newuser = UserForm()
         # neworker = RegisterWorker()
@@ -88,59 +85,56 @@ def new_worker(request):
     worker_now, market_now = get_worker_market(request)
     if request.method == 'POST':
         data = request.POST
-        newuser = UserForm(request.POST)
+        newuser = UserForm(data=request.POST)
         neworker = RegisterWorker(data, request.FILES)
         new_address = FullDirectionForm(request.POST)
-        password = PasswordMarketForm(request.POST)
         if request.POST['neWorkerForm'] == 'registerUser':
             data['tel1'] = int(data['tel1'])
-            if (newuser.is_valid() * new_address.is_valid() *
-                    neworker.is_valid(request) * password.is_valid()):
-                if (request.POST.get('secretKey', False) ==
-                        market_now.secretKey):
-                    user_aux = newuser.save()
-                    ''' >>>>> FUNCIONA PARO NO UTIL -> NO LOGIN
-                    user = request.POST.get('username',False)
-                    key = request.POST.get('password1',False)
-                    '''
-                    addr = new_address.save()
-                    worker_aux = neworker.save(commit=False)
-                    worker_aux.user = user_aux
-                    worker_aux.market = market_now
-                    worker_aux.home = addr
-                    worker_aux.save()
-                    return redirect('/employers')
-                else:
-                    password['secretKey'].error = "¡Contraseña incorrecta!"
-            elif not newuser.is_valid():
-                print "NO SE HA CREADO BIEN EL USER"
+            is_valid_user = newuser.is_valid(request)
+            is_valid_worker = neworker.is_valid(request)
+            if (is_valid_user * new_address.is_valid() *
+                    is_valid_worker):
+                user_aux = newuser.save()
+                ''' >>>>> FUNCIONA PARO NO UTIL -> NO LOGIN
+                user = request.POST.get('username',False)
+                key = request.POST.get('password1',False)
+                '''
+                addr = new_address.save()
+                worker_aux = neworker.save(commit=False)
+                worker_aux.user = user_aux
+                worker_aux.market = market_now
+                worker_aux.home = addr
+                worker_aux.save()
+                messages.success(
+                    request, 'Empleado registrado satisfactoriamente.')
+                return redirect('/employers')
+            elif not is_valid_user:
+                messages.error(request,
+                               "Fallo al registrar los datos del usuario.")
             elif not new_address.is_valid():
-                print "NO SE HA CREADO BIEN LA DIRECCIÓN"
-            elif not neworker.is_valid():
-                print "NO SE HA CREADO BIEN EL USUARIO"
+                messages.error(request,
+                               "Fallo al registrar los datos del domicilio.")
+            elif not is_valid_worker:
+                messages.error(
+                    request, "Fallo al registrar los datos del trabajador.")
             else:
-                print "¡ERROR! CONTACTE CON EL SERVICIO TÉCNICO"
-                return render(request, 'page_404.html')
-
+                messages.error(
+                    request,
+                    "Fallo al registrar. Contacte con el administrador.")
     else:
         newuser = UserForm()
         neworker = RegisterWorker()
         new_address = FullDirectionForm()
-        password = PasswordMarketForm()
     return render(request, 'workerForm.html', {'newuser': newuser,
                                                'neworker': neworker,
                                                'newAddress': new_address,
-                                               'worker_now': worker_now,
-                                               'password': password})
+                                               'worker_now': worker_now})
 
 
 @login_required(login_url='/')
 def list_workers(request):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
-    market_now = worker_now.market
+    worker_now, market_now = get_worker_market(request)
 
-    fail = None
     workers = Worker.objects.filter(market=market_now)
 
     if request.method == 'POST':
@@ -149,41 +143,11 @@ def list_workers(request):
         if 'searchWorkerForm' in request.POST:
             if request.POST['searchWorkerForm'] == 'searchWorker':
                 if search.is_valid():
-                    aux = request.POST.get('array', False)
-                    cad = aux.split(' ')
-                    aux_c = []
-                    for word in cad:
-                        aux_n_dictionary = {'user__first_name__icontains':
-                                            word,
-                                            'market': market_now}
-                        aux_n = Worker.objects.filter(**aux_n_dictionary)
-                        aux_a_dictionary = {'user__last_name__icontains': word,
-                                            'market': market_now}
-                        aux_a = Worker.objects.filter(**aux_a_dictionary)
-                        aux_l_dictionary = {'user__username__icontains': word,
-                                            'market': market_now}
-                        aux_l = Worker.objects.filter(**aux_l_dictionary)
-                        aux_d = Worker.objects.filter(dni__icontains=word,
-                                                      market=market_now)
-                        if aux_n or aux_a or aux_l or aux_d:
-                            for i in (list(aux_n) + list(aux_a) + list(aux_l) +
-                                      list(aux_d)):
-                                counter = 0
-                                for j in aux_c:
-                                    if i == j:
-                                        counter = 1
-                                if counter == 0:
-                                    if i:
-                                        aux_c.append(i)
-                    if aux_c:
-                        workers = aux_c
-                    else:
-                        fail = "title: 'Error', type: 'error', text: 'No se  \
-                                han encontrado trabajadores.'"
+                    workers = search_workers(request, workers, market_now)
         if 'newNotification' in request.POST:
             for i in workers:
                 if request.POST['newNotification'] == i.dni:
-                    if notification.is_valid():
+                    if notification.is_valid(request):
                         aux = notification.save(commit=False)
                         aux.reciver = i
                         aux.writer = worker_now
@@ -194,65 +158,56 @@ def list_workers(request):
         search = SearchWorkerForm()
         notification = NotificationForm()
 
-    paginator = Paginator(workers, 4)
-    page = request.GET.get('page', 1)
-    try:
-        workers = paginator.page(page)
-    except PageNotAnInteger:
-        workers = paginator.page(page)
-    except EmptyPage:
-        workers = paginator.page(paginator.num_pages)
+    workers, page = paginator_function(request, workers)
 
     to_return = {'worker_now': worker_now, 'workers': workers,
-                 'search': search, 'notification': notification, 'fail': fail}
+                 'search': search, 'notification': notification}
 
     return render(request, 'employers.html', to_return)
 
 
 @login_required(login_url='/')
 def mod_worker(request, pk):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
-    market_now = worker_now.market
-    fail = None
+    worker_now, market_now = get_worker_market(request)
 
     worker_profile = Worker.objects.get(dni=pk)
+    is_mod = True
 
     if worker_profile == worker_now:
         if request.method == 'POST':
-            newuser = UserForm(request.POST, instance=worker_profile.user)
+            newuser = UserForm(is_mod=is_mod, data=request.POST,
+                               instance=worker_profile.user)
             neworker = RegisterWorker(request.POST, instance=worker_profile)
             new_address = FullDirectionForm(request.POST,
                                             instance=worker_profile.home)
-            password = PasswordMarketForm(request.POST)
             if request.POST['neWorkerForm'] == 'registerUser':
-                if (newuser.is_valid() * new_address.is_valid() *
-                        neworker.is_valid() * password.is_valid()):
-                    if (request.POST.get('secretKey', False) ==
-                            market_now.secretKey):
-                        user_aux = newuser.save()
-                        addr = new_address.save()
-                        worker_aux = neworker.save(commit=False)
-                        if not request.POST.get('genre', False):
-                            worker_aux.genre = worker_profile.genre
-                        worker_aux.user = user_aux
-                        worker_aux.market = market_now
-                        worker_aux.home = addr
-                        worker_aux.save()
-                        return new_login(request, worker_aux.user.username,
-                                         request.POST.get('password1', False))
-                    else:
-                        password['secretKey'].error = "¡Contraseña incorrecta!"
-
+                if (newuser.is_valid(request) * new_address.is_valid() *
+                        neworker.is_valid(request)):
+                    # user_aux = newuser.save()
+                    for key, value in newuser.cleaned_data.items():
+                        setattr(worker_now.user, key, value)
+                    worker_now.user.save()
+                    for key, value in new_address.cleaned_data.items():
+                        setattr(worker_now.home, key, value)
+                    worker_now.home.save()
+                    for key, value in neworker.cleaned_data.items():
+                        setattr(worker_now, key, value)
+                    worker_now.save()
+                    messages.success(request,
+                                     'Trabajador actualizado correctamente.')
+                    return redirect('/employer_profile/' + pk)
+                else:
+                    messages.error(
+                        request,
+                        'Fallo al intentar actualiar trabajador.')
         else:
-            newuser = UserForm(instance=worker_profile.user)
+            newuser = UserForm(instance=worker_profile.user, is_mod=is_mod)
             neworker = RegisterWorker(instance=worker_profile)
             new_address = FullDirectionForm(instance=worker_profile.home)
-            password = PasswordMarketForm()
 
-        to_return = {'worker_now': worker_now, 'fail': fail,
+        to_return = {'worker_now': worker_now, 'is_mod': is_mod,
                      'neworker': neworker, 'newAddress': new_address,
-                     'password': password, 'newuser': newuser}
+                     'newuser': newuser}
     else:
         return redirect('/employers')
 
@@ -261,15 +216,14 @@ def mod_worker(request, pk):
 
 @login_required(login_url='/')
 def worker_profile(request, pk):
-    user_now = request.user
-    worker_now = Worker.objects.get(user=user_now)
-    fail = None
+    worker_now, market = get_worker_market(request)
 
-    worker_profile = Worker.objects.get(dni=pk)
+    worker_profile = Worker.objects.get(dni=pk, market=market)
     notifications = Notification.objects.filter(reciver=worker_profile)
+    sales = Sale.objects.filter(market=market, seller=worker_profile)
 
     to_return = {'worker_now': worker_now, 'workerProfile': worker_profile,
-                 'notifications': notifications, 'fail': fail}
+                 'notifications': notifications, 'sales': sales}
 
     return render(request, 'employerProfile.html', to_return)
 
@@ -358,7 +312,6 @@ def new_product(request):
 def list_products(request):
     worker_now, market_now = get_worker_market(request)
     products = Product.objects.filter(market=market_now)
-    fail = None
     search_product = SearchProduct(request.GET)
     filter_products = ProductFilterForm(request.GET)
     mod_quantity = StockForm(request.POST)
@@ -418,7 +371,7 @@ def list_products(request):
         table = None
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'search_product': search_product,
-                 'mod_quantity': mod_quantity, 'fail': fail, 'table': table,
+                 'mod_quantity': mod_quantity, 'table': table,
                  'filter_products': filter_products,
                  'offer_form': offer_form}
 
@@ -516,7 +469,11 @@ def new_client(request):
                 if not aux_cli.email:
                     aux_cli.email = None
                 aux_cli.save()
+                messages.success(request,
+                                 "Cliente agregado satisfactoriamente.")
                 return redirect('/clients')
+            else:
+                messages.warning(request, "Error al agregar cliente.")
     else:
         new_client = ClientForm()
 
@@ -531,7 +488,6 @@ def list_clients(request):
     worker_now = Worker.objects.get(user=user_now)
     market_now = worker_now.market
     clients = Client.objects.filter(market=market_now)
-    fail = None
 
     if request.method == 'POST':
         search_clie = SearchClientForm(request.POST)
@@ -556,6 +512,7 @@ def list_clients(request):
             for i in clients:
                 if request.POST['modWallet'] == i.pk:
                     if wallet.is_valid(request):
+                        old_val = i.wallet
                         for key, value in wallet.cleaned_data.items():
                             if value and key == 'new':
                                 i.wallet = float(value)
@@ -563,23 +520,21 @@ def list_clients(request):
                                 i.wallet += float(value)
                         i.save()
                         wallet = InputMoney()
+                        note = Notification(
+                            reciverCli=i, writer=worker_now,
+                            content=("Se ma modificado el monedero del " +
+                                     "cliente de " + str(old_val) + "€ a " +
+                                     str(i.wallet) + "€"), typeNote='wallet')
+                        note.save()
     else:
         search_clie = SearchClientForm()
         notification = NotificationForm()
         wallet = InputMoney()
 
-    paginator = Paginator(clients, 4)
-    page = request.GET.get('page', 1)
-    try:
-        clients = paginator.page(page)
-    except PageNotAnInteger:
-        clients = paginator.page(page)
-    except EmptyPage:
-        clients = paginator.page(paginator.num_pages)
+    clients, page = paginator_function(request, query=clients)
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'clients': clients, 'search_clie': search_clie,
-                 'notification': notification, 'wallet': wallet,
-                 'fail': fail}
+                 'notification': notification, 'wallet': wallet}
     return render(request, 'clients.html', to_return)
 
 
@@ -612,6 +567,8 @@ def mod_client(request, pk):
                 if client.email == '':
                     client.email = None
                 client.save()
+                messages.success(request,
+                                 "Cliente modificado satisfactoriamente.")
                 note = Notification(reciverCli=client, writer=worker_now,
                                     content="Cliente modificado. \
                                              Datos anteriores; \
@@ -626,11 +583,13 @@ def mod_client(request, pk):
                     note2 = Notification(reciverCli=client, writer=worker_now,
                                          content="Se ma modificado el \
                                                   monedero del cliente de \
-                                                  " + str(aux.wallet) + " a \
-                                                  " + str(client.wallet),
-                                         typeNote='warning')
+                                                  " + str(aux.wallet) + "€ a \
+                                                  " + str(client.wallet) + "€",
+                                         typeNote='wallet')
                     note2.save()
                 return redirect('/client_profile/' + pk)
+            else:
+                request.warning(request, "Fallo al modificar el cliente.")
     else:
         new_client = ClientForm(instance=client)
 
@@ -645,16 +604,18 @@ def client_profile(request, pk):
     worker_now = Worker.objects.get(user=user_now)
     market_now = worker_now.market
     client = Client.objects.get(pk=pk, market=market_now)
-    sales = Sale.objects.filter(market=market_now, buyer=client)
+    sales = Sale.objects.filter(
+        market=market_now, buyer=client).order_by("-date")
 
-    notifications = Notification.objects.filter(reciverCli=client,
-                                                typeNote='normal')
-    warnings_wallet = Notification.objects.filter(reciverCli=client,
-                                                  typeNote='warning')
+    notifications = Notification.objects.filter(
+        reciverCli=client, typeNote='normal').order_by('-date')
+    warnings_wallet = Notification.objects.filter(
+        reciverCli=client,
+        typeNote='wallet').order_by('-date')
 
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'client': client, 'notifications': notifications,
-                 'warningsWallet': warnings_wallet, 'sales': sales}
+                 'warnings_wallet': warnings_wallet, 'sales': sales}
 
     return render(request, 'clientProfile.html', to_return)
 
@@ -905,6 +866,7 @@ def all_sales(request):
         criteria = form.get_filter(market=worker_now.market)
         sales_query = sales_query.filter(**criteria)
 
+    '''
     paginator = Paginator(sales_query, 5)
     page = request.GET.get('page', 1)
     try:
@@ -913,6 +875,8 @@ def all_sales(request):
         sales = paginator.page(page)
     except EmptyPage:
         sales = paginator.page(paginator.num_pages)
+    '''
+    sales, page = paginator_function(request, query=sales_query)
 
     to_return = {'worker_now': worker_now,
                  'sales': sales, 'form': form, 'url_vars': url_vars}

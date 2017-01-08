@@ -30,6 +30,7 @@
                     <div class="x_content">
 
                         <div class="row">
+                            {% if clients %}
                             <div class="clearfix"></div>
 
                             {% for client in clients %}
@@ -172,10 +173,11 @@
                                 <!-- /END MODAL -->
                             {% endfor %}
                             <nav aria-label="Page navigation" class="col-md-12">
+                            <div class="col-md-6">
                                 <ul class="pagination">
                                     {% if clients.has_previous %}
                                     <li class="previous">
-                                        <a href="?page={{ clients.previous_page_number }}">Anterior</a>
+                                        <a href="?page={{ clients.previous_page_number }}">&laquo; Anterior</a>
                                     </li>
                                     {% endif %}
                                     <li class="cardinality">
@@ -183,11 +185,27 @@
                                     </li>
                                     {% if clients.has_next %}
                                     <li class="next">
-                                        <a href="?page={{ clients.next_page_number }}">Siguiente</a>
+                                        <a href="?page={{ clients.next_page_number }}">Siguiente &raquo;</a>
                                     </li>
                                     {% endif %}
                                 </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="GET" action="." style="text-align: right;">
+                                    <ul class="pagination">
+                                        <li class="cardinality">
+                                            Página <input type="number" placeholder="Num." value="{{clients.number}}" name="page" style="width: 15%" step="1"/> de {{clients.paginator.num_pages}}
+                                            <button class="btn btn-default" type="submit">Ir <icon class="glyphicon glyphicon-play"></icon></button>
+                                        </li>
+                                    </ul>
+                                    </form>
+                                </div>
                             </nav>
+                            {% else %}
+                                <div class="alert alert-success" role="alert">
+                                  No se han registrado clientes en la plataforma.
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

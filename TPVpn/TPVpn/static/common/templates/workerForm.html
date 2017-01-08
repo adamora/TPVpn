@@ -66,7 +66,7 @@
                               </ul>
                                 <div id="step-1">
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Nombre de usuario <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -75,7 +75,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       E-mail <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -83,8 +83,9 @@
                                       {{ newuser.email.error }}
                                     </div>
                                   </div>
+                                  {% if not is_mod %}
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Contraseña <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -93,7 +94,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Repita contraseña <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -101,17 +102,9 @@
                                       {{ newuser.password2.error }}
                                     </div>
                                   </div>
+                                  {% endif %}
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-                                      Contraseña del Negocio <span class="required">*</span>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                      {{ password.secretKey }}
-                                      {{ password.secretKey.error }}
-                                    </div>
-                                  </div>
-                                  <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Nombre de pila <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -120,7 +113,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Apellidos <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -131,7 +124,7 @@
                                 </div>
                                 <div id="step-2">
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       DNI <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -140,22 +133,30 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">
+                                    <label class="control-label col-md-3">
                                       Género <span class="required">*</span>
                                     </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                      <div id="id_genre" class="btn-group" data-toggle="buttons">
-                                          <label for="id_genre_0" class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                            <input class="form-control" id="id_genre_0" name="genre" type="radio" value="Hombre" /> Hombre
-                                          </label>
-                                          <label for="id_genre_1" class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                            <input class="form-control" id="id_genre_1" name="genre" type="radio" value="Mujer" /> Mujer
-                                          </label>
+                                    <div class="col-md-6">
+                                      <div class="btn-group" data-toggle="buttons">
+                                        <label class="btn btn-default{% if worker_now.genre == 'Hombre' and is_mod %} active{% endif %}">
+                                          {% if worker_now.genre == 'Hombre' and is_mod %}
+                                          <input type="radio" name="genre" id="id_genre_0" autocomplete="off" value="Hombre" checked> Hombre
+                                          {% else %}
+                                          <input type="radio" name="genre" id="id_genre_0" autocomplete="off" value="Hombre"> Hombre
+                                          {% endif %}
+                                        </label>
+                                        <label class="btn btn-default{% if worker_now.genre == 'Mujer' and is_mod %} active{% endif %}">
+                                          {% if worker_now.genre == 'Mujer' and is_mod %}
+                                          <input type="radio" name="genre" id="id_genre_1" autocomplete="off" value="Mujer" checked> Mujer
+                                          {% else %}
+                                          <input type="radio" name="genre" id="id_genre_1" autocomplete="off" value="Mujer"> Mujer
+                                          {% endif %}
+                                        </label>
                                       </div>
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Nº. Seguridad Social <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -164,7 +165,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Teléfono <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -173,7 +174,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">
                                       Teléfono <span class="required"><small>(Opcional)</small></span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -182,18 +183,24 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">
                                       Foto de perfil <span class="required"></span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                       {{ neworker.image }}
                                       {{ neworker.image.error }}
+                                      <label for="id_image">
+                                          <a class="btn btn-default"><icon class="glyphicon glyphicon-open"></icon> Seleccione un archivo</a>
+                                          <a id="modal-button" data-toggle="modal" data-target="#myModal" hidden="">
+                                           ó Previsualizar Imagen
+                                          </a>
+                                      </label>
                                     </div>
                                   </div>
                                 </div>
                                 <div id="step-3">
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Localidad <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -202,7 +209,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Provincia <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -211,7 +218,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Código Postal <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -220,7 +227,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Dirección <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -229,7 +236,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Número <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -238,7 +245,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Escaleras <span class="required"></span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -247,7 +254,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Planta <span class="required"></span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -256,7 +263,7 @@
                                     </div>
                                   </div>
                                   <div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                    <label class="control-label col-md-3">
                                       Localidad <span class="required"></span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -269,18 +276,6 @@
                                     <input type="hidden" name="neWorkerForm" value="registerUser">
                                     <!--button class="btn btn-default submit" type="submit">Registrar</a-->
                                 </div>
-                              <!--/form-->
-                              <!--div id="step-4">
-                                  <h2 class="StepTitle">Step 4 Content</h2>
-                                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                  </p>
-                                  <p>
-                                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                  </p>
-                                  <p>
-                                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                  </p>
-                              </div-->
 
                           </div>
                           <!-- End SmartWizard Content -->
@@ -295,42 +290,66 @@
 
   <div class="clearfix"></div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Previsualizar Imagen</h4>
+          </div>
+          <div class="modal-body col-md-12">
+            <img id="image_to_show" style="max-width: 100%" />  
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  {% block scripts %}
-    <!--
-    <script src="{% static "common/templates/js/bootstrap.min.js" %}"></script>
+{% endblock %}
 
+{% block scripts %}
+  <script src="{% static "common/templates/js/textarea/autosize.min.js" %} "></script>
+  <script type="text/javascript">
+      $(document).ready(function () {
+        autosize($('.resizable_textarea'));
+          $('#id_image').hide();
+          document.getElementById("id_image").onchange = function () {
+              var reader = new FileReader();
 
-    <script src="{% static "common/templates/js/chartjs/chart.min.js" %}"></script>
+              reader.onload = function (e) {
+                  // get loaded data and render thumbnail.
+                  document.getElementById("image_to_show").src = e.target.result;
+              };
 
-    <script src="{% static "common/templates/js/progressbar/bootstrap-progressbar.min.js" %}"></script>
-    <script src="{% static "common/templates/js/nicescroll/jquery.nicescroll.min.js" %}"></script>
+              // read the image file as a data URL.
+              reader.readAsDataURL(this.files[0]);
+              $('#myModal').modal('show');
+              $('#modal-button').show();
+          };
+      });
+  </script>
+  <!-- form wizard -->
+  <script type="text/javascript" src="{% static "common/templates/js/wizard/jquery.smartWizard.js" %}"></script>
+  <script type="text/javascript">
+      $(document).ready(function () {
+          // Smart Wizard
+          $('#wizard').smartWizard();
 
-    <script src="{% static "common/templates/js/icheck/icheck.min.js" %}"></script>
+          function onFinishCallback() {
+              $('#wizard').smartWizard('showMessage', 'Finish Clicked');
+                alert('Finish Clicked');
+          }
+      });
 
-    <script src="{% static "common/templates/js/custom.js" %}"></script>
-    -->
-    
-    <!-- form wizard -->
-    <script type="text/javascript" src="{% static "common/templates/js/wizard/jquery.smartWizard.js" %}"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // Smart Wizard
-            $('#wizard').smartWizard();
+      $(document).ready(function () {
+          // Smart Wizard
+          $('#wizard_verticle').smartWizard({
+              transitionEffect: 'slide'
+          });
 
-            function onFinishCallback() {
-                $('#wizard').smartWizard('showMessage', 'Finish Clicked');
-                  alert('Finish Clicked');
-            }
-        });
-
-        $(document).ready(function () {
-            // Smart Wizard
-            $('#wizard_verticle').smartWizard({
-                transitionEffect: 'slide'
-            });
-
-        });
-    </script>
-  {% endblock %}
+      });
+  </script>
 {% endblock %}

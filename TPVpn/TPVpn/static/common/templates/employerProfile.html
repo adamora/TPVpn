@@ -2,18 +2,13 @@
     {% load staticfiles %}
 {% block mainContent %}
     <div class="">
-      <div class="page-title">
-        <div class="title_left">
-          <h3>Perfil de <a class='green'>@{{workerProfile.user.username}}</a></h3>
-        </div>
-      </div>
       <div class="clearfix"></div>
 
         <div class="row">
           <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                   <div class="x_title">
-                      <h2>Trabajador <small>Informe de actividad</small></h2>
+                      <h3>Perfil de: <a class='green'>@{{workerProfile.user.username}}</a></h3>
                       <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
@@ -92,59 +87,52 @@
 
                           <ul class="list-unstyled user_data">
                             <li>
-                              <i class="fa fa-user user-profile-icon"></i> DNI: {{workerProfile.user.username}}
+                              <i class="fa fa-user user-profile-icon"></i> Login: <b><a href="/employer_profile/{{workerProfile.dni}}" class="green">@{{workerProfile.user.username}}</a></b>
                             </li>
                             <li>
-                              <i class="fa fa-credit-card user-profile-icon"></i> DNI: {{workerProfile.dni}}
+                              <i class="fa fa-credit-card user-profile-icon"></i> DNI: <b>{{workerProfile.dni}}</b>
                             </li>
 
                               <li>
-                                  <i class="fa fa-phone user-profile-icon"></i> Telefono:
+                                  <i class="fa fa-phone user-profile-icon"></i> Teléfono:
+                                  <b>
                                   {% if workerProfile.tel1 == None %}
                                       (Vacío)
                                   {% else %}
                                       {{workerProfile.tel1}}
                                   {% endif %}
+                                  </b>
                               </li>
 
                               <li>
-                                  <i class="fa fa-phone user-profile-icon"></i> Telefono (opc.):
+                                  <i class="fa fa-phone user-profile-icon"></i> Teléfono (opc.):
+                                  <b>
                                   {% if workerProfile.tel2 == None %}
                                       (Vacío)
                                   {% else %}
                                       {{workerProfile.tel2}}
                                   {% endif %}
+                                  </b>
                               </li>
 
                               <li class="m-top-xs">
                                   <i class="fa fa-envelope user-profile-icon"></i>
-                                  <a href="{{workerProfile.user.email}}" target="_blank"> E-mail: {{workerProfile.user.email}}</a>
+                                  E-mail: <a class="blue" href="mailto:{{workerProfile.user.email}}">{{workerProfile.user.email}}</a>
                               </li>
                           </ul>
                           {% if workerProfile == worker_now %}
-                            <a href="/modWorker/{{workerProfile.pk}}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Editar Perfil</a>
+                            <a href="/modWorker/{{workerProfile.dni}}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Editar Perfil</a>
                           {% endif %}
                           <br />
 
                       </div>
                       <div class="col-md-9 col-sm-9 col-xs-12">
 
-                          <!--div class="profile_title">
-                              <div class="col-md-6">
-                                  <h2>Actividad del Cliente</h2>
-                              </div>
-                              <div class="col-md-6">
-                              </div>
-                          </div>
-                          -- start of user-activity-graph --
-                          <div id="graph_bar" style="width:100%; height:280px;"></div>
-                          -- end of user-activity-graph -->
-
                           <div class="" role="tabpanel" data-example-id="togglable-tabs">
 
                               <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
                                   <li role="presentation" class="active">
-                                    <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Facturas Recientes</a>
+                                    <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Ventas Realizadas</a>
                                   </li>
                                   <li role="presentation">
                                     <a href="#tab_content2" role="tab" data-toggle="tab" aria-expanded="false">Notificaciones</a>
@@ -152,34 +140,94 @@
                               </ul>
 
                               <div id="myTabContent" class="tab-content">
-                                  <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
-                                      <ul class="messages" style="list-style-type:none">
-                                      {% for sale in sales %}
-                                        <li>
-                                          <img src="/media/{{workerProfile.image}}" class="avatar" alt="Avatar">
-                                          <div class="message_date">
-                                            {{sale.date}}
-                                          </div>
-                                          <div class="message_wrapper">
-                                            <h4 class="heading">Factura: {{sale.sale_code}}</h4>
-                                            <blockquote class="message">Monedero invertido en la compra: {{sale.usedWallet}}€</blockquote>
-                                            <br />
-                                            <p class="url">
-                                              <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
-                                              <a href="/index/{{sale.id}}"><i class="fa fa-paperclip"></i> Ver Factura </a>
-                                            </p>
-                                          </div>
-                                        </li>
-                                      {% endfor %}
-                                      </ul>
+                                  <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" style="overflow: scroll; overflow-x:hidden; max-height: 420px;">
+                                      {% if sales %}
+                                        <ul class="messages" style="list-style-type:none">
+                                        {% for sale in sales %}
+                                            <li>
+                                                <img src="/media/{{sale.seller.image}}" class="avatar" alt="Avatar">
+                                                <div class="message_date" style="margin-right: 10px">
+                                                    {{sale.date}}
+                                                </div>
+                                                <div class="message_wrapper">
+                                                    <h4 class="heading">Ticket: {{sale.sale_code}}</h4>
+                                                    <blockquote class="message">
+                                                        <b>Venta realizada a:
+                                                        {% if sale.buyer %}
+                                                          <a class="green" href="/client_profile/{{sale.buyer.dni}}">{{sale.buyer.name}}</a>
+                                                        {% else %}
+                                                          <a class="green" >Anónimo</a>
+                                                        {% endif %}
+                                                        </b><br>
+                                                        Total de la compra: {{sale.totAmount}}€ <br>
+                                                        Efectivo invertido en la compra: {{sale.recivedAmount}}€ <br>
+                                                        Monedero invertido en la compra: {{sale.usedWallet}}€ <br>
+                                                        Devolución: {{sale.devolution}}€
+                                                    </blockquote>
+                                                    <br />
+                                                    <p class="url">
+                                                        <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
+                                                        <a data-toggle="modal" data-target="#myModal{{sale.id}}"><i class="fa fa-paperclip"></i> Ver Ticket de Compra </a>
+
+<div class="modal fade" id="myModal{{sale.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">{{sale.sale_code}}</h4>
+      </div>
+      <div class="modal-body">
+          <table class="table table-striped">
+              <thead>
+                  <tr>
+                      <th>Nombre</th>
+                      <th>Cantidad</th>
+                      <th>Precio Unitario</th>
+                      <th>Precio Total</th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% for product in sale.productsale_set.all %}
+                <tr>
+                    {% if product.product %}
+                        <td>{{product.product.name}}</td>
+                    {% else %}
+                        <td>Sin Nombre</td>
+                    {% endif %}
+                    <td>{{product.amount}}</td>
+                    <td>{{product.sellPrice}}€</td>
+                    <td>{{product.totAmount}}€</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                        </ul>
+                                      {% else %}
+                                        <div class="alert alert-info" role="alert">
+                                          No se han realizado ventas.
+                                        </div>
+                                      {% endif %}
                                   </div>
 
-                                  <div role="tabpanel" class="tab-pane" id="tab_content2" aria-labelledby="home-tab">
+                                  <div role="tabpanel" class="tab-pane" id="tab_content2" style="overflow: scroll; overflow-x:hidden; max-height: 420px;">
+                                      {% if notifications %}
                                       <ul class="messages" style="list-style-type:none">
                                       {% for notification in notifications %}
                                         <li>
                                           <img src="/media/{{notification.writer.image}}" class="avatar" alt="Avatar">
-                                          <div class="message_date">
+                                          <div class="message_date" style="margin-right: 10px">
                                             {{notification.date}}
                                           </div>
                                           <div class="message_wrapper">
@@ -194,6 +242,11 @@
                                         </li>
                                       {% endfor %}
                                       </ul>
+                                      {% else %}
+                                        <div class="alert alert-info" role="alert">
+                                          No has recibido notificaciones.
+                                        </div>
+                                      {% endif %}
                                   </div>
 
                               </div>
@@ -205,162 +258,4 @@
           </div>
       </div>
     </div>
-
-    {% block script %}
-
-        <script src="{% static "common/templates/js/bootstrap.min.js" %}"></script>
-
-        <!-- chart js -->
-        <script src="{% static "common/templates/js/chartjs/chart.min.js" %}"></script>
-        <!-- bootstrap progress js -->
-        <script src="{% static "common/templates/js/progressbar/bootstrap-progressbar.min.js" %}"></script>
-        <script src="{% static "common/templates/js/nicescroll/jquery.nicescroll.min.js" %}"></script>
-        <!-- icheck -->
-        <script src="{% static "common/templates/js/icheck/icheck.min.js" %}"></script>
-
-        <script src="{% static "common/templates/js/custom.js" %}"></script>
-
-        <!-- image cropping -->
-        <script src="{% static "common/templates/js/cropping/cropper.min.js" %}"></script>
-        <script src="{% static "common/templates/js/cropping/main.js" %}"></script>
-
-
-        <!-- daterangepicker -->
-        <script type="text/javascript" src="{% static "common/templates/js/moment.min.js" %}"></script>
-        <script type="text/javascript" src="{% static "common/templates/js/datepicker/daterangepicker.js" %}"></script>
-        <!-- moris js -->
-        <script src="{% static "common/templates/js/moris/raphael-min.js" %}"></script>
-        <script src="{% static "common/templates/js/moris/morris.js" %}"></script>
-        <script>
-            $(function () {
-                var day_data = [
-                    {
-                        "period": "Jan",
-                        "Hours worked": 80
-                    },
-                    {
-                        "period": "Feb",
-                        "Hours worked": 125
-                    },
-                    {
-                        "period": "Mar",
-                        "Hours worked": 176
-                    },
-                    {
-                        "period": "Apr",
-                        "Hours worked": 224
-                    },
-                    {
-                        "period": "May",
-                        "Hours worked": 265
-                    },
-                    {
-                        "period": "Jun",
-                        "Hours worked": 314
-                    },
-                    {
-                        "period": "Jul",
-                        "Hours worked": 347
-                    },
-                    {
-                        "period": "Aug",
-                        "Hours worked": 287
-                    },
-                    {
-                        "period": "Sep",
-                        "Hours worked": 240
-                    },
-                    {
-                        "period": "Oct",
-                        "Hours worked": 211
-                    }
-        ];
-                Morris.Bar({
-                    element: 'graph_bar',
-                    data: day_data,
-                    xkey: 'period',
-                    hideHover: 'auto',
-                    barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
-                    ykeys: ['Hours worked', 'sorned'],
-                    labels: ['Hours worked', 'SORN'],
-                    xLabelAngle: 60
-                });
-            });
-        </script>
-        <!-- datepicker -->
-        <script type="text/javascript">
-            $(document).ready(function () {
-
-                var cb = function (start, end, label) {
-                    console.log(start.toISOString(), end.toISOString(), label);
-                    $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                    //alert("Callback has fired: [" + start.format('MMMM D, YYYY') + " to " + end.format('MMMM D, YYYY') + ", label = " + label + "]");
-                }
-
-                var optionSet1 = {
-                    startDate: moment().subtract(29, 'days'),
-                    endDate: moment(),
-                    minDate: '01/01/2012',
-                    maxDate: '12/31/2015',
-                    dateLimit: {
-                        days: 60
-                    },
-                    showDropdowns: true,
-                    showWeekNumbers: true,
-                    timePicker: false,
-                    timePickerIncrement: 1,
-                    timePicker12Hour: true,
-                    ranges: {
-                        'Today': [moment(), moment()],
-                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                        'This Month': [moment().startOf('month'), moment().endOf('month')],
-                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                    },
-                    opens: 'left',
-                    buttonClasses: ['btn btn-default'],
-                    applyClass: 'btn-small btn-primary',
-                    cancelClass: 'btn-small',
-                    format: 'MM/DD/YYYY',
-                    separator: ' to ',
-                    locale: {
-                        applyLabel: 'Submit',
-                        cancelLabel: 'Clear',
-                        fromLabel: 'From',
-                        toLabel: 'To',
-                        customRangeLabel: 'Custom',
-                        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-                        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                        firstDay: 1
-                    }
-                };
-                $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
-                $('#reportrange').daterangepicker(optionSet1, cb);
-                $('#reportrange').on('show.daterangepicker', function () {
-                    console.log("show event fired");
-                });
-                $('#reportrange').on('hide.daterangepicker', function () {
-                    console.log("hide event fired");
-                });
-                $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
-                    console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
-                });
-                $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
-                    console.log("cancel event fired");
-                });
-                $('#options1').click(function () {
-                    $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
-                });
-                $('#options2').click(function () {
-                    $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
-                });
-                $('#destroy').click(function () {
-                    $('#reportrange').data('daterangepicker').remove();
-                });
-            });
-        </script>
-        <!-- /datepicker -->
-    {% endblock %}
-
 {% endblock %}

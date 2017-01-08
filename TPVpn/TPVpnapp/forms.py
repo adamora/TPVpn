@@ -21,14 +21,6 @@ class UserForm(UserCreationForm):
                              widget=forms.EmailInput(attrs={
                                                      'class': 'form-control',
                                                      'placeholder': ''}))
-    password1 = forms.CharField(required=True, label='',
-                                widget=forms.PasswordInput(
-                                    attrs={'class': 'form-control',
-                                           'placeholder': ''}))
-    password2 = forms.CharField(required=True, label='',
-                                widget=forms.PasswordInput(
-                                    attrs={'class': 'form-control',
-                                           'placeholder': ''}))
     first_name = forms.CharField(required=True, label='',
                                  widget=forms.TextInput(
                                      attrs={'class': 'form-control',
@@ -43,6 +35,40 @@ class UserForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', 'first_name',
                   'last_name')
 
+    def __init__(self, is_mod=False, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        if is_mod:
+            self.fields['password1'].required = False
+            self.fields['password2'].required = False
+            self.fields.pop('password1')
+            self.fields.pop('password2')
+        else:
+            self.fields['password1'].widget.attrs = {
+                'class': 'form-control',
+                'placeholder': ''}
+            self.fields['password2'].widget.attrs = {
+                'class': 'form-control',
+                'placeholder': ''}
+
+    def is_valid(self, request):
+        is_valid = super(UserForm, self).is_valid()
+        if not is_valid:
+            if self.errors:
+                for key, value in self.errors.items():
+                    if isinstance(value, list):
+                        msg = key + ': ' + value[0]
+                    else:
+                        msg = key + ': ' + value
+                    messages.warning(request, msg)
+            if self.error_messages:
+                for key, value in self.error_messages.items():
+                    if isinstance(value, list):
+                        msg = key + ': ' + value[0].title()
+                    else:
+                        msg = key + ': ' + value.title()
+                    messages.warning(request, msg)
+        return is_valid
+
 
 class RegisterBusinessForm(ModelForm):
     name = forms.CharField(required=True, label='',
@@ -55,15 +81,6 @@ class RegisterBusinessForm(ModelForm):
                                               'placeholder':
                                               '¿Que tipo de actividad realiza?'
                                               }))
-    secretKey = forms.CharField(required=True, label='',
-                                widget=forms.PasswordInput(
-                                    attrs={'class': 'form-control',
-                                           'placeholder': 'Contraseña*'}))
-    secretKey2 = forms.CharField(required=True, label='',
-                                 widget=forms.PasswordInput(
-                                     attrs={'class': 'form-control',
-                                            'placeholder':
-                                            'Repita la contraseña*'}))
     tel = forms.IntegerField(required=True, label='',
                              widget=forms.NumberInput(
                                  attrs={'class': 'form-control',
@@ -76,8 +93,7 @@ class RegisterBusinessForm(ModelForm):
 
     class Meta:
         model = Market
-        fields = ('name', 'tel', 'email', 'kindActivity', 'secretKey',
-                  'secretKey2')
+        fields = ('name', 'tel', 'email', 'kindActivity')
 
 
 class FullDirectionForm(ModelForm):
@@ -99,10 +115,11 @@ class FullDirectionForm(ModelForm):
                                 widget=forms.TextInput(
                                     attrs={'class': 'form-control',
                                            'placeholder': 'Dirección*'}))
-    numDir = forms.CharField(required=False, label='',
-                             widget=forms.TextInput(attrs={
-                                                    'class': 'form-control',
-                                                    'placeholder': 'Número*'}))
+    numDir = forms.CharField(
+        required=False, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Número*'}))
     stairs = forms.CharField(required=False, label='',
                              widget=forms.TextInput(attrs={
                                                     'class': 'form-control',
@@ -124,52 +141,50 @@ class FullDirectionForm(ModelForm):
 
 
 class RegisterWorker(ModelForm):
-    dni = forms.CharField(required=True, label='',
+    dni = forms.CharField(required=True, label='DNI',
                           widget=forms.TextInput(attrs={
                                                  'class': 'form-control',
                                                  'placeholder': ''}))
-    genre = forms.ChoiceField(required=False, choices=GENRE, label='',
+    genre = forms.ChoiceField(required=True, choices=GENRE, label='Género',
                               widget=forms.RadioSelect(attrs={
                                                        'class': 'form-control',
                                                        'name': 'gender'}))
-    segSocial = forms.CharField(required=True, label='',
+    segSocial = forms.CharField(required=True, label='Seguridad Social',
                                 widget=forms.TextInput(attrs={
                                                        'class': 'form-control',
                                                        'placeholder': ''}))
-    tel1 = forms.IntegerField(required=True, label='',
+    tel1 = forms.IntegerField(required=True, label='Teléfono',
                               widget=forms.NumberInput(attrs={
                                                        'class': 'form-control',
-                                                       'placeholder': ''}))
-    tel2 = forms.IntegerField(required=False, label='',
+                                                       'step': '1'}))
+    tel2 = forms.IntegerField(required=False, label='Teléfono (Opcional)',
                               widget=forms.NumberInput(
                                   attrs={'class': 'form-control',
-                                         'placeholder': ''}))
-    image = forms.FileField(required=False, widget=forms.FileInput, label='')
+                                         'step': '1'}))
+    image = forms.FileField(required=False, widget=forms.FileInput,
+                            label='Imagen')
 
     class Meta:
         model = Worker
         fields = ('dni', 'genre', 'segSocial', 'tel1', 'tel2', 'image')
 
+    def __init__(self, *args, **kwargs):
+        super(RegisterWorker, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs.keys():
+            self.fields['genre'].initial = self.instance.genre
+
     def is_valid(self, request):
         super(RegisterWorker, self).is_valid()
         if self.errors:
-            for msg in self.errors.values():
+            for key, value in self.errors.items():
+                if isinstance(value, list):
+                    msg = key + ': ' + value[0]
+                else:
+                    msg = key + ': ' + value
                 messages.error(request, msg)
             return False
         else:
             return True
-
-
-class PasswordMarketForm(ModelForm):
-    secretKey = forms.CharField(required=True, label='',
-                                widget=forms.PasswordInput(
-                                    attrs={
-                                        'class': 'form-control'
-                                    }))
-
-    class Meta:
-        model = Market
-        fields = ('secretKey',)
 
 
 class SearchWorkerForm(forms.Form):

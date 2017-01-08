@@ -25,8 +25,8 @@ class Market(models.Model):
     direction = models.ForeignKey(
         FullDirection, unique=False, null=True, blank=True
     )
-    secretKey = models.CharField(max_length=16, blank=False, null=False)
-    secretKey2 = models.CharField(max_length=16, blank=False, null=False)
+    # secretKey = models.CharField(max_length=16, blank=False, null=False)
+    # secretKey2 = models.CharField(max_length=16, blank=False, null=False)
     tel = models.IntegerField()
     email = models.EmailField()
 
@@ -107,16 +107,18 @@ class Worker(models.Model):
     user = models.OneToOneField(User, unique=True, default=None)
     # Relacion 1:N - Mercado puede tener muchos trabajadores
     market = models.ForeignKey(Market, null=True, blank=True)
-    dni = models.CharField(max_length=9, blank=False, unique=True,
-                           primary_key=True)
+    dni = models.CharField(max_length=9)
     genre = models.CharField(max_length=20, choices=GENRE)
-    segSocial = models.CharField(max_length=12, unique=True)
+    segSocial = models.CharField(max_length=12)
     tel1 = models.IntegerField(blank=False, null=False)
     tel2 = models.IntegerField(blank=True, null=True)
     home = models.ForeignKey(FullDirection, null=True, blank=True)
     image = models.ImageField(blank=False, null=False,
                               upload_to='users/profile',
                               default='users/default/img.jpg')
+
+    class Meta:
+        unique_together = (("market", "dni"), ("market", "segSocial"), )
 
     def __unicode__(self):
         return unicode(self.user.username)
@@ -132,11 +134,13 @@ class Client(models.Model):
     image = models.ImageField(blank=True, null=True,
                               default='clients/default/img.jpg',
                               upload_to='clients/profile')
-    dni = models.CharField(max_length=9, blank=False, null=False, unique=True,
-                           primary_key=True)
+    dni = models.CharField(max_length=9)
     email = models.EmailField(blank=True, null=True, default=None)
     tel = models.IntegerField(blank=True, null=True, default=None)
     wallet = models.FloatField(blank=False, null=False, default=0.0)
+
+    class Meta:
+        unique_together = (("market", "dni"), )
 
     def __unicode__(self):
         return unicode(self.name)
@@ -178,8 +182,7 @@ class ProductSale(models.Model):
 
 TYPENOTE = (
     ('normal', 'normal'),
-    ('alert', 'alert'),
-    ('warning', 'warning')
+    ('wallet', 'wallet'),
 )
 
 
