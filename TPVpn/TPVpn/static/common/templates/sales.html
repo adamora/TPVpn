@@ -33,6 +33,88 @@
 		</div>
 	</div>
 	<div class="row">
+		<div class="col-md-6 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><i class="fa fa-money"></i> Facturación Monetaria <small>Cambiarán en función al filtro aplicado</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+			        <b>Período del calculo: </b>
+			        {% if start_date %}
+			        	Desde el <a class="green">{{start_date}}</a>
+			        {% endif %}
+			        {% if end_date %}
+			        	Hasta el <a class="green">{{end_date}}</a>
+			        {% endif %}
+			        {% if not start_date and not end_date %}
+			        	<a class="green">Total Facturado</a>
+			        {% endif %}
+			        {% if fil_category %}
+			        	<br><b>Para la categoría:</b> <a class="green">{{fil_category}}</a>
+			        {% endif %}
+			        <br><div class="clearfix"></div><br>
+			        <table class="table table-striped projects">
+			        	<thead>
+			        		<tr>
+			        			<th><center>Costes</center></th>
+			        			<th><center>Ingresos</center></th>
+			        			<th><center>Beneficio</center></th>
+			        		</tr>
+			        	</thead>
+			        	<tbody>
+			        		<tr>
+			        			<td><center>{{coste}}€</center></td>
+			        			<td><center>{{ingreso}}€</center></td>
+			        			<td><center>{{beneficio}}€</center></td>
+			        		</tr>
+			        	</tbody>
+			        </table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><icon><b>%</b></icon> Facturación según IVA <small>Cambiarán en función al filtro aplicado</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+			        <b>Período del calculo: </b>
+			        {% if start_date %}
+			        	Desde el <a class="green">{{start_date}}</a>
+			        {% endif %}
+			        {% if end_date %}
+			        	Hasta el <a class="green">{{end_date}}</a>
+			        {% endif %}
+			        {% if not start_date and not end_date %}
+			        	<a class="green">Total Facturado</a>
+			        {% endif %}
+			        {% if fil_category %}
+			        	<br><b>Para la categoría:</b> <a class="green">{{fil_category}}</a>
+			        {% endif %}
+			        <br><div class="clearfix"></div><br>
+			        <table class="table table-striped projects">
+			        	<thead>
+			        		<tr>
+			        			<th><center>21%</center></th>
+			        			<th><center>10%</center></th>
+			        			<th><center>4%</center></th>
+			        		</tr>
+			        	</thead>
+			        	<tbody>
+			        		<tr>
+			        			<td><center>{{iva21}}€</center></td>
+			        			<td><center>{{iva10}}€</center></td>
+			        			<td><center>{{iva4}}€</center></td>
+			        		</tr>
+			        	</tbody>
+			        </table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-md-12 col-sm-12 col-xs-12">
 			<div class="x_panel">
 			    <div class="x_title">
@@ -72,13 +154,13 @@
 											<address>
 												{% if sale.buyer == None %}
 												<strong>Anónimo</strong>
-												<br>Efectivo: {{sale.recivedAmount}}
+												<br>Efectivo: {{sale.recivedAmount}}€
 												{% else %}
 												<strong>{{sale.buyer.name}}</strong>
 												<br>DNI: {{sale.buyer.dni}}
 												<br>Phone: {{sale.buyer.tel}}
 												<br>Email: {{sale.buyer.email}}
-												<br>Monedero/Efectivo: {{sale.usedWallet}}/{{sale.recivedAmount}}
+												<br>Monedero / Efectivo: {{sale.usedWallet}}€ / {{sale.recivedAmount}}€
 												{% endif %}
 											</address>
 										</div>
@@ -89,11 +171,11 @@
 											<br>
 											<b>ID Venta:</b> {{sale.pk}}
 											<br>
-											<b>Tot. Cobrar:</b> {{sale.totAmount}}
+											<b>Tot. Cobrar:</b> {{sale.totAmount}}€
 											<br>
-											<b>Tot. Devuelto:</b> {{sale.devolution}}
+											<b>Tot. Devuelto:</b> {{sale.devolution}}€
 											<br>
-											<b>Beneficio:</b> {{sale.benefice}}
+											<b>Beneficio:</b> {{sale.benefice}}€
 										</div>
 										<!-- /.col -->
 									</div>
@@ -163,57 +245,6 @@
 					  </ul>
 					  </div>
 					  <div class="col-md-4" style="text-align: center;">
-					  	<ul class="pagination">
-					  	<li><a class="btn btn-default" data-toggle="modal" data-target="#myModal"> <i class="glyphicon glyphicon-book"></i> Obtener Informe de Facturación</a>
-
-					  		<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Importe total según IVA</h4>
-      </div>
-      <div class="modal-body">
-        <table class="table table-striped projects">
-        <b>Período del calculo: </b>
-        {% if start_date %}
-        	Desde el {{start_date}}
-        {% endif %}
-        {% if end_date %}
-        	Hasta el {{end_date}}
-        {% endif %}
-        {% if not start_date and not end_date %}
-        	Total Facturado
-        {% endif %}
-        {% if fil_category %}
-        	<br><b>Para la categoría:</b> {{fil_category}}
-        {% endif %}
-        	<thead>
-        		<tr>
-        			<th><center>21%</center></th>
-        			<th><center>10%</center></th>
-        			<th><center>4%</center></th>
-        		</tr>
-        	</thead>
-        	<tbody>
-        		<tr>
-        			<td>{{iva21}}€</td>
-        			<td>{{iva10}}€</td>
-        			<td>{{iva4}}€</td>
-        		</tr>
-        	</tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-					  	</li>
-					  	</ul>
 					  </div>
 					  <div class="col-md-4" style="text-align: right;">
 					  <ul class="pagination">

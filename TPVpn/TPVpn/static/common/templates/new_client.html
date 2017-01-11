@@ -12,6 +12,9 @@
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
         }
+        ul.errorlist {
+          list-style-type: none;
+        }
     </style>
 {% endblock %}
 {% block mainContent %}
@@ -24,62 +27,84 @@
             </div>
         </div>
         <div class="clearfix"></div>
+        <form class="form-horizontal form-label-left" method='post' action='' id="newprod" enctype="multipart/form-data"> {% csrf_token %}
         <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2><small>Introduzca los datos para agregar un cliente al comercio</small></h2>
+                        <h2>Datos personales<small>Los campos con <a class="red">*</a> son obligatorios</small></h2>
 
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-                        <br />
-                        <form class="form-horizontal form-label-left" method='post' action='' id="newprod" enctype="multipart/form-data"> {% csrf_token %}
+                        
                             <div class="block">
                                 <div class="block_content">
-                                    <h2 class="title"></h2>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Nombre del cliente <span class="required">*</span><div class='byline'><span class='red'>{{ new_client.name.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Nombre <span class="required">*</span>
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
                                             {{ new_client.name }}
                                             <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
                                         </div>
+                                        <div class='red'>{{ new_client.name.errors }}</div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">DNI del cliente <span class="required">*</span><div class='byline'><span class='red'>{{ new_client.dni.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Apellidos <span class="required"></span>
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
+                                            {{ new_client.surname }}
+                                            <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                                        </div>
+                                        <div class='red'>{{ new_client.surname.errors }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">DNI <span class="required">*</span><div class='byline'></div>
+                                        </label>
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
                                             {{ new_client.dni }}
                                             <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
                                         </div>
+                                        <div class='red'>{{ new_client.dni.errors }}</div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Telefono del cliente <span class="required"> </span><div class='byline'><span class='red'>{{ new_client.tel.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Teléfono <span class="required"> </span>
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
                                             {{ new_client.tel }}
                                             <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
                                         </div>
+                                        <div class='red'>{{ new_client.tel.errors }}</div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">E-mail <span class="required"> </span><div class='byline'><span class='red'>{{ new_client.email.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Teléfono <span class="required"> </span>
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
+                                            {{ new_client.tel2 }}
+                                            <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
+                                        </div>
+                                        <div class='red'>{{ new_client.tel2.errors }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">E-mail <span class="required"> </span>
+                                        </label>
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
                                             {{ new_client.email }}
                                             <span class="fa fa-envelope form-control-feedback right" aria-hidden="true"></span>
                                         </div>
+                                        <div class='red'>{{ new_client.email.errors }}</div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Cartera <span class="required">*</span><div class='byline'><span class='red'>{{ new_client.wallet.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Saldo <span class="required">*</span>
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-9 col-sm-6 col-xs-12">
                                             {{ new_client.wallet }}
                                             <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
                                         </div>
+                                        <div class='red'>{{ new_client.wallet.errors }}</div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Foto de perfil <span class="required"> </span><div class='byline'><span class='red'>{{ new_client.image.errors }}</span></div>
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Foto de perfil <span class="required"> </span>
                                         </label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
                                             {{ new_client.image }}
@@ -90,23 +115,195 @@
                                                 </a>
                                             </label>
                                         </div>
+                                        <div class='red'>{{ new_client.image.errors }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <br >
-                            <div class="form-group">
-                                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                    <input type="hidden" name="inputInNewCli" value="newCli">
-                                    <a href='/new_client' class="btn btn-primary">Cancelar</a>
-                                    <button type="submit" class="btn btn-success">Aceptar</button>
-                                </div>
-                            </div>
 
-                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Domicilio<small>Los campos con <a class="red">*</a> son obligatorios</small></h2>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        {% if new_direction %}
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Localidad <span class="required">*</span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.location }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.location.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Provincia <span class="required">*</span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.province }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.province.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Cód. Postal <span class="required">*</span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.postalCode }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.postalCode.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Dirección <span class="required">*</span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.direction }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.direction.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Número <span class="required">*</span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.numDir }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.numDir.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Escalera <span class="required"></span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.stairs }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.stairs.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Piso <span class="required"></span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.numFlat }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.numFlat.errors }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name" style="text-align: right;">Puerta <span class="required"></span>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_direction.door }}
+                                <span class="fa fa-home form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                            <div class='red'>{{ new_direction.door.errors }}</div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel" style="min-height: 100% !important;">
+                    <div class="x_title">
+                        <h2>Datos Bancarios<small>Estos datos no son obligatorios</small></h2>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Método de pago <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.payment_method.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.payment_method }}
+                                <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Nombre del propietario <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.owner_name.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.owner_name }}
+                                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Apellidos del propietario <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.owner_surname.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.owner_surname }}
+                                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">NIF del propietario <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.owner_nif.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.owner_nif }}
+                                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Nombre del banco <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.bank_name.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.bank_name }}
+                                <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Número de cuenta <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.account_number.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.account_number }}
+                                <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Cuota <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.subscription.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.subscription }}
+                                <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Frecuencia de cuota <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.frequency.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.frequency }}
+                                <span class="fa fa-calendar form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Observaciones <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.observations.errors }}</span></div>
+                            </label>
+                            <div class="col-md-9 col-sm-6 col-xs-12">
+                                {{ new_bank.observations }}
+                                <span class="fa fa-list form-control-feedback right" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <br >
+                        <div class="form-group">
+                            <center>
+                                <input type="hidden" name="inputInNewCli" value="newCli">
+                                <a href='/new_client' class="btn btn-primary">Cancelar</a>
+                                <button type="submit" class="btn btn-success">Aceptar</button>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+
     </div>
     <!-- /page content -->
 

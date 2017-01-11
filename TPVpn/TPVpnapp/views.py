@@ -8,7 +8,8 @@ from TPVpnapp.forms import (ClientForm, ConfigurationForm, DateForm,
                             ProviderForm, RegisterBusinessForm, RegisterWorker,
                             SearchClientForm, SearchProduct,
                             SearchWorkerForm, StockForm, UserForm,
-                            ProductFilterForm, OfferForm)
+                            ProductFilterForm, OfferForm,
+                            ClientDirectionForm, BankDataForm)
 from TPVpnapp.models import (Client, Configuration, Market, Notification,
                              Product, ProductSale, Provider, Sale, Worker)
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
@@ -16,7 +17,7 @@ from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
 from .tables import ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
-                    paginator_function, get_ivas)
+                    paginator_function, get_ivas, get_total_invoice)
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -475,12 +476,22 @@ def new_client(request):
 
     if request.method == 'POST':
         new_client = ClientForm(request.POST, request.FILES)
+        new_direction = ClientDirectionForm(request.POST)
+        new_bank = BankDataForm(request.POST)
         if request.POST['inputInNewCli'] == 'newCli':
-            if new_client.is_valid():
+            is_client_valid = new_client.is_valid()
+            is_direction_valid = new_direction.is_valid()
+            if (is_client_valid and is_direction_valid and
+                    new_bank.is_valid()):
                 aux_cli = new_client.save(commit=False)
                 aux_cli.market = worker_now.market
                 if not aux_cli.email:
                     aux_cli.email = None
+                direction = new_direction.save()
+                aux_cli.home = direction
+                if new_bank.cleaned_data:
+                    bank = new_bank.save()
+                    aux_cli.bank = bank
                 aux_cli.save()
                 messages.success(request,
                                  "Cliente agregado satisfactoriamente.")
@@ -489,8 +500,11 @@ def new_client(request):
                 messages.warning(request, "Error al agregar cliente.")
     else:
         new_client = ClientForm()
+        new_direction = ClientDirectionForm()
+        new_bank = BankDataForm()
 
-    to_return = {'new_client': new_client, 'worker_now': worker_now}
+    to_return = {'new_client': new_client, 'worker_now': worker_now,
+                 'new_direction': new_direction, 'new_bank': new_bank}
 
     return render(request, 'new_client.html', to_return)
 
@@ -572,13 +586,25 @@ def mod_client(request, pk):
     worker_now = Worker.objects.get(user=request.user)
     client = Client.objects.get(pk=pk, market=worker_now.market)
     aux = copy.copy(client)
-
+    home = client.home
+    bank = client.bank
     if request.method == 'POST':
         new_client = ClientForm(request.POST, request.FILES, instance=client)
+        new_direction = ClientDirectionForm(request.POST, instance=home)
+        if client.bank:
+            new_bank = BankDataForm(request.POST, instance=bank)
+        else:
+            new_bank = BankDataForm(request.POST)
         if request.POST['inputInNewCli'] == 'newCli':
-            if new_client.is_valid():
+            is_client_valid = new_client.is_valid()
+            is_direction_valid = new_direction.is_valid()
+            if (is_client_valid and is_direction_valid and
+                    new_bank.is_valid()):
                 if client.email == '':
                     client.email = None
+                client.home = new_direction.save()
+                if new_bank.cleaned_data:
+                    client.bank = new_bank.save()
                 client.save()
                 messages.success(request,
                                  "Cliente modificado satisfactoriamente.")
@@ -602,11 +628,17 @@ def mod_client(request, pk):
                     note2.save()
                 return redirect('/client_profile/' + pk)
             else:
-                request.warning(request, "Fallo al modificar el cliente.")
+                messages.warning(request, "Fallo al modificar el cliente.")
     else:
         new_client = ClientForm(instance=client)
+        new_direction = ClientDirectionForm(instance=client.home)
+        if client.bank:
+            new_bank = BankDataForm(instance=client.bank)
+        else:
+            new_bank = BankDataForm()
 
-    to_return = {'new_client': new_client, 'worker_now': worker_now}
+    to_return = {'new_client': new_client, 'worker_now': worker_now,
+                 'new_direction': new_direction, 'new_bank': new_bank}
 
     return render(request, 'new_client.html', to_return)
 
@@ -881,6 +913,8 @@ def all_sales(request):
 
     iva21, iva10, iva4 = get_ivas(sales_query)
 
+    coste, ingreso, beneficio = get_total_invoice(sales_query)
+
     sales, page = paginator_function(request, query=sales_query)
 
     start_date = request.GET.get('start_date', None)
@@ -890,7 +924,8 @@ def all_sales(request):
                  'sales': sales, 'form': form, 'url_vars': url_vars,
                  'iva21': iva21, 'iva10': iva10, 'iva4': iva4,
                  'start_date': start_date, 'end_date': end_date,
-                 'fil_category': fil_category}
+                 'fil_category': fil_category,
+                 'coste': coste, 'ingreso': ingreso, 'beneficio': beneficio}
     return render(request, 'sales.html', to_return)
 
 

@@ -127,6 +127,19 @@ class Worker(models.Model):
         return unicode(self.user.first_name + ' ' + self.user.last_name)
 
 
+class BankData(models.Model):
+    payment_method = models.CharField(max_length=120, blank=True, null=True)
+    owner_name = models.CharField(max_length=120, blank=True, null=True)
+    owner_surname = models.CharField(max_length=120, blank=True, null=True)
+    owner_nif = models.CharField(max_length=120, blank=True, null=True)
+    bank_name = models.CharField(max_length=120, blank=True, null=True)
+    account_number = models.CharField(max_length=120, blank=True, null=True)
+    subscription = models.FloatField(blank=True, null=True)
+    frequency = models.CharField(max_length=120, blank=True, null=True)
+    observations = models.CharField(max_length=500, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+
+
 class Client(models.Model):
     name = models.CharField(max_length=120)
     # Relacion 1:N - Mercado puede tener muchos clientes
@@ -138,12 +151,22 @@ class Client(models.Model):
     email = models.EmailField(blank=True, null=True, default=None)
     tel = models.IntegerField(blank=True, null=True, default=None)
     wallet = models.FloatField(blank=False, null=False, default=0.0)
+    # Nuevos
+    surname = models.CharField(max_length=120, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    home = models.ForeignKey(FullDirection, blank=True, null=True)
+    expire_date = models.DateField(blank=True, null=True)
+    tel2 = models.IntegerField(blank=True, null=True)
+    bank = models.ForeignKey(BankData, blank=True, null=True)
 
     class Meta:
         unique_together = (("market", "dni"), )
 
     def __unicode__(self):
         return unicode(self.name)
+
+    def get_full_name(self):
+        return self.name + ' ' + self.surname
 
 
 class Sale(models.Model):

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from TPVpnapp.models import (Client, Configuration, FullDirection, GENRE, IVA,
                              KINDPRODUCT, Market, Notification, Product,
-                             Provider, User, Worker, Sale, Offer)
+                             Provider, User, Worker, Sale, Offer, BankData)
 
 from django import forms
 from django.contrib import messages
@@ -392,7 +392,7 @@ class StockForm(GenericTwoRowsForm):
 class ClientForm(ModelForm):
     name = forms.CharField(required=True, label='',
                            widget=forms.TextInput(
-                               attrs={'placeholder': 'Nombre Completo',
+                               attrs={'placeholder': 'Nombre',
                                       'class': 'form-control'}))
     dni = forms.CharField(required=True,
                           widget=forms.TextInput(
@@ -417,7 +417,20 @@ class ClientForm(ModelForm):
 
     class Meta:
         model = Client
-        fields = ('name', 'dni', 'tel', 'email', 'wallet', 'image')
+        fields = ('name', 'surname', 'dni', 'tel', 'tel2', 'email', 'wallet',
+                  'image')
+
+    def __init__(self, *args, **kwargs):
+        super(ClientForm, self).__init__(*args, **kwargs)
+        self.fields['surname'].widget = forms.TextInput(
+            attrs={'placeholder': 'Apellidos',
+                   'class': 'form-control'})
+        self.fields['tel2'].widget = forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Teléfono (Opc.)',
+                'type': 'tel'
+            })
 
 
 class InputMoney(GenericTwoRowsForm):
@@ -642,3 +655,74 @@ class OfferForm(forms.ModelForm):
             if self.cleaned_data:
                 messages.error(request, 'Oferta erronea')
             return is_true
+
+
+class ClientDirectionForm(forms.ModelForm):
+
+    class Meta:
+        model = FullDirection
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(ClientDirectionForm, self).__init__(*args, **kwargs)
+        self.fields['location'].widget = forms.TextInput(
+            attrs={'placeholder': 'Localidad',
+                   'class': 'form-control'})
+        self.fields['province'].widget = forms.TextInput(
+            attrs={'placeholder': 'Provincia',
+                   'class': 'form-control'})
+        self.fields['postalCode'].widget = forms.TextInput(
+            attrs={'placeholder': 'Código Postal',
+                   'class': 'form-control'})
+        self.fields['direction'].widget = forms.TextInput(
+            attrs={'placeholder': 'Dirección',
+                   'class': 'form-control'})
+        self.fields['numDir'].widget = forms.TextInput(
+            attrs={'placeholder': 'Número',
+                   'class': 'form-control'})
+        self.fields['stairs'].widget = forms.TextInput(
+            attrs={'placeholder': 'Escaleras',
+                   'class': 'form-control'})
+        self.fields['numFlat'].widget = forms.TextInput(
+            attrs={'placeholder': 'Piso',
+                   'class': 'form-control'})
+        self.fields['door'].widget = forms.TextInput(
+            attrs={'placeholder': 'Puerta',
+                   'class': 'form-control'})
+
+
+class BankDataForm(forms.ModelForm):
+
+    class Meta:
+        model = BankData
+        exclude = ['date', ]
+
+    def __init__(self, *args, **kwargs):
+        super(BankDataForm, self).__init__(*args, **kwargs)
+        self.fields['payment_method'].widget = forms.TextInput(
+            attrs={'placeholder': 'Método de pago',
+                   'class': 'form-control'})
+        self.fields['owner_name'].widget = forms.TextInput(
+            attrs={'placeholder': 'Nombre del propietario',
+                   'class': 'form-control'})
+        self.fields['owner_surname'].widget = forms.TextInput(
+            attrs={'placeholder': 'Apellidos del propietario',
+                   'class': 'form-control'})
+        self.fields['owner_nif'].widget = forms.TextInput(
+            attrs={'placeholder': 'NIF del propietario',
+                   'class': 'form-control'})
+        self.fields['bank_name'].widget = forms.TextInput(
+            attrs={'placeholder': 'Nombre del banco',
+                   'class': 'form-control'})
+        self.fields['account_number'].widget = forms.TextInput(
+            attrs={'placeholder': 'Número de cuenta',
+                   'class': 'form-control'})
+        self.fields['subscription'].widget = forms.TextInput(
+            attrs={'placeholder': 'Cuota',
+                   'class': 'form-control'})
+        self.fields['frequency'].widget = forms.TextInput(
+            attrs={'placeholder': 'Frecuencia de cuota',
+                   'class': 'form-control'})
+        self.fields['observations'].widget = forms.TextInput(
+            attrs={'placeholder': 'Observaciones',
+                   'class': 'form-control'})

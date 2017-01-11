@@ -8,7 +8,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h3>Perfil del cliente: <a class='green' href="/client_profile/{{client.dni}}">{{client.name}}</a>
+                        <h3>Perfil del cliente: <a class='green' href="/client_profile/{{client.pk}}">{{client.get_full_name}}</a>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -83,14 +83,14 @@
                                 <!-- end of image cropping -->
 
                             </div>
-                            <h3>{{client.name}}</h3>
+                            <h3>{{client.get_full_name}}</h3>
 
                             <ul class="list-unstyled user_data">
                                 <li><i class="fa fa-credit-card user-profile-icon"></i> DNI: <b>{{client.dni}}</b>
                                 </li>
 
                                 <li>
-                                    <i class="fa fa-phone user-profile-icon"></i> Telefono: <b>
+                                    <i class="fa fa-phone user-profile-icon"></i> Teléfono: <b>
                                     {% if client.tel == None %}
                                         (Vacío)
                                     {% else %}
@@ -98,7 +98,15 @@
                                     {% endif %}
                                     </b>
                                 </li>
-
+                                <li>
+                                    <i class="fa fa-phone user-profile-icon"></i> Teléfono (Opc.): <b>
+                                    {% if not client.tel2 %}
+                                        (Vacío)
+                                    {% else %}
+                                        {{client.tel2}}
+                                    {% endif %}
+                                    </b>
+                                </li>
                                 <li class="m-top-xs">
                                     <i class="fa fa-envelope user-profile-icon"></i>
                                     E-mail: <a href="{% if client.email %}mailto:{{client.email}}{% endif %}" class="blue">{{client.email}}</a>
@@ -108,7 +116,7 @@
                                 </li>
                             </ul>
 
-                            <a href="/modCli/{{client.dni}}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Editar Perfil</a>
+                            <a href="/modCli/{{client.pk}}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Editar Perfil</a>
                             <br />
 
                         </div>
@@ -150,46 +158,45 @@
                                                         <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
                                                         <a data-toggle="modal" data-target="#myModal{{sale.id}}"><i class="fa fa-paperclip"></i> Ver Ticket de Compra </a>
 
-<div class="modal fade" id="myModal{{sale.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">{{sale.sale_code}}</h4>
-      </div>
-      <div class="modal-body">
-          <table class="table table-striped">
-              <thead>
-                  <tr>
-                      <th>Nombre</th>
-                      <th>Cantidad</th>
-                      <th>Precio Unitario</th>
-                      <th>Precio Total</th>
-                  </tr>
-              </thead>
-              <tbody>
-                {% for product in sale.productsale_set.all %}
-                <tr>
-                    {% if product.product %}
-                        <td>{{product.product.name}}</td>
-                    {% else %}
-                        <td>Sin Nombre</td>
-                    {% endif %}
-                    <td>{{product.amount}}</td>
-                    <td>{{product.sellPrice}}€</td>
-                    <td>{{product.totAmount}}€</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-          </table>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
-      </div>
-    </div>
-  </div>
-</div>
-
+                                                        <div class="modal fade" id="myModal{{sale.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                          <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                              <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                <h4 class="modal-title" id="myModalLabel">{{sale.sale_code}}</h4>
+                                                              </div>
+                                                              <div class="modal-body">
+                                                                  <table class="table table-striped">
+                                                                      <thead>
+                                                                          <tr>
+                                                                              <th>Nombre</th>
+                                                                              <th>Cantidad</th>
+                                                                              <th>Precio Unitario</th>
+                                                                              <th>Precio Total</th>
+                                                                          </tr>
+                                                                      </thead>
+                                                                      <tbody>
+                                                                        {% for product in sale.productsale_set.all %}
+                                                                        <tr>
+                                                                            {% if product.product %}
+                                                                                <td>{{product.product.name}}</td>
+                                                                            {% else %}
+                                                                                <td>Sin Nombre</td>
+                                                                            {% endif %}
+                                                                            <td>{{product.amount}}</td>
+                                                                            <td>{{product.sellPrice}}€</td>
+                                                                            <td>{{product.totAmount}}€</td>
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                      </tbody>
+                                                                  </table>
+                                                              </div>
+                                                              <div class="modal-footer">
+                                                                <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
                                                     </p>
                                                 </div>
                                             </li>
