@@ -15,6 +15,13 @@
         ul.errorlist {
           list-style-type: none;
         }
+
+        .spec-padding {
+            padding-left: 0px;
+        }
+        .padding-right {
+            padding-right: 0px;
+        }
     </style>
 {% endblock %}
 {% block mainContent %}
@@ -222,8 +229,18 @@
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Método de pago <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.payment_method.errors }}</span></div>
                             </label>
                             <div class="col-md-9 col-sm-6 col-xs-12">
+                                <div class="col-md-6 spec-padding">
                                 {{ new_bank.payment_method }}
                                 <span class="fa fa-eur form-control-feedback right" aria-hidden="true"></span>
+                                </div>
+                                <div class="col-md-6 padding-right">
+                                <select id="payment_method" class='select2_single_method form-control'>
+                                    <option value='' disabled selected>ó seleccione método</option>
+                                    {% for i in method %}
+                                        <option value='{{i}}'>{{i}}</option>
+                                    {% endfor %}
+                                </select>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -278,8 +295,18 @@
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Frecuencia de cuota <span class="required"></span><div class='byline'><span class='red'>{{ new_bank.frequency.errors }}</span></div>
                             </label>
                             <div class="col-md-9 col-sm-6 col-xs-12">
+                                <div class="col-md-6 spec-padding">
                                 {{ new_bank.frequency }}
                                 <span class="fa fa-calendar form-control-feedback right" aria-hidden="true"></span>
+                                </div>
+                                <div class="col-md-6 padding-right">
+                                <select id="frequency" class='select2_single_method form-control'>
+                                    <option value='' disabled selected>ó seleccione frecuencia</option>
+                                    {% for i in freq %}
+                                        <option value='{{i}}'>{{i}}</option>
+                                    {% endfor %}
+                                </select>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -349,6 +376,13 @@
                     $('#myModal').modal('show');
                     $('#modal-button').show();
                 };
+
+                $('#frequency').on('change', function() {
+                  $('#id_frequency').val($('#frequency').val())
+                });
+                $('#payment_method').on('change', function() {
+                  $('#id_payment_method').val($('#payment_method').val())
+                });
             });
         </script>
 

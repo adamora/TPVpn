@@ -17,7 +17,8 @@ from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
 from .tables import ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
-                    paginator_function, get_ivas, get_total_invoice)
+                    paginator_function, get_ivas, get_total_invoice,
+                    get_method_freq)
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -472,8 +473,9 @@ def modify_product(request, product_id):
 
 @login_required(login_url='/')
 def new_client(request):
-    worker_now = Worker.objects.get(user=request.user)
-
+    # worker_now = Worker.objects.get(user=request.user)
+    worker_now, market_now = get_worker_market(request)
+    method, freq = get_method_freq(market_now)
     if request.method == 'POST':
         new_client = ClientForm(request.POST, request.FILES)
         new_direction = ClientDirectionForm(request.POST)
@@ -504,7 +506,8 @@ def new_client(request):
         new_bank = BankDataForm()
 
     to_return = {'new_client': new_client, 'worker_now': worker_now,
-                 'new_direction': new_direction, 'new_bank': new_bank}
+                 'new_direction': new_direction, 'new_bank': new_bank,
+                 'method': method, 'freq': freq}
 
     return render(request, 'new_client.html', to_return)
 
@@ -583,7 +586,8 @@ def take_clients(request):
 
 @login_required(login_url='/')
 def mod_client(request, pk):
-    worker_now = Worker.objects.get(user=request.user)
+    worker_now, market_now = get_worker_market(request)
+    method, freq = get_method_freq(market_now)
     client = Client.objects.get(pk=pk, market=worker_now.market)
     aux = copy.copy(client)
     home = client.home
@@ -638,7 +642,8 @@ def mod_client(request, pk):
             new_bank = BankDataForm()
 
     to_return = {'new_client': new_client, 'worker_now': worker_now,
-                 'new_direction': new_direction, 'new_bank': new_bank}
+                 'new_direction': new_direction, 'new_bank': new_bank,
+                 'method': method, 'freq': freq}
 
     return render(request, 'new_client.html', to_return)
 
