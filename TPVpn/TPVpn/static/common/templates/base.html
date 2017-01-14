@@ -37,7 +37,7 @@
 
 <body class="nav-md">
     <div class="container body">
-        <div class="main_container">
+        <div class="main_container hidden-print">
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
 
@@ -138,7 +138,7 @@
             </div>
 
             <!-- top navigation -->
-            <div class="top_nav">
+            <div class="top_nav hidden-print">
 
                 <div class="nav_menu">
                     <nav class="" role="navigation">
@@ -153,9 +153,14 @@
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
-                                    <li><a href="/employer_profile/{{worker_now.dni}}">  Perfil</a>
+                                    <li>
+                                        <a href="/employer_profile/{{worker_now.dni}}"><icon class="fa fa-user pull-right"></icon> Perfil</a>
                                     </li>
-                                    <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                                    <li>
+                                        <a href="/configuration/"><icon class="glyphicon glyphicon-cog pull-right" aria-hidden="true"></icon> Configuración</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
                                     </li>
                                 </ul>
                             </li>
@@ -172,7 +177,7 @@
 
             {% block mainContent %}{% endblock %}
 
-               <footer>
+               <footer class="hidden-print">
                     <div class="">
                         <p class="pull-right">Trabajo Fin de Grado por <a>Adam Mora Tortajada</a>.
                             <span class="lead">| Universidad de Cordoba</span>
@@ -186,7 +191,7 @@
     </div>
 
 
-    <div id="custom_notifications" class="custom-notifications dsp_none">
+    <div id="custom_notifications" class="custom-notifications dsp_none hidden-print">
         <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
         </ul>
         <div class="clearfix"></div>
@@ -227,6 +232,9 @@
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.core.js" %}"></script>
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.buttons.js" %}"></script>
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.nonblock.js" %}"></script>
+
+    <script src="{% static "common/templates/js/tinymce/tinymce.min.js" %}"></script>
+    <script>tinymce.init({ selector:'textarea', language : "es" });</script>
 
     <script>
         $(function () {
@@ -344,6 +352,7 @@
             document.dispatchEvent(e);
         }
     </script>
+
     {% block scripts %}{% endblock %}
     <!-- /footer content -->
 

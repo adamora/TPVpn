@@ -18,7 +18,7 @@ from .tables import ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
                     paginator_function, get_ivas, get_total_invoice,
-                    get_method_freq)
+                    get_method_freq, import_csv)
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -936,24 +936,40 @@ def all_sales(request):
 
 @login_required(login_url='/')
 def configuration(request):
-    worker_now = Worker.objects.get(user=request.user)
-    message = ''
-    if request.method == 'GET':
-        try:
-            instance_conf = Configuration.objects.get(worker=worker_now)
-            form = ConfigurationForm(worker_now=worker_now,
-                                     instance=instance_conf)
-        except ObjectDoesNotExist:
-            form = ConfigurationForm()
-    elif request.method == 'POST':
-        if request.POST.get('stock_enabled', None):
+    worker_now, market_now = get_worker_market(request)
+    kwargs = {}
+    instance_conf = None
+    try:
+        instance_conf = Configuration.objects.get(market=market_now)
+        kwargs.update({'instance': instance_conf})
+    except ObjectDoesNotExist:
+        pass
+    form = ConfigurationForm(**kwargs)
+    if request.method == 'POST':
+        if request.POST.get('invoice_header', None):
             form = ConfigurationForm(data=request.POST)
+        elif request.FILES:
+            file = request.FILES.get('upload_file', None)
+            imported = import_csv(market=market_now, file=file)
+            if imported:
+                messages.success(
+                    request,
+                    "Los clientes se han importado satisfactoriamente.")
+            else:
+                messages.error(
+                    request, "El archivo no se encuentra en formato CSV.")
         else:
-            form = ConfigurationForm(data=request.POST,
-                                     initial={'stock_enabled': False})
-        if form.is_valid():
-            form.full_save(worker_now)
-            message = 'Configuración actualiada satisfactoriamente.'
+            form = ConfigurationForm(data=request.POST)
+        if form.is_valid() and form.cleaned_data:
+            if not instance_conf:
+                form.full_save(market_now)
+            else:
+                for key, value in form.cleaned_data.items():
+                    setattr(instance_conf, key, value)
+                instance_conf.save()
+            messages.success(
+                request,
+                'Configuración actualiada satisfactoriamente.')
 
-    to_return = {'worker_now': worker_now, 'form': form, 'message': message}
+    to_return = {'worker_now': worker_now, 'form': form}
     return render(request, 'configuration.html', to_return)

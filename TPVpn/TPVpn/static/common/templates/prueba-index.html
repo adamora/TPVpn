@@ -9,9 +9,9 @@
   <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">
     <div class="clearfix"></div>
     {% csrf_token %}
-    <div class="row">
+    <div class="row hidden-print">
 
-      <div class="col-md-6 col-sm-6 col-xs-12">
+      <div class="col-md-6 col-sm-6 col-xs-12 hidden-print">
         <div class="x_panel">
             <div class="col-md-2 col-sm-2 col-xs-2">
               <input type="text" class="form-control" onClick='this.select();' ng-model='takeQuantity'>
@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="col-md-6 col-sm-6 col-xs-12">
+      <div class="col-md-6 col-sm-6 col-xs-12 hidden-print">
         <div class="x_panel">
             <select class="select2_single_provider form-control">
               <option></option>
@@ -82,7 +82,7 @@
 
     <div class="row">
 
-      <div class="col-md-6 col-sm-6 col-xs-12">
+      <div class="col-md-6 col-sm-6 col-xs-12  hidden-print">
         <div class="x_panel" style="height: 350px; overflow: scroll; overflow-x:hidden;" id="productListPanel">
           <table class="table table-striped">
             <thead>
@@ -96,15 +96,47 @@
             </thead>
             <tbody id='listaProductos' >
               <tr ng-repeat='i in listProd'>
-                <td><a ng-click='addList(i.pk,i.name,i.price)'><i class="green fa fa-plus"></i></a> <b>{$ i.num $}</b> <a ng-click="decreaseProdList(i.pk,i.name,i.price)"><i class="red fa fa-minus"></i></a></td>
+                <td><a class="hidden-print" ng-click='addList(i.pk,i.name,i.price)'><i class="green fa fa-plus"></i></a> <b>{$ i.num $}</b> <a class="hidden-print" ng-click="decreaseProdList(i.pk,i.name,i.price)"><i class="red fa fa-minus"></i></a></td>
                 <td>{$ i.name $}</td>
                 <td>{$ i.price $}€</td>
                 <td>{$ i.finalPrice $}€</td>
-                <td><a ng-click="clearRowLP(i.pk)"><i class="red fa fa-close"></i></a></td>
+                <td class="hidden-print"><a ng-click="clearRowLP(i.pk)"><i class="red fa fa-close"></i></a></td>
               </tr>
               <tr>
+                <td><button class="btn btn-default hidden-print" onclick="imprimir();"><i class="fa fa-print"></i> Ticket</button></td>
+                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
+                <td><big><b>Total:</b><big></td>
+                <td><big><b class="red">{$ totalPrice $}€</b><big></td>
                 <td></td>
-                <td><button id='endSale' class="btn btn-warning" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
+              </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-sm-6 col-xs-12" id="factura_imprimir" style="display: none;">
+        <div class="x_panel" id="productListPanel">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Cantidad</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id='listaProductos' >
+              <tr ng-repeat='i in listProd'>
+                <td><a class="hidden-print" ng-click='addList(i.pk,i.name,i.price)'><i class="green fa fa-plus"></i></a> <b>{$ i.num $}</b> <a class="hidden-print" ng-click="decreaseProdList(i.pk,i.name,i.price)"><i class="red fa fa-minus"></i></a></td>
+                <td>{$ i.name $}</td>
+                <td>{$ i.price $}€</td>
+                <td>{$ i.finalPrice $}€</td>
+                <td><a class="hidden-print" ng-click="clearRowLP(i.pk)"><i class="red fa fa-close"></i></a></td>
+              </tr>
+              <tr>
+                <td><button class="btn btn-default hidden-print" onclick="window.print();"><i class="fa fa-print"></i> Ticket</button></td>
+                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
                 <td><big><b>Total:</b><big></td>
                 <td><big><b class="red">{$ totalPrice $}€</b><big></td>
                 <td></td>
@@ -115,7 +147,7 @@
       </div>
 
       <div class="col-md-6 col-sm-6 col-xs-12">
-          <div class="x_panel" ng-show="!showClient">
+          <div class="x_panel hidden-print" ng-show="!showClient">
             <div class="x_title">
               <h2>Agregar Monedero</h2>
               <div class="clearfix"></div>
@@ -145,7 +177,7 @@
             </div>
           </div>
           <div class="x_panel">
-            <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
               <table class="table table-striped">
                 <thead>
                   <tr>
@@ -178,7 +210,7 @@
                 </tbody>
               </table>
             </div>
-            <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
               <table class="table table-striped">
                 <thead>
                   <tr>
@@ -218,7 +250,6 @@
     </div>
 
   </div>
-  <div class="clearfix"></div><br />
   </div>
 
 {% endblock %}
@@ -374,6 +405,14 @@
     	var input = $("#barCodeInpt");
 		$("#barCodeInpt").focus();
     }
+
+    function imprimir() {
+      $('#factura_imprimir').show()
+      window.print();
+      $('#factura_imprimir').hide()
+    }
+
+
   </script>
   <!-- /shortcuts -->
 

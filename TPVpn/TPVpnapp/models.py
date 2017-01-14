@@ -2,6 +2,8 @@
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class FullDirection(models.Model):
@@ -139,6 +141,9 @@ class BankData(models.Model):
     observations = models.CharField(max_length=500, blank=True, null=True)
     date = models.DateField(auto_now_add=True)
 
+    def __unicode__(self):
+        return unicode(self.pk)
+
 
 class Client(models.Model):
     name = models.CharField(max_length=120)
@@ -167,6 +172,27 @@ class Client(models.Model):
 
     def get_full_name(self):
         return self.name + ' ' + self.surname
+
+
+@receiver(pre_save, sender=Client)
+def my_handler(sender, instance, **kwargs):
+    try:
+        instance.tel = int(instance.tel)
+    except:
+        instance.tel = None
+    try:
+        instance.wallet = float(instance.wallet)
+    except:
+        instance.wallet = 0.0
+    try:
+        instance.tel2 = int(instance.tel2)
+    except:
+        instance.tel2 = None
+
+    if '-' in instance.dni:
+        instance.dni = instance.dni.replace('-', '')
+    if not instance.expire_date:
+        instance.expire_date = None
 
 
 class Sale(models.Model):
@@ -224,12 +250,8 @@ class Notification(models.Model):
 
 
 class Configuration(models.Model):
-    worker = models.OneToOneField(Worker)
-    stock_enabled = models.BooleanField(default=True)
-    max_negative_wallet = models.FloatField(
-        blank=True, null=True,
-        verbose_name='¿Valor tope minimo del monedero?'
-    )
+    market = models.OneToOneField(Market)
+    invoice_header = models.CharField(max_length=1000, blank=True, null=True)
 
     def __unicode__(self):
-        return self.worker.get_full_name()
+        return self.market.name

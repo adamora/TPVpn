@@ -551,33 +551,15 @@ class ConfigurationForm(forms.ModelForm):
 
     class Meta:
         model = Configuration
-        exclude = ('worker', )
+        exclude = ('market', )
 
-    def __init__(self, worker_now=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(ConfigurationForm, self).__init__(*args, **kwargs)
-        self.fields['max_negative_wallet'].initial = 0.0
+        self.fields['invoice_header'].widget = forms.Textarea()
 
-    def clean_stock_enabled(self):
-        val = self.cleaned_data.get('stock_enabled', None)
-        if not val:
-            self.cleaned_data['stock_enabled'] = False
-        else:
-            self.cleaned_data['stock_enabled'] = True
-
-        return self.cleaned_data['stock_enabled']
-
-    def clean_max_negative_wallet(self):
-        val = self.cleaned_data.get('max_negative_wallet', None)
-        if not val:
-            self.cleaned_data['max_negative_wallet'] = None
-        else:
-            self.cleaned_data['max_negative_wallet'] = float(val)
-
-        return self.cleaned_data['max_negative_wallet']
-
-    def full_save(self, worker_now):
+    def full_save(self, market_now):
         instance = self.save(commit=False)
-        instance.worker = worker_now
+        instance.market = market_now
         instance.save()
 
         return instance

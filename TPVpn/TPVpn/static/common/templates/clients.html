@@ -39,14 +39,19 @@
                                         <div class="col-sm-12">
                                             <h4 class="brief"><i>Cliente de <b>{{market_now.name}}</b></i></h4>
                                             <div class="left col-xs-7">
-                                                <h2>{{client.name}}</h2>
+                                                <h2>{{client.get_full_name}}</h2>
                                                 <p><strong>DNI: </strong> {{client.dni}} </p>
                                                 <ul class="list-unstyled">
                                                     <li><i class="fa fa-phone"></i>
-                                                        {% if client.tel == None %}
-                                                          (Ninguno)
+                                                        {% if not client.tel and not client.tel2 %}
+                                                          (Ninguno) 
+                                                        {% elif not client.tel and client.tel2 %}
+                                                           {{client.tel2}}
                                                         {% else %}
                                                           {{client.tel}}
+                                                          {% if client.tel2 %}
+                                                          / {{client.tel2}}
+                                                          {% endif %}
                                                         {% endif %}
                                                     </li>
                                                     <li><i class="fa fa-envelope"></i>
