@@ -175,7 +175,7 @@ class Client(models.Model):
 
 
 @receiver(pre_save, sender=Client)
-def my_handler(sender, instance, **kwargs):
+def client_pre_save(sender, instance, **kwargs):
     try:
         instance.tel = int(instance.tel)
     except:
@@ -216,6 +216,11 @@ class Sale(models.Model):
 
     def __unicode__(self):
         return unicode(self.pk)
+
+    def save(self, force_insert=None, using=None):
+        super(Sale, self).save()
+        self.sale_code = self.market.name + "#" + str(self.id)
+        super(Sale, self).save()
 
 
 class ProductSale(models.Model):

@@ -370,7 +370,7 @@
      * @example
        <button ng-click='updateServer(market)'></my-directive>
      */
-    $scope.updateServer = function(market,worker) {
+    $scope.updateServer = function(market,worker,sale_id) {
       if($scope.listProd.length == 0) {
         alert("No se han seleccionado productos.");
         return false;
@@ -381,6 +381,7 @@
       }
       var dataObject = jQuery.param({
         'operation':'addSell',
+        'sale':sale_id,
         'market':market,
         'user':worker,
         'products':JSON.stringify($scope.listProd),

@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
     {% load staticfiles %}
 {% block style %}
+<style type="text/css" media="print">
+@page {
+    size: auto;   /* auto is the initial value */
+    margin: 0;  /* this affects the margin in the printer settings */
+    margin-right: 70px;
+}
+</style>
 {% endblock %}
 {% block mainContent %}
 
@@ -104,7 +111,7 @@
               </tr>
               <tr>
                 <td><button class="btn btn-default hidden-print" onclick="imprimir();"><i class="fa fa-print"></i> Ticket</button></td>
-                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
+                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}','{{sale.id}}')">Finalizar Venta</button></td>
                 <td><big><b>Total:</b><big></td>
                 <td><big><b class="red">{$ totalPrice $}€</b><big></td>
                 <td></td>
@@ -113,8 +120,19 @@
         </table>
         </div>
       </div>
-
-      <div class="col-md-6 col-sm-6 col-xs-12" id="factura_imprimir" style="display: none;">
+      <div class="col-md-12 col-sm-12 col-xs-12" id="cabecera_imprimir" style="display:none;">
+        {% if configuration %}
+          {{configuration.invoice_header|safe}}
+        {% endif %}
+        <div class="col-md-6 col-sm-6 col-xs-6">
+          <b>Identificador:</b> {{sale.id}}
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6" style="text-align: right">
+          <b>Código de venta:</b> {{sale.sale_code}}
+        </div>
+        <br><br>
+      </div>
+      <div class="col-md-12 col-sm-12 col-xs-12" id="factura_imprimir" style="display: none;">
         <div class="x_panel" id="productListPanel">
           <table class="table table-striped">
             <thead>
@@ -136,7 +154,7 @@
               </tr>
               <tr>
                 <td><button class="btn btn-default hidden-print" onclick="window.print();"><i class="fa fa-print"></i> Ticket</button></td>
-                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">Finalizar Venta</button></td>
+                <td><button id='endSale' class="btn btn-warning hidden-print" ng-click="updateServer('{{worker_now.market.pk}}','{{worker_now.user.pk}}','{{sale.id}}')">Finalizar Venta</button></td>
                 <td><big><b>Total:</b><big></td>
                 <td><big><b class="red">{$ totalPrice $}€</b><big></td>
                 <td></td>
@@ -146,7 +164,7 @@
         </div>
       </div>
 
-      <div class="col-md-6 col-sm-6 col-xs-12">
+      <div class="col-md-6 col-sm-12 col-xs-12">
           <div class="x_panel hidden-print" ng-show="!showClient">
             <div class="x_title">
               <h2>Agregar Monedero</h2>
@@ -408,7 +426,9 @@
 
     function imprimir() {
       $('#factura_imprimir').show()
+      $('#cabecera_imprimir').show()
       window.print();
+      $('#cabecera_imprimir').hide()
       $('#factura_imprimir').hide()
     }
 

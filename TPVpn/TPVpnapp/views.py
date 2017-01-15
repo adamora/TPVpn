@@ -224,7 +224,8 @@ def worker_profile(request, pk):
     notifications = Notification.objects.filter(
         reciver=worker_profile).order_by("-date")
     sales = Sale.objects.filter(
-        market=market, seller=worker_profile).order_by("-date")
+        market=market, seller=worker_profile,
+        totAmount__gt=0).order_by("-date")
     notifi = NotificationForm()
     if request.method == 'POST':
         notifi = NotificationForm(request.POST)
@@ -655,7 +656,8 @@ def client_profile(request, pk):
     market_now = worker_now.market
     client = Client.objects.get(pk=pk, market=market_now)
     sales = Sale.objects.filter(
-        market=market_now, buyer=client).order_by("-date")
+        market=market_now, buyer=client,
+        totAmount__gt=0).order_by("-date")
 
     notifications = Notification.objects.filter(
         reciverCli=client, typeNote='normal').order_by('-date')
@@ -692,8 +694,7 @@ def delete_client(request, pk):
 
 @login_required(login_url='/')
 def index(request):
-    worker_now = Worker.objects.get(user=request.user)
-    market_now = worker_now.market
+    worker_now, market_now = get_worker_market(request)
 
     clients = Client.objects.filter(market=market_now)
 
@@ -702,6 +703,11 @@ def index(request):
     providers = Provider.objects.filter(market=market_now)
 
     categorys, subcategorys = get_categorys_subcategorys(products)
+    sale = Sale.objects.create(market=market_now, seller=worker_now)
+    try:
+        configuration = Configuration.objects.get(market=market_now)
+    except ObjectDoesNotExist:
+        configuration = None
 
     '''
     for i in products:
@@ -724,7 +730,8 @@ def index(request):
 
     context = {'worker_now': worker_now, 'clients': clients,
                'products': products, 'providers': providers,
-               'categorys': categorys, 'subcategorys': subcategorys}
+               'categorys': categorys, 'subcategorys': subcategorys,
+               'configuration': configuration, 'sale': sale}
 
     return render(request, 'prueba-index.html', context)
 
@@ -755,14 +762,14 @@ def add_sell(request):
         if worker_now.user.is_authenticated:
             if request.POST['operation'] == 'addSell':
                 list_obj = json.loads(request.POST['products'])
-
-                sale = Sale(market=worker_now.market,
-                            seller=worker_now,
-                            totAmount=request.POST['totalPrice'],
-                            usedWallet=request.POST['usedWallet'],
-                            recivedAmount=request.POST['clientMoney'],
-                            devolution=request.POST['devolution'],
-                            done=True)
+                sale = Sale.objects.get(id=request.POST['sale'])
+                copy_data = {'totAmount': request.POST['totalPrice'],
+                             'usedWallet': request.POST['usedWallet'],
+                             'recivedAmount': request.POST['clientMoney'],
+                             'devolution': request.POST['devolution'],
+                             'done': True}
+                for key, value in copy_data.items():
+                    setattr(sale, key, value)
 
                 if request.POST['client'] != '':
                     buyer = Client.objects.get(dni=request.POST['client'],
@@ -772,8 +779,6 @@ def add_sell(request):
                     buyer.save()
                     sale.buyer = buyer
 
-                sale.save()
-                sale.sale_code = sale.market.name + "#" + str(sale.id)
                 sale.save()
 
                 benefice = 0
@@ -800,6 +805,9 @@ def add_sell(request):
                 sale.save()
                 # GENERAR NOTIFICACION
                 data['location'] = request.META['HTTP_REFERER']
+                messages.success(
+                    request,
+                    'Venta %s finalizada.' % sale.sale_code)
                 return HttpResponse(json.dumps(data))
 
     data['status'] = 'fail'
@@ -811,7 +819,7 @@ def cash_flows(request):
     worker_now = Worker.objects.get(user=request.user)
     market_now = worker_now.market
 
-    sales = Sale.objects.filter(market=market_now)
+    sales = Sale.objects.filter(market=market_now, totAmount__gt=0)
     sales_of_the_day = []
     # print date.today() #.isoformat()
 
@@ -863,7 +871,7 @@ def take_sales(request):
             )
             if worker_now.user.is_authenticated:
                 market_now = worker_now.market
-                sales = Sale.objects.filter(market=market_now)
+                sales = Sale.objects.filter(market=market_now, totAmount__gt=0)
                 aux = []
                 for i in sales:
                     if abs(sales.last().date - i.date).days <= 30:
@@ -905,7 +913,8 @@ def all_sales(request):
         url_vars = '&'
 
     worker_now = Worker.objects.get(user=request.user)
-    sales_query = Sale.objects.filter(market=worker_now.market).order_by('-id')
+    sales_query = Sale.objects.filter(
+        market=worker_now.market, totAmount__gt=0).order_by('-id')
     products = Product.objects.filter(market=worker_now.market)
     categorys = set([('', '*Categorías*'), ])
     for i in products:
