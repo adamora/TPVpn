@@ -80,7 +80,7 @@
           $scope.showProducts = response;
         })
         .error(function(response){
-          $window.alert('No conectado');
+          $window.alert('Error al obtener productos. Contacte con el administrador.');
         })
 
       RegisterService.registerFor(dataObject,'/take_clients/')
@@ -88,8 +88,9 @@
           $scope.clientList = response;
         })
         .error(function(response){
-          $window.alert('No conectado clientes');
+          $window.alert('Error al obtener clientes. Contacte con el administrador.');
         })
+      return true
     }
 
 
@@ -401,6 +402,8 @@
          alert('No conectado. Fallo en venta.')
        })
     }
+    $('#angular_preload').hide()
+    $('#StartAngular').show()
 
   })
 

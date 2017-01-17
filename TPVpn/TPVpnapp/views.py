@@ -1,5 +1,6 @@
 # encoding:utf-8
 import copy
+from cStringIO import StringIO
 from datetime import date, datetime
 
 from TPVpnapp.forms import (ClientForm, ConfigurationForm, DateForm,
@@ -19,10 +20,11 @@ from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
                     paginator_function, get_ivas, get_total_invoice,
                     get_method_freq, import_csv)
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib import messages
+from django.core.management import call_command
 from django.core.serializers.json import json
 from django.http import HttpResponse
 # , HttpResponseRedirect
@@ -959,14 +961,21 @@ def configuration(request):
             form = ConfigurationForm(data=request.POST)
         elif request.FILES:
             file = request.FILES.get('upload_file', None)
-            imported = import_csv(market=market_now, file=file)
-            if imported:
-                messages.success(
-                    request,
-                    "Los clientes se han importado satisfactoriamente.")
+            if file:
+                imported = import_csv(market=market_now, file=file)
+                if imported:
+                    messages.success(
+                        request,
+                        "Los clientes se han importado satisfactoriamente.")
+                else:
+                    messages.error(
+                        request, "El archivo no se encuentra en formato CSV.")
             else:
-                messages.error(
-                    request, "El archivo no se encuentra en formato CSV.")
+                db_file = request.FILES.get('db_file', None)
+                if db_file:
+                    file_name = db_file.name
+                    load_data(request, file_name)
+                    return redirect('/configuration')
         else:
             form = ConfigurationForm(data=request.POST)
         if form.is_valid() and form.cleaned_data:
@@ -982,3 +991,27 @@ def configuration(request):
 
     to_return = {'worker_now': worker_now, 'form': form}
     return render(request, 'configuration.html', to_return)
+
+
+@login_required(login_url='/')
+def dump_data(request):
+    buf = StringIO()
+    call_command('dumpdata', '--all', stdout=buf, format='json')
+    buf.seek(0)
+    filename = 'BBDD-Backup-' + str(datetime.now()) + '.json'
+    filename = filename.replace(' ', '_')
+    with open(filename, 'w') as f:
+        f.write(buf.read())
+
+    messages.success(
+        request,
+        'Se ha generado una copia de la base de datos satisfactoriamente.')
+    return redirect('/configuration')
+
+
+def load_data(request, file_name):
+    call_command('loaddata', file_name)
+    messages.success(
+        request,
+        'Se ha cargado una copia de la base de datos satisfactoriamente.')
+    return redirect('/configuration')

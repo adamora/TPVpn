@@ -13,11 +13,18 @@
 
 <!-- page content -->
   <div class="" ng-app="TPVpnapp">
-  <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{worker_now.market.pk}}','{{worker_now.user.pk}}')">
+  <div class="col-md-12" id='angular_preload'>
+    <center>
+      <h1>
+        <img src='/media/loading/loading.gif' width="25px" height="25px">
+        Cargando...
+      </h1>
+    </center>
+  </div>
+  <div id="StartAngular" ng-controller="IndexCtrl" ng-init="init('{{worker_now.market.pk}}','{{worker_now.user.pk}}')" style="display: none">
     <div class="clearfix"></div>
     {% csrf_token %}
     <div class="row hidden-print">
-
       <div class="col-md-6 col-sm-6 col-xs-12 hidden-print">
         <div class="x_panel">
             <div class="col-md-2 col-sm-2 col-xs-2">
