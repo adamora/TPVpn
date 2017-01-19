@@ -65,7 +65,7 @@
      * @example
        <my-directive ng-init='init(market)'></my-directive>
      */
-    $scope.init = function(marketNow,worker) {
+    $scope.init = function(marketNow, worker) {
       var dataObject = jQuery.param({
         'status': 'done',
         'user': worker,
@@ -74,22 +74,23 @@
         'market': marketNow
       });
 
-      RegisterService.registerFor(dataObject,'/initialData/')
+      RegisterService.registerFor(dataObject,'/initial_data/')
         .success(function(response){
           $scope.completeList = response;
           $scope.showProducts = response;
         })
         .error(function(response){
-          $window.alert('No conectado');
+          $window.alert('Error al obtener productos. Contacte con el administrador.');
         })
 
-      RegisterService.registerFor(dataObject,'/takeClients/')
+      RegisterService.registerFor(dataObject,'/take_clients/')
         .success(function(response){
           $scope.clientList = response;
         })
         .error(function(response){
-          $window.alert('No conectado clientes');
+          $window.alert('Error al obtener clientes. Contacte con el administrador.');
         })
+      return true
     }
 
 
@@ -102,6 +103,9 @@
             var priceProd = $scope.completeList[i].sellPrice;
             $scope.addList(pk,nameProd,priceProd);
             $scope.takeBar=null;
+            var audioElement = document.createElement('audio');
+            audioElement.setAttribute('src', '/media/loading/beep.mp3');
+            audioElement.play();
           }
         }
       }
@@ -185,8 +189,10 @@
       for (var i=0;i<$scope.listProd.length;i++){
         if (counter == 1 && $scope.listProd[i].pk == pk){
           $scope.totalPrice = Math.round(($scope.totalPrice - $scope.listProd[i].finalPrice)*100)/100;
+          $scope.devolution = Math.round(($scope.devolution + $scope.listProd[i].finalPrice)*100)/100;
         } else if (counter == 0 && $scope.listProd[i].pk === pk) {
           $scope.totalPrice = Math.round(($scope.totalPrice - $scope.listProd[i].finalPrice)*100)/100;
+          $scope.devolution = Math.round(($scope.devolution + $scope.listProd[i].finalPrice)*100)/100;
         }
         else {
           aux.push($scope.listProd[i]);
@@ -368,7 +374,7 @@
      * @example
        <button ng-click='updateServer(market)'></my-directive>
      */
-    $scope.updateServer = function(market,worker) {
+    $scope.updateServer = function(market,worker,sale_id) {
       if($scope.listProd.length == 0) {
         alert("No se han seleccionado productos.");
         return false;
@@ -379,6 +385,7 @@
       }
       var dataObject = jQuery.param({
         'operation':'addSell',
+        'sale':sale_id,
         'market':market,
         'user':worker,
         'products':JSON.stringify($scope.listProd),
@@ -398,6 +405,8 @@
          alert('No conectado. Fallo en venta.')
        })
     }
+    $('#angular_preload').hide()
+    $('#StartAngular').show()
 
   })
 

@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
-    {% load staticfiles %}
-{% block mainContent %}
-<div class="right_col" role="main">
+{% load staticfiles %}
 
+{% block mainContent %}
     <div class="row">
         <div class="page-title">
             <div class="title_left">
@@ -13,7 +12,7 @@
             <form method='post' action='' id='searchBill'> {% csrf_token %}
                 <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                     <div class="input-group">
-                        {{searchClie.array}}
+                        {{search_clie.array}}
                         <span class="input-group-btn">
                             <input type="hidden" name="searchCli" value="newSearch">
                             <button class="btn btn-default" type="submit">Ir!</button>
@@ -31,45 +30,28 @@
                     <div class="x_content">
 
                         <div class="row">
-
-                            <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:center;">
-                                <ul class="pagination pagination-split">
-                                    <li><a href="#">A~C</a>
-                                    </li>
-                                    <li><a href="#">D~F</a>
-                                    </li>
-                                    <li><a href="#">G~I</a>
-                                    </li>
-                                    <li><a href="#">J~L</a>
-                                    </li>
-                                    <li><a href="#">M~Ñ</a>
-                                    </li>
-                                    <li><a href="#">O~Q</a>
-                                    </li>
-                                    <li><a href="#">R~T</a>
-                                    </li>
-                                    <li><a href="#">U~W</a>
-                                    </li>
-                                    <li><a href="#">X~Z</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            {% if clients %}
                             <div class="clearfix"></div>
 
                             {% for client in clients %}
-                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                <div class="col-md-6 animated fadeInDown">
                                     <div class="well profile_view">
                                         <div class="col-sm-12">
-                                            <h4 class="brief"><i>Cliente de <b>{{marketNow.name}}</b></i></h4>
+                                            <h4 class="brief"><i>Cliente de <b>{{market_now.name}}</b></i></h4>
                                             <div class="left col-xs-7">
-                                                <h2>{{client.name}}</h2>
+                                                <h2>{{client.get_full_name}}</h2>
                                                 <p><strong>DNI: </strong> {{client.dni}} </p>
                                                 <ul class="list-unstyled">
                                                     <li><i class="fa fa-phone"></i>
-                                                        {% if client.tel == None %}
-                                                          (Ninguno)
+                                                        {% if not client.tel and not client.tel2 %}
+                                                          (Ninguno) 
+                                                        {% elif not client.tel and client.tel2 %}
+                                                           {{client.tel2}}
                                                         {% else %}
                                                           {{client.tel}}
+                                                          {% if client.tel2 %}
+                                                          / {{client.tel2}}
+                                                          {% endif %}
                                                         {% endif %}
                                                     </li>
                                                     <li><i class="fa fa-envelope"></i>
@@ -102,14 +84,26 @@
                                             </div>
                                             <div class="clearfix"></div><p></p>
                                             <center class="">
-                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{client.pk}}">
+                                                <a type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{client.pk}}">
                                                   <i class="fa fa-comments-o"></i>
-                                                </button>
-                                                <a href="/client_profile/{{client.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
-                                                    </i> Perfil </a>
-                                                <a href="/modCli/{{client.pk}}" type="button" class="btn btn-warning btn-xs"> <i class="fa fa-pencil"></i> Editar </a>
-                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-money-{{client.pk}}"> <i class="fa fa-eur"></i> Monedero </button>
-                                                <a href="javascript:void(0);" onclick="delete_client('{{client.name}}','{{client.pk}}')" type="button" class="btn btn-danger btn-xs"> <i class="fa fa-close"></i> Eliminar </a>
+                                                  Notificación
+                                                </a>
+                                                <a href="/client_profile/{{client.pk}}" type="button" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-user"></i>
+                                                    Perfil 
+                                                </a>
+                                                <a href="/modCli/{{client.pk}}" type="button" class="btn btn-warning btn-xs">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Editar 
+                                                </a>
+                                                <a type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-money-{{client.pk}}">
+                                                    <i class="fa fa-eur"></i>
+                                                    Monedero
+                                                </a>
+                                                <a href="javascript:void(0);" onclick="delete_client('{{client.name}}','{{client.pk}}')" type="button" class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-close"></i>
+                                                    Eliminar
+                                                </a>
                                             </center>
                                         </div>
                                     </div>
@@ -183,6 +177,40 @@
                                 </div>
                                 <!-- /END MODAL -->
                             {% endfor %}
+                            <nav aria-label="Page navigation" class="col-md-12">
+                            <div class="col-md-6">
+                                <ul class="pagination">
+                                    {% if clients.has_previous %}
+                                    <li class="previous">
+                                        <a href="?page={{ clients.previous_page_number }}">&laquo; Anterior</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="cardinality">
+                                        <a>Página {{clients.number}} de {{clients.paginator.num_pages}}</a>
+                                    </li>
+                                    {% if clients.has_next %}
+                                    <li class="next">
+                                        <a href="?page={{ clients.next_page_number }}">Siguiente &raquo;</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="GET" action="." style="text-align: right;">
+                                    <ul class="pagination">
+                                        <li class="cardinality">
+                                            Página <input type="number" placeholder="Num." value="{{clients.number}}" name="page" style="width: 15%" step="1"/> de {{clients.paginator.num_pages}}
+                                            <button class="btn btn-default" type="submit">Ir <icon class="glyphicon glyphicon-play"></icon></button>
+                                        </li>
+                                    </ul>
+                                    </form>
+                                </div>
+                            </nav>
+                            {% else %}
+                                <div class="alert alert-success" role="alert">
+                                  No se han registrado clientes en la plataforma.
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

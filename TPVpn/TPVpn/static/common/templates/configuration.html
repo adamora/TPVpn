@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+    {% load staticfiles %}
+{% block style %}
+{% endblock %}
+{% block mainContent %}
+	<div class="row">
+		<div class="col-md-6">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><i class="fa fa-group"></i> Importar socios<small>(Clientes de "La tejedora")</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<form method="POST" action="." enctype="multipart/form-data"> {% csrf_token %}
+						<div class="block-form">
+                        <center>
+                        	<br>
+	                        <input type="file" id="file_import" name="upload_file" style="display: none;" />
+	                        <label for="file_import">
+	                            <a class="btn btn-default"><icon class="glyphicon glyphicon-open"></icon> Seleccione un archivo (*.csv)</a>
+	                            <b id="selected_file"></b>
+	                        </label>
+                        </center>
+						</div>
+						<div style="float: right;">
+							<br>
+							<button type="submit" class='btn btn-success'>Importar Clientes</button>
+							<a href="." class="btn btn-danger">Cancelar</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><i class="glyphicon glyphicon-floppy-disk"></i> Copia de seguridad<small>Realiza un backup de la Base de Datos</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<form method="POST" action="." enctype="multipart/form-data"> {% csrf_token %}
+						<div class="block-form">
+                        <center>
+                        	<br>
+	                        <a class="btn btn-default" href="/dump_data/"><icon class="glyphicon glyphicon-export"></icon> Realizar Copia</a>
+                        </center>
+                        <br>
+                        <center>
+                        	<input id="id_db_file" type="file" name="db_file" style="display: none;"/>
+                        	<label for="id_db_file">
+	                        	<a class="btn btn-default"><icon class="glyphicon glyphicon-import"></icon> Restaurar Copia</a>
+	                        	<b id="selected_db"></b>
+	                        	<br><small><i>*Aviso: La opción de "Restaurar Copia" solo es válida desde la máquina servidor.</i></small>
+	                        </label>
+							<br><br>
+							<div style="float: right;">
+								<button type="submit" class='btn btn-success'>Confirmar Restauración</button>
+								<a href="." class="btn btn-danger">Cancelar</a>
+							</div>
+                        </center>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2><i class="glyphicon glyphicon-cog"></i> Configuración <small>Cabecera para los tickets</small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<form method="POST" action="."> {% csrf_token %}
+						<div class="block-form">
+							<!--textarea></textarea-->
+							{{form.invoice_header}}
+						</div>
+						<div style="float: right;">
+							<br>
+							<button type="submit" class='btn btn-success'>Guardar</button>
+							<a href="." class="btn btn-danger">Cancelar</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    $(document).ready(function () {
+	    $('#file_import').change(function() {
+        	var filename = $('#file_import').val();
+        	$('#selected_file').html(filename);
+    	});
+	    $('#id_db_file').change(function() {
+        	var filename = $('#id_db_file').val();
+        	$('#selected_db').html(filename);
+    	});
+    });
+</script>
+{% endblock %}

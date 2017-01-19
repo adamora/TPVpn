@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>TPV | Pequeño Comercio</title>
+    <title>{{worker_now.market.name.upper}}</title>
 
     <!-- Bootstrap core CSS -->
 
@@ -31,28 +31,29 @@
     <script>
         NProgress.start();
     </script>
+
     {% block style %}{% endblock %}
 </head>
 
 <body class="nav-md">
     <div class="container body">
-        <div class="main_container">
+        <div class="main_container hidden-print">
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
 
                     <div class="navbar nav_title" style="border: 0;">
-                        <a href="/index" class="site_title"><i class="fa fa-paw"></i> <span> tpvPC </span></a>
+                        <a href="/index/" class="site_title"><i class="fa fa-home"></i> <span> {{worker_now.market.name.upper}} </span></a>
                     </div>
                     <div class="clearfix"></div>
 
                     <!-- menu prile quick info -->
                     <div class="profile">
                         <div class="profile_pic">
-                            <img src="/media/{{workerNow.image}}" alt="/media/{{workerNow.image}}" class="img-circle profile_img" style="height:70px;width:70px">
+                            <img src="/media/{{worker_now.image}}" class="img-circle profile_img" style="height:70px;width:70px">
                         </div>
                         <div class="profile_info">
                             <span>Bienvenido,</span>
-                            <h2>{{workerNow.user.first_name}}</h2>
+                            <h2>{{worker_now.user.first_name}}</h2>
                         </div>
                     </div>
                     <!-- /menu prile quick info -->
@@ -97,22 +98,29 @@
                                 </li>
                                 <li><a><i class="fa fa-money"></i> Movimientos de Caja <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
-                                        <li>
+                                        <!--li>
                                             <a href="/cashFlows/">Ver Movimientos</a>
-                                        </li>
+                                        </li-->
                                         <li>
                                             <a href="/sales/">Ventas</a>
                                         </li>
                                     </ul>
                                 </li>
+                                <!--li><a><i class="glyphicon glyphicon-book"></i> Informes <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li>
+                                            <a href="/invoice-report/">Informes de facturas</a>
+                                        </li>
+                                    </ul>
+                                </li-->
                             </ul>
                         </div>
                     </div>
                     <!-- /sidebar menu -->
 
                     <!-- /menu footer buttons -->
-                    <div class="sidebar-footer hidden-small">
-                        <a data-toggle="tooltip" data-placement="top" title="Configuración">
+                    <!--div class="sidebar-footer hidden-small">
+                        <a data-toggle="tooltip" data-placement="top" title="Configuración" href="/configuration/">
                             <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                         </a>
                         <a data-toggle="tooltip" data-placement="top" title="Pantalla Completa">
@@ -124,13 +132,13 @@
                         <a data-toggle="tooltip" data-placement="top" title="Cerrar Sesión" href="/logout/">
                             <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                         </a>
-                    </div>
+                    </div-->
                     <!-- /menu footer buttons -->
                 </div>
             </div>
 
             <!-- top navigation -->
-            <div class="top_nav">
+            <div class="top_nav hidden-print">
 
                 <div class="nav_menu">
                     <nav class="" role="navigation">
@@ -141,67 +149,35 @@
                         <ul class="nav navbar-nav navbar-right">
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                    <img src="/media/{{workerNow.image}}" alt="">{{workerNow.user.first_name}}
+                                    <img src="/media/{{worker_now.image}}" alt="">{{worker_now.user.first_name}}
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
-                                    <li><a href="/employer_profile/{{workerNow.dni}}">  Perfil</a>
+                                    <li>
+                                        <a href="/employer_profile/{{worker_now.dni}}"><icon class="fa fa-user pull-right"></icon> Perfil</a>
                                     </li>
-                                    <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                                    <li>
+                                        <a href="/configuration/"><icon class="glyphicon glyphicon-cog pull-right" aria-hidden="true"></icon> Configuración</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
                                     </li>
                                 </ul>
                             </li>
 
-                                {% if not fail == None %}
-                                <li role="presentation" class="dropdown open">
-                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="true">
-                                    <i class="fa fa-envelope-o"></i>
-                                        <span class="badge bg-red">1</span>
-                                {% else %}
-                                <li role="presentation" class="dropdown">
-                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-envelope-o"></i>
-                                        <span class="badge">0</span>
-                                {% endif %}
-                                </a>
-                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list animated fadeInDown" role="menu">
-                                    {% if not fail == None %}
-                                    <li>
-                                        <a>
-                                            <span class="image">
-                                                <img src="/media/{{workerNow.image}}" alt="Profile Image" />
-                                            </span>
-                                            <span>
-                                                <span>{{workerNow.user.first_name}}</span>
-                                                <span class="time">hace 1 minuto</span>
-                                            </span>
-                                            <span class="message">
-                                                {{fail}}
-                                            </span>
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                    <li>
-                                        <div class="text-center">
-                                            <a>
-                                                <strong><a href="/employer_profile/{{workerNow.pk}}">Ver todas mis alertas</strong>
-                                                <i class="fa fa-angle-right"></i>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
 
                         </ul>
                     </nav>
                 </div>
 
             </div>
+        </div>
             <!-- /top navigation -->
+        <div class="right_col" role="main">
 
             {% block mainContent %}{% endblock %}
 
-               <footer>
+               <footer class="hidden-print">
                     <div class="">
                         <p class="pull-right">Trabajo Fin de Grado por <a>Adam Mora Tortajada</a>.
                             <span class="lead">| Universidad de Cordoba</span>
@@ -215,7 +191,7 @@
     </div>
 
 
-    <div id="custom_notifications" class="custom-notifications dsp_none">
+    <div id="custom_notifications" class="custom-notifications dsp_none hidden-print">
         <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
         </ul>
         <div class="clearfix"></div>
@@ -256,6 +232,9 @@
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.core.js" %}"></script>
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.buttons.js" %}"></script>
     <script type="text/javascript" src="{% static "common/templates/js/notify/pnotify.nonblock.js" %}"></script>
+
+    <script src="{% static "common/templates/js/tinymce/tinymce.min.js" %}"></script>
+    <script>tinymce.init({ selector:'textarea', language : "es" });</script>
 
     <script>
         $(function () {
@@ -306,10 +285,12 @@
     <script type="text/javascript">
         var permanotice, tooltip, _alert;
         $(function () {
+            {% if messages %}
+            {% for message in messages %}
             new PNotify({
-                {% autoescape off %}
-                {{fail}}
-                {% endautoescape %},
+                title: '{{message.tags|title}}',
+                type: '{{message.tags}}',
+                text: '{{message}}',
                 before_close: function (PNotify) {
                     // You can access the notice's options with this. It is read only.
                     //PNotify.options.text;
@@ -323,7 +304,8 @@
                     return false;
                 }
             });
-
+            {% endfor %}
+            {% endif %}
         });
     </script>
     <script>
@@ -333,6 +315,43 @@
         });
     </script>
     <!-- /PNotity -->
+    <script>
+        function toggleFullScreen(elem) {
+            // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+            if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) || (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) || (document.mozFullScreen !== undefined && !document.mozFullScreen) || (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
+                if (elem.requestFullScreen) {
+                    elem.requestFullScreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullScreen) {
+                    elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                if (document.cancelFullScreen) {
+                    document.cancelFullScreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function mKeyF11(){
+            var e = new Event('keypress');
+            e.which = 122; // Character F11 equivalent.
+            e.altKey=false;
+            e.ctrlKey=false;
+            e.shiftKey=false;
+            e.metaKey=false;
+            e.bubbles=true;
+            document.dispatchEvent(e);
+        }
+    </script>
 
     {% block scripts %}{% endblock %}
     <!-- /footer content -->

@@ -1,0 +1,110 @@
+<div class="col-md-12">
+	<a href="/modProd/{{record.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Editar </a>
+	<a href="javascript:void(0);" onclick="delete_product('{{record.name}}',{{record.pk}})" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Borrar </a>
+</div>
+<div class="col-md-12">
+	<a class="btn btn-warning btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{record.pk}}"><i class="fa fa-sliders"></i> Stock </a>
+	<a class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-offer-{{record.pk}}"><i class="fa fa-eur"></i> Oferta </a>
+</div>
+
+
+
+<!-- MODAL -->
+<div class="modal fade bs-example-modal-{{record.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Cantidad actual de producto: <b class="green">{{record.amount}} {{record.kind}}</b></h4>
+            </div>
+            <form class="form-horizontal form-label-left" method='post' action='' id="newStock"> {% csrf_token %}
+                <div class="modal-body">
+                    <b class="red">{{ mod_quantity.new.error }}</b><div class="clearfix"></div><br>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ mod_quantity.new.errors }}</span></div>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            {{ mod_quantity.new }}
+                        </div>
+                    </div>
+                    <br>
+                    <div class="clearfix"></div>
+                    <br>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ mod_quantity.add.errors }}</span></div>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            {{ mod_quantity.add }}
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="clearfix"></div>
+                <br>
+                <div class="modal-footer">
+                    <input type="hidden" name="q_prod_id" value="{{record.pk}}">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /END MODAL -->
+
+<!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
+<div class="modal fade bs-example-modal-offer-{{record.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Precio actual de producto: <b class="green">{{record.sellPrice}}</b></h4>
+                {% if record.offer %}
+                    <h4 class="modal-title" id="myModalLabel">Oferta actual de producto: <b class="green">{{record.offer.offer}}€</b> desde el <b class="green">{{record.offer.start_date}}</b> hasta el <b class="green">{{record.offer.end_date}}</b></h4>
+                {% endif %}
+            </div>
+            <form class="form-horizontal form-label-left" method='POST' action='.'> {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <i>Todos los campos con (*) son obligatorios</i>
+                        <div class="clearfix"></div><br>
+                        <div class="col-md-12">
+                            <label class="control-label col-md-3">Precio de Oferta (€) *:
+                            </label>
+                            <div class="col-md-4">
+                                {{ offer_form.offer }}
+                            </div>
+                        </div><div class="clearfix"></div><br>
+                        <div class="col-md-12">
+                            <label class="control-label col-md-3">Fecha de Inicio *:
+                            </label>
+                            <div class="col-md-4">
+                                <input class="form-control" id="datepicker_{{record.id}}" name="start_date" type="text">
+                            </div>
+                        </div><div class="clearfix"></div><br>
+                        <div class="col-md-12">
+                            <label class="control-label col-md-3">Fecha de Fin *:
+                            </label>
+                            <div class="col-md-4">
+                                <input class="form-control" id="datepicker_2_{{record.id}}" name="end_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="o_prod_id" value="{{record.pk}}" />
+                    {% if record.offer %}
+                        <a href="/offer/delete/{{record.id}}" class="btn btn-danger">Borrar Oferta</a>
+                    {% endif %}
+                    <a class="btn btn-default" data-dismiss="modal">Cerrar</a>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /END MODAL -->

@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
     {% load staticfiles %}
 {% block mainContent %}
-<div class="right_col" role="main">
 
-    <div class="">
+    <div class="row">
         <div class="page-title">
             <div class="title_left">
-                <h3>Empleados de {{workerNow.market.name}}</h3>
+                <h3>Empleados de {{worker_now.market.name}}</h3>
             </div>
 
             <div class="title_right">
@@ -29,35 +28,11 @@
             <div class="col-md-12">
                 <div class="x_panel">
                     <div class="x_content">
-
                         <div class="row">
-
-                            <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:center;">
-                                <ul class="pagination pagination-split">
-                                    <li><a href="#">A~C</a>
-                                    </li>
-                                    <li><a href="#">D~F</a>
-                                    </li>
-                                    <li><a href="#">G~I</a>
-                                    </li>
-                                    <li><a href="#">J~L</a>
-                                    </li>
-                                    <li><a href="#">M~Ñ</a>
-                                    </li>
-                                    <li><a href="#">O~Q</a>
-                                    </li>
-                                    <li><a href="#">R~T</a>
-                                    </li>
-                                    <li><a href="#">U~W</a>
-                                    </li>
-                                    <li><a href="#">X~Z</a>
-                                    </li>
-                                </ul>
-                            </div>
                             <div class="clearfix"></div>
 
                             {% for worker in workers %}
-                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                <div class="col-md-6 col-sm-12 col-xs-12 animated fadeInDown">
                                     <div class="well profile_view">
                                         <div class="col-sm-12">
                                             <h4 class="brief"><i>Trabajador de <b>{{worker.market.name}}</b></i></h4>
@@ -90,16 +65,15 @@
                                             <div class="col-xs-12 col-sm-6 emphasis">
                                                 <p class="ratings">
                                                     <a style="text-decoration:none">Login: </a>
-                                                    <a class="green" style="text-decoration:none">{{worker.user.username}}</a>
+                                                    <a class="green" href="/employer_profile/{{worker.dni}}">@{{worker.user.username}}</a>
                                                 </p>
                                             </div>
                                             <div class="col-xs-12 col-sm-6 emphasis">
-                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{worker.dni}}"> <i class="fa fa-user">
-                                                    </i> <i class="fa fa-comments-o"></i> </button>
-                                                <a href="/employer_profile/{{worker.pk}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
+                                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{worker.dni}}"> Notificar <i class="fa fa-comments-o"></i> </button>
+                                                <a href="/employer_profile/{{worker.dni}}" type="button" class="btn btn-primary btn-xs"> <i class="fa fa-user">
                                                     </i> Perfil </a>
-                                                {% if workerNow == worker %}
-                                                <!--a href="/modWorker/{{worker.pk}}" type="button" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i> Editar </a-->
+                                                {% if worker_now == worker %}
+                                                    <a href="/modWorker/{{worker.dni}}" type="button" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i> Editar </a>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -136,8 +110,36 @@
                                     </div>
                                 </div>
                                 <!-- /END MODAL -->
-
                             {% endfor %}
+                            <nav aria-label="Page navigation" class="col-md-12">
+                                <div class="col-md-6">
+                                    <ul class="pagination">
+                                        {% if workers.has_previous %}
+                                        <li class="previous">
+                                            <a href="?page={{ workers.previous_page_number }}">&laquo; Anterior</a>
+                                        </li>
+                                        {% endif %}
+                                        <li class="cardinality">
+                                            <a>Página {{workers.number}} de {{workers.paginator.num_pages}}</a>
+                                        </li>
+                                        {% if workers.has_next %}
+                                        <li class="next">
+                                            <a href="?page={{ workers.next_page_number }}">Siguiente &raquo;</a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="GET" action="." style="text-align: right;">
+                                    <ul class="pagination">
+                                        <li class="cardinality">
+                                            Página <input type="number" placeholder="Num." value="{{workers.number}}" name="page" style="width: 15%" step="1"/> de {{workers.paginator.num_pages}}
+                                            <button class="btn btn-default" type="submit">Ir <icon class="glyphicon glyphicon-play"></icon></button>
+                                        </li>
+                                    </ul>
+                                    </form>
+                                </div>
+                            </nav>
                         </div>
                     </div>
                 </div>

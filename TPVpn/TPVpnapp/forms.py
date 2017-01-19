@@ -1,294 +1,710 @@
-#encoding:utf-8
-from django.forms import ModelForm
+# encoding:utf-8
+from datetime import datetime
+
+from TPVpnapp.models import (Client, Configuration, FullDirection, GENRE, IVA,
+                             KINDPRODUCT, Market, Notification, Product,
+                             Provider, User, Worker, Sale, Offer, BankData)
+
 from django import forms
-from TPVpnapp.models import *
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.forms.extras.widgets import SelectDateWidget
-from django.template.defaultfilters import mark_safe
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.forms import ModelForm
+from django.utils.dateparse import parse_date
+
 
 class UserForm(UserCreationForm):
-	username=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	email=forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	password1=forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	password2=forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	first_name=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	last_name=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	class Meta:
-		model = User
-		fields=('username','email','password1','password2','first_name','last_name')
+    username = forms.CharField(required=True, label='',
+                               widget=forms.TextInput(attrs={
+                                                      'class': 'form-control',
+                                                      'placeholder': ''}))
+    email = forms.EmailField(required=True, label='',
+                             widget=forms.EmailInput(attrs={
+                                                     'class': 'form-control',
+                                                     'placeholder': ''}))
+    first_name = forms.CharField(required=True, label='',
+                                 widget=forms.TextInput(
+                                     attrs={'class': 'form-control',
+                                            'placeholder': ''}))
+    last_name = forms.CharField(required=True, label='',
+                                widget=forms.TextInput(attrs={
+                                                       'class': 'form-control',
+                                                       'placeholder': ''}))
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2', 'first_name',
+                  'last_name')
+
+    def __init__(self, is_mod=False, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        if is_mod:
+            self.fields['password1'].required = False
+            self.fields['password2'].required = False
+            self.fields.pop('password1')
+            self.fields.pop('password2')
+        else:
+            self.fields['password1'].widget.attrs = {
+                'class': 'form-control',
+                'placeholder': ''}
+            self.fields['password2'].widget.attrs = {
+                'class': 'form-control',
+                'placeholder': ''}
+
+    def is_valid(self, request):
+        is_valid = super(UserForm, self).is_valid()
+        if not is_valid:
+            if self.errors:
+                for key, value in self.errors.items():
+                    if isinstance(value, list):
+                        msg = key + ': ' + value[0]
+                    else:
+                        msg = key + ': ' + value
+                    messages.warning(request, msg)
+            if self.error_messages:
+                for key, value in self.error_messages.items():
+                    if isinstance(value, list):
+                        msg = key + ': ' + value[0].title()
+                    else:
+                        msg = key + ': ' + value.title()
+                    messages.warning(request, msg)
+        return is_valid
+
 
 class RegisterBusinessForm(ModelForm):
-	name=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Nombre de la tienda*'}), label='')
-	kindActivity=forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control', 'placeholder':'¿Que tipo de actividad realiza?'}), label='')
-	secretKey=forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Contraseña*'}), label='')
-	secretKey2=forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Repita la contraseña*'}), label='')
-	tel = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Teléfono*'}), label='')
-	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'E-mail*'}), label='')
-	class Meta:
-		model=Market
-		fields=('name','tel','email','kindActivity','secretKey','secretKey2')
+    name = forms.CharField(required=True, label='',
+                           widget=forms.TextInput(
+                               attrs={'class': 'form-control',
+                                      'placeholder': 'Nombre de la tienda*'}))
+    kindActivity = forms.CharField(required=False, label='',
+                                   widget=forms.Textarea(
+                                       attrs={'class': 'form-control',
+                                              'placeholder':
+                                              '¿Que tipo de actividad realiza?'
+                                              }))
+    tel = forms.IntegerField(required=True, label='',
+                             widget=forms.NumberInput(
+                                 attrs={'class': 'form-control',
+                                        'placeholder': 'Teléfono*'}))
+    email = forms.EmailField(required=True, label='',
+                             widget=forms.EmailInput(attrs={
+                                                     'class': 'form-control',
+                                                     'placeholder': 'E-mail*'
+                                                     }))
 
-class RegisterFullDirectionForm(ModelForm):
-	#id=forms.IntegerField(widget=forms.HiddenInput(),label='')
-	location=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Localidad*'}), label='')
-	province=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Provincia*'}), label='')
-	postalCode=forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Código postal*'}), label='')
-	direction=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Dirección*'}), label='')
-	numDir=forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número*'}), label='')
-	stairs=forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Escaleras'}), label='')
-	numFlat=forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Planta'}), label='')
-	door=forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Puerta'}), label='')
-	class Meta:
-		model=FullDirection
-		fields=('location','province','postalCode','direction','numDir','stairs','numFlat','door')
+    class Meta:
+        model = Market
+        fields = ('name', 'tel', 'email', 'kindActivity')
+
+
+class FullDirectionForm(ModelForm):
+    # id=forms.IntegerField(widget=forms.HiddenInput(),label='')
+    location = forms.CharField(required=True, label='',
+                               widget=forms.TextInput(
+                                   attrs={'class': 'form-control',
+                                          'placeholder': 'Localidad*'}))
+    province = forms.CharField(required=True, label='',
+                               widget=forms.TextInput(
+                                   attrs={'class': 'form-control',
+                                          'placeholder': 'Provincia*'}))
+    postalCode = forms.IntegerField(required=True, label='',
+                                    widget=forms.NumberInput(
+                                        attrs={'class': 'form-control',
+                                               'placeholder': 'Código postal*'
+                                               }))
+    direction = forms.CharField(required=True, label='',
+                                widget=forms.TextInput(
+                                    attrs={'class': 'form-control',
+                                           'placeholder': 'Dirección*'}))
+    numDir = forms.CharField(
+        required=False, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Número*'}))
+    stairs = forms.CharField(required=False, label='',
+                             widget=forms.TextInput(attrs={
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Escaleras'
+                                                    }))
+    numFlat = forms.IntegerField(required=False, label='',
+                                 widget=forms.NumberInput(
+                                     attrs={'class': 'form-control',
+                                            'placeholder': 'Planta'}))
+    door = forms.CharField(required=False, label='',
+                           widget=forms.TextInput(attrs={
+                                                  'class': 'form-control',
+                                                  'placeholder': 'Puerta'}))
+
+    class Meta:
+        model = FullDirection
+        fields = ('location', 'province', 'postalCode', 'direction', 'numDir',
+                  'stairs', 'numFlat', 'door')
+
 
 class RegisterWorker(ModelForm):
-	dni = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	genre = forms.ChoiceField(required=False, widget=forms.RadioSelect(attrs={'class':'form-control', 'name':'gender'}), choices=GENRE, label='')
-	segSocial = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	tel1 = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	tel2 = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':''}), label='')
-	image = forms.FileField(required=False, widget=forms.FileInput, label='')
-	#market = forms.ModelChoiceField(required=True, queryset=Market.objects.all(), widget=forms.Select(attrs={'class':'form-control col-md-6 col-sm-6 col-xs-12'}), label='Escoja un comercio')
-	#marketKey = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Contraseña del negocio*'}), label='')
-	class Meta:
-		model=Worker
-		fields=('dni','genre','segSocial','tel1','tel2','image')
+    dni = forms.CharField(required=True, label='DNI',
+                          widget=forms.TextInput(attrs={
+                                                 'class': 'form-control',
+                                                 'placeholder': ''}))
+    genre = forms.ChoiceField(required=True, choices=GENRE, label='Género',
+                              widget=forms.RadioSelect(attrs={
+                                                       'class': 'form-control',
+                                                       'name': 'gender'}))
+    segSocial = forms.CharField(required=True, label='Seguridad Social',
+                                widget=forms.TextInput(attrs={
+                                                       'class': 'form-control',
+                                                       'placeholder': ''}))
+    tel1 = forms.IntegerField(required=True, label='Teléfono',
+                              widget=forms.NumberInput(attrs={
+                                                       'class': 'form-control',
+                                                       'step': '1'}))
+    tel2 = forms.IntegerField(required=False, label='Teléfono (Opcional)',
+                              widget=forms.NumberInput(
+                                  attrs={'class': 'form-control',
+                                         'step': '1'}))
+    image = forms.FileField(required=False, widget=forms.FileInput,
+                            label='Imagen')
 
-class PasswordMarketForm(ModelForm):
-	secretKey = forms.CharField(
-	required=True, widget=forms.PasswordInput(attrs = {
-			'class':'form-control',
-		}), label='')
-	class Meta:
-		model=Market
-		fields = ('secretKey',)
+    class Meta:
+        model = Worker
+        fields = ('dni', 'genre', 'segSocial', 'tel1', 'tel2', 'image')
 
-#Formulario sin modelo
+    def __init__(self, *args, **kwargs):
+        super(RegisterWorker, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs.keys():
+            self.fields['genre'].initial = self.instance.genre
+
+    def is_valid(self, request):
+        super(RegisterWorker, self).is_valid()
+        if self.errors:
+            for key, value in self.errors.items():
+                if isinstance(value, list):
+                    msg = key + ': ' + value[0]
+                else:
+                    msg = key + ': ' + value
+                messages.error(request, msg)
+            return False
+        else:
+            return True
+
+
 class SearchWorkerForm(forms.Form):
-	array = forms.CharField(
-	required=True, widget=forms.TextInput(attrs = {
-			'class':'form-control',
-			'placeholder':'Buscar...',
-			'title':'Login, Nombre, Apellidos o DNI'
-		}), label='')
-	class Meta:
-		fields = ('array',)
+    array = forms.CharField(required=True, label='',
+                            widget=forms.TextInput(attrs={
+                                'class': 'form-control',
+                                'placeholder': 'Buscar...',
+                                'title': 'Login, Nombre, Apellidos o DNI'}))
+
+    class Meta:
+        fields = ('array',)
+
 
 class SearchClientForm(forms.Form):
-	array = forms.CharField(
-	required=True, widget=forms.TextInput(attrs = {
-			'class':'form-control',
-			'placeholder':'Buscar...',
-			'title':'Nombre, Apellidos, DNI o e-mail'
-		}), label='')
-	class Meta:
-		fields = ('array',)
+    array = forms.CharField(required=True, label='',
+                            widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'placeholder': 'Buscar...',
+                                       'title':
+                                       'Nombre, Apellidos, DNI o e-mail'}))
+
+    class Meta:
+        fields = ('array',)
+
 
 class NotificationForm(ModelForm):
-	content = forms.CharField(
-		required = True,
-		widget=forms.Textarea(attrs = {
-			'class':'form-control',
-			'rows':'3',
-			'style':'resize:none'
-		}),
-		label='')
-	class Meta:
-		model=Notification
-		fields = ('content',)
+    content = forms.CharField(required=True, label='',
+                              widget=forms.Textarea(
+                                  attrs={'class': 'form-control',
+                                         'rows': '3',
+                                         'style': 'resize:none'}))
+
+    class Meta:
+        model = Notification
+        fields = ('content',)
+
+    def is_valid(self, request):
+        is_valid = super(NotificationForm, self).is_valid()
+        if not is_valid:
+            messages.warning(request,
+                             'Rellene el campo de Mensaje para notificar.')
+        return is_valid
+
 
 class LoginForm(AuthenticationForm):
-	username=forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Login de usuario'}), label='')
-	password=forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Contraseña'}), label='')
-	#class Meta:
-	#	model=User
-	#	fields=('username','password')
-	def authentication(self,username,password):
-		if User.objects.filter(username=username,password=password):
-			return User.objects.get(username=username)
+    username = forms.CharField(required=True, label='',
+                               widget=forms.TextInput(
+                                   attrs={'class': 'form-control',
+                                          'placeholder': 'Login de usuario'}))
+    password = forms.CharField(required=True, label='',
+                               widget=forms.PasswordInput(
+                                   attrs={'class': 'form-control',
+                                          'placeholder': 'Contraseña'}))
 
-class ProviderForm(ModelForm): #REVISADO
-	namePro = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	tel = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	class Meta:
-		model = Provider
-		fields = ('namePro','tel','email')
-
-class ProductForm(ModelForm): #REVISADO
-	provider = forms.ModelChoiceField(
-		required=True, queryset=Provider.objects.all(),
-		widget=forms.Select(attrs={
-			'class':'select2_single form-control col-md-7 col-xs-12'
-		}),
-		label=''
-	)
-	name = forms.CharField(
-		required=True,
-		widget=forms.TextInput(attrs = {
-				'class':'form-control col-md-7 col-xs-12'
-		}),
-		label=''
-	)
-	category = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	subcategory = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	brand = forms.CharField(
-		required=True,
-		widget=forms.TextInput(attrs={
-			'class':'form-control col-md-7 col-xs-12'
-		}),
-		label=''
-	)
-	buyPrice = forms.FloatField(
-		required=True,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control col-md-7 col-xs-12',
-				'placeholder':'Ej: 5,50'
-			}
-		),
-		label=''
-	)
-	kind = forms.ChoiceField(required=True, choices = KINDPRODUCT, widget=forms.Select(attrs={'class':'form-control col-md-7 col-xs-12'}) ,label = '' )
-	iva = forms.ChoiceField(
-		required=True, choices = IVA,
-		widget=forms.Select(attrs = {
-			'class':'form-control'
-		}) ,label='' )
-	amount = forms.FloatField(
-		required = True,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control col-md-7 col-xs-12',
-				'placeholder':'Ej: 10,3'
-			}),
-		label = ''
-	)
-	sellPrice = forms.FloatField(
-		required = True,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control col-md-7 col-xs-12',
-				'placeholder':'Ej: 5,50'
-			}
-		),
-		label=''
-	)
-	barCode = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12'}), label='')
-	image = forms.ImageField(required=False, widget=forms.FileInput, label='')
-	class Meta:
-		model = Product
-		fields = (
-			'name','provider','category','subcategory','brand',
-			'buyPrice','sellPrice','amount','kind','iva','barCode','image'
-		)
-
-class StockForm(forms.Form):
-	new = forms.CharField(
-		required=False,
-		widget=forms.TextInput(
-			attrs = {
-				'class':'form-control col-md-7 col-xs-12',
-				'placeholder':'',
-				'title':''
-			}
-		),
-		label=''
-	)
-	add = forms.CharField(
-		required=False,
-		widget=forms.TextInput(
-			attrs = {
-				'class':'form-control col-md-7 col-xs-12',
-				'placeholder':'Ejemplo: 1, -5, 1.5, etc.',
-				'title':''
-			}
-		),
-		label=''
-	)
-	class Meta:
-		fields = ('new','add')
-
-class OfferForm(forms.Form):
-	offer = forms.FloatField(
-		required = False,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control'
-			}
-		),
-		label = ''
-	)
-	class Meta:
-		fields = ('offer',)
-
-class ClientForm(ModelForm):  #REVISADO
-	name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12','placeholder':'Nombre Completo'}), label='')
-	dni = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12','placeholder':'DNI'}), label='')
-	tel = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12','placeholder':'Teléfono'}), label='')
-	email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={'class':'form-control col-md-7 col-xs-12','placeholder':'E-mail'}), label='')
-	wallet = forms.FloatField(required=True, widget=forms.TextInput(attrs={'class':'form-control col-md-7 col-xs-12','placeholder':'Cuantía'}), label='',initial='0.0')
-	image = forms.FileField(required=False, widget=forms.FileInput, label='')
-	class Meta:
-		model = Client
-		fields = ('name','dni','tel','email','wallet','image')
-
-class InputMoney(forms.Form):
-	new = forms.FloatField(
-		required = False,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control'
-			}
-		),
-		label = '',
-		initial = 0.0
-	)
-	add = forms.FloatField(
-		required = False,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control'
-			}
-		),
-		label = '',
-		initial = 0.0
-	)
-	class Meta:
-		model = Client
-		fields = ('new','add')
+    def authentication(self, username, password):
+        if User.objects.filter(username=username, password=password):
+            return User.objects.get(username=username)
 
 
-class InputTrue(ModelForm):
-	done = forms.BooleanField(required=True,label='')
-	class Meta:
-		model = Sale
-		fields = ('done',)
+class ProviderForm(ModelForm):
+    namePro = forms.CharField(required=True, label='',
+                              widget=forms.TextInput(
+                                  attrs={'class':
+                                         'form-control col-md-7 col-xs-12'}))
+    tel = forms.IntegerField(required=True, label='',
+                             widget=forms.NumberInput(
+                                 attrs={'class':
+                                        'form-control col-md-7 col-xs-12'}))
+    email = forms.EmailField(required=True, label='',
+                             widget=forms.EmailInput(
+                                 attrs={'class':
+                                        'form-control col-md-7 col-xs-12'}))
+
+    class Meta:
+        model = Provider
+        fields = ('namePro', 'tel', 'email')
+
+
+class ProductForm(ModelForm):
+    provider = forms.ModelChoiceField(required=True, label='',
+                                      queryset=Provider.objects.all())
+    name = forms.CharField(
+        required=True, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}))
+    category = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Crear nueva categoría'}
+        )
+    )
+    subcategory = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Crear nueva subcategoría'}
+        )
+    )
+    brand = forms.CharField(
+        required=True, label='',
+        widget=forms.TextInput(
+            attrs={'class':
+                   'form-control'}))
+    buyPrice = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "0.01",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    kind = forms.ChoiceField(required=True, choices=KINDPRODUCT, label='',
+                             widget=forms.Select(
+                                 attrs={'class':
+                                        'form-control col-md-7 col-xs-12'}))
+    iva = forms.ChoiceField(required=True, choices=IVA, label='',
+                            widget=forms.Select(attrs={
+                                'class': 'form-control'}))
+    amount = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "0.001",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    sellPrice = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'step': "0.01",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    barCode = forms.CharField(required=False, label='',
+                              widget=forms.TextInput(
+                                  attrs={
+                                      'class':
+                                      'form-control col-md-7 col-xs-12'}))
+    image = forms.ImageField(
+        required=False, label='',
+        widget=forms.FileInput(attrs={'hide': ''}))
+
+    class Meta:
+        model = Product
+        fields = ('name', 'provider', 'category', 'subcategory', 'brand',
+                  'buyPrice', 'sellPrice', 'amount', 'kind', 'iva', 'barCode',
+                  'image')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.fields['provider'].widget.attrs = {
+            'class': 'select2_single_provider form-control',
+        }
+
+
+class GenericTwoRowsForm(forms.Form):
+    new = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'type': 'number',
+                   'class': 'form-control',
+                   'step': "0.01",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+    add = forms.CharField(
+        required=False, label='',
+        widget=forms.TextInput(
+            attrs={'type': 'number',
+                   'class': 'form-control',
+                   'step': "0.01",
+                   'placeholder': "Usar ',' en decimales. Ej.: 11,5"}))
+
+
+class StockForm(GenericTwoRowsForm):
+
+    class Meta:
+        fields = ('new', 'add')
+
+    def __init__(self, *args, **kwargs):
+        super(StockForm, self).__init__(*args, **kwargs)
+        self.fields['new'].widget.attrs['step'] = '0.001'
+        self.fields['add'].widget.attrs['step'] = '0.001'
+
+    def is_valid(self, request, instance_prod):
+        if super(StockForm, self).is_valid():
+            cleaned_data = self.cleaned_data
+            try:
+                data = [float(i) for i in cleaned_data.values() if i]
+            except:
+                messages.error(request,
+                               ("El formato de los campos " +
+                                "introducidos no es correcto. " +
+                                "Solo valores numéricos."))
+                return False
+            if data:
+                if len(data) > 1:
+                    messages.error(
+                        request,
+                        ("Ha rellenado los dos campos de Stock " +
+                         "en el producto '%(prod)s'" %
+                         {'prod': instance_prod.name}))
+                    return False
+            else:
+                return False
+            return True
+        else:
+            return False
+
+
+class ClientForm(ModelForm):
+    name = forms.CharField(required=True, label='',
+                           widget=forms.TextInput(
+                               attrs={'placeholder': 'Nombre',
+                                      'class': 'form-control'}))
+    dni = forms.CharField(required=True,
+                          widget=forms.TextInput(
+                              attrs={'class': 'form-control',
+                                     'placeholder': 'DNI'}), label='')
+    tel = forms.IntegerField(required=False,
+                             widget=forms.TextInput(
+                                 attrs={'class': 'form-control',
+                                        'placeholder': 'Teléfono',
+                                        'type': 'tel'}), label='')
+    email = forms.EmailField(required=False,
+                             widget=forms.EmailInput(
+                                 attrs={'class': 'form-control',
+                                        'placeholder': 'E-mail'}), label='')
+    wallet = forms.FloatField(
+        required=True, label='',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control',
+                   'placeholder': "Cuantía. Usar ',' en decimales. Ej.: 11,5"})
+    )
+    image = forms.FileField(required=False, label='', widget=forms.FileInput)
+
+    class Meta:
+        model = Client
+        fields = ('name', 'surname', 'dni', 'tel', 'tel2', 'email', 'wallet',
+                  'image')
+
+    def __init__(self, *args, **kwargs):
+        super(ClientForm, self).__init__(*args, **kwargs)
+        self.fields['surname'].widget = forms.TextInput(
+            attrs={'placeholder': 'Apellidos',
+                   'class': 'form-control'})
+        self.fields['tel2'].widget = forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Teléfono (Opc.)',
+                'type': 'tel'
+            })
+
+
+class InputMoney(GenericTwoRowsForm):
+    class Meta:
+        exclude = []
+
+    def is_valid(self, request):
+        is_valid = super(InputMoney, self).is_valid()
+        if is_valid:
+            len_values = len([i for i in self.cleaned_data.values() if i])
+            if len_values == 1:
+                return True
+            elif len_values > 1:
+                messages.error(
+                    request,
+                    'Solo puede rellenar un campo en los valores de Monedero.')
+            elif len_values < 1:
+                messages.warning(
+                    request,
+                    'Rellene al menos un campo del Monedero editado.')
+        else:
+            messages.error(request, 'Datos de Monedero invalidos.')
+        return False
+
 
 class SearchProduct(forms.Form):
-	search = forms.CharField(
-		required = True,
-		widget = forms.TextInput(
-			attrs = {
-				'class':'form-control',
-				'placeholder':'Buscar...',
-				'title':'Nombre, Marca, Proveedor, Categoría o Código de Barras'
-			}
-		),
-		label='')
-	class Meta:
-		fields = ('search',)
+    search = forms.CharField(required=True, label='',
+                             widget=forms.TextInput(
+                                 attrs={
+                                     'class': 'form-control',
+                                     'placeholder': 'Buscar por nombre...',
+                                     'title':
+                                     'Nombre, Marca, Proveedor, Categoría o '
+                                     'Código de Barras'}))
+
+    class Meta:
+        fields = ('search',)
+
+    def get_filter(self):
+        my_filter = {}
+        cleaned_data = self.cleaned_data
+        for key, value in cleaned_data.items():
+            if key == 'search' and value:
+                my_filter.update({'name__icontains': value})
+        return my_filter
 
 
-class AmountForm(ModelForm):
-	amount = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class':'form-control col-md-7 col-xs-12'}),label='')
-	class Meta:
-		model = Product
-		fields = ('amount',)
+class DateForm(forms.Form):
+    start_date = forms.CharField(required=False, label='Fecha Inicio')
+    end_date = forms.CharField(required=False, label='Fecha Fin')
+    categorys = forms.ChoiceField(required=False, label='Categoría')
 
-class SrchCliForm(ModelForm):
-	name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Buscar...'}), label='')
-	class Meta:
-		model = Client
-		fields = ('name',)
+    def __init__(self, categorys, *args, **kwargs):
+        super(DateForm, self).__init__(*args, **kwargs)
+        # self.fields['start_date'].widget = extras.SelectDateWidget()
+        self.fields['start_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker',
+            'placeholder': 'Fecha inicio'
+        }
+        # self.fields['end_date'].widget = extras.SelectDateWidget()
+        self.fields['end_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker_2',
+            'placeholder': 'Fecha fin'
+        }
+        self.fields['categorys'].widget = forms.Select(
+            attrs={'class': 'select2_single_categorias form-control'})
+        self.fields['categorys'].choices = categorys
+
+    def get_filter(self, market):
+        objects = self.cleaned_data
+        first_d = Sale.objects.first().date
+        last_d = Sale.objects.last().date
+        big_list = None
+        big_list_two = None
+
+        for field_name, val in objects.items():
+            if not val:
+                del self.cleaned_data[field_name]
+            else:
+                if field_name == 'start_date':
+                    val = '-'.join(reversed(val.split('/')))
+                    start_date = parse_date(val)
+                    first_d = datetime.combine(start_date, datetime.min.time())
+                elif field_name == 'end_date':
+                    val = '-'.join(reversed(val.split('/')))
+                    end_date = parse_date(val)
+                    last_d = datetime.combine(end_date, datetime.max.time())
+                elif field_name == 'categorys':
+                    products_query = Product.objects.filter(category=val,
+                                                            market=market)
+                    big_list = set([])
+                    for i in products_query:
+                        for j in i.productsale_set.all():
+                            big_list.add(j.sale.id)
+                    if big_list_two:
+                        big_list = big_list.intersection(big_list_two)
+                    self.cleaned_data['id__in'] = big_list
+                elif field_name == 'iva':
+                    products_query = Product.objects.filter(market=market,
+                                                            iva=val)
+                    big_list_two = set([])
+                    for i in products_query:
+                        for j in i.productsale_set.all():
+                            big_list_two.add(j.sale.id)
+                    if big_list:
+                        big_list = big_list.intersection(big_list_two)
+                    else:
+                        big_list = big_list_two
+                    self.cleaned_data['id__in'] = big_list
+                del self.cleaned_data[field_name]
+        self.cleaned_data['date__range'] = (first_d, last_d)
+        return self.cleaned_data
+
+
+class ConfigurationForm(forms.ModelForm):
+
+    class Meta:
+        model = Configuration
+        exclude = ('market', )
+
+    def __init__(self, *args, **kwargs):
+        super(ConfigurationForm, self).__init__(*args, **kwargs)
+        self.fields['invoice_header'].widget = forms.Textarea()
+
+    def full_save(self, market_now):
+        instance = self.save(commit=False)
+        instance.market = market_now
+        instance.save()
+
+        return instance
+
+
+class ProductFilterForm(forms.Form):
+    bar_code = forms.CharField(required=False, label='Código de barras')
+    provider = forms.CharField(required=False, label='Proveedor')
+    brand = forms.CharField(required=False, label='Marca')
+    iva = forms.ChoiceField(required=False, label='IVA', choices=IVA,
+                            initial='')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductFilterForm, self).__init__(*args, **kwargs)
+        self.fields['bar_code'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Código de Barras'}
+        self.fields['provider'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Proveedor'}
+        self.fields['brand'].widget.attrs = {
+            'class': 'form-control',
+            'placeholder': 'Marca'}
+        self.fields['iva'].widget.attrs = {
+            'class': 'select2_single_iva form-control'
+        }
+
+    def get_filter(self):
+        for key, value in self.cleaned_data.items():
+            del self.cleaned_data[key]
+            if value:
+                if key == 'bar_code':
+                    self.cleaned_data.update(
+                        {'barCode__icontains': value})
+                elif key == 'provider':
+                    self.cleaned_data.update(
+                        {'provider__namePro__icontains': value})
+                elif key == 'brand':
+                    self.cleaned_data.update({'brand__icontains': value})
+                elif key == 'iva':
+                    self.cleaned_data.update({'iva': value})
+        return self.cleaned_data
+
+
+class OfferForm(forms.ModelForm):
+    class Meta:
+        model = Offer
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(OfferForm, self).__init__(*args, **kwargs)
+        self.fields['offer'].widget.attrs = {
+            'class': 'form-control',
+            'step': "0.01",
+            'placeholder': "Usar ',' en decimales. Ej.: 11,5"}
+        self.fields['start_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker'}
+        self.fields['end_date'].widget.attrs = {
+            'class': 'form-control',
+            'id': 'datepicker_2'}
+
+    def is_valid(self, request):
+        is_true = super(OfferForm, self).is_valid()
+        if is_true:
+            cleaned_data = self.cleaned_data
+            if cleaned_data['start_date'] <= cleaned_data['end_date']:
+                return True
+            else:
+                messages.error(request,
+                               ('La fecha de fin de la oferta debe ' +
+                                'ser mayor o igual a la fecha inicial'))
+                return False
+        else:
+            if self.cleaned_data:
+                messages.error(request, 'Oferta erronea')
+            return is_true
+
+
+class ClientDirectionForm(forms.ModelForm):
+
+    class Meta:
+        model = FullDirection
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(ClientDirectionForm, self).__init__(*args, **kwargs)
+        self.fields['location'].widget = forms.TextInput(
+            attrs={'placeholder': 'Localidad',
+                   'class': 'form-control'})
+        self.fields['province'].widget = forms.TextInput(
+            attrs={'placeholder': 'Provincia',
+                   'class': 'form-control'})
+        self.fields['postalCode'].widget = forms.TextInput(
+            attrs={'placeholder': 'Código Postal',
+                   'class': 'form-control'})
+        self.fields['direction'].widget = forms.TextInput(
+            attrs={'placeholder': 'Dirección',
+                   'class': 'form-control'})
+        self.fields['numDir'].widget = forms.TextInput(
+            attrs={'placeholder': 'Número',
+                   'class': 'form-control'})
+        self.fields['stairs'].widget = forms.TextInput(
+            attrs={'placeholder': 'Escaleras',
+                   'class': 'form-control'})
+        self.fields['numFlat'].widget = forms.TextInput(
+            attrs={'placeholder': 'Piso',
+                   'class': 'form-control'})
+        self.fields['door'].widget = forms.TextInput(
+            attrs={'placeholder': 'Puerta',
+                   'class': 'form-control'})
+
+
+class BankDataForm(forms.ModelForm):
+
+    class Meta:
+        model = BankData
+        exclude = ['date', ]
+
+    def __init__(self, *args, **kwargs):
+        super(BankDataForm, self).__init__(*args, **kwargs)
+        self.fields['payment_method'].widget = forms.TextInput(
+            attrs={'placeholder': 'Método de pago',
+                   'class': 'form-control'})
+        self.fields['owner_name'].widget = forms.TextInput(
+            attrs={'placeholder': 'Nombre del propietario',
+                   'class': 'form-control'})
+        self.fields['owner_surname'].widget = forms.TextInput(
+            attrs={'placeholder': 'Apellidos del propietario',
+                   'class': 'form-control'})
+        self.fields['owner_nif'].widget = forms.TextInput(
+            attrs={'placeholder': 'NIF del propietario',
+                   'class': 'form-control'})
+        self.fields['bank_name'].widget = forms.TextInput(
+            attrs={'placeholder': 'Nombre del banco',
+                   'class': 'form-control'})
+        self.fields['account_number'].widget = forms.TextInput(
+            attrs={'placeholder': 'Número de cuenta',
+                   'class': 'form-control'})
+        self.fields['subscription'].widget = forms.TextInput(
+            attrs={'placeholder': 'Cuota',
+                   'class': 'form-control'})
+        self.fields['frequency'].widget = forms.TextInput(
+            attrs={'placeholder': 'Frecuencia de cuota',
+                   'class': 'form-control'})
+        self.fields['observations'].widget = forms.TextInput(
+            attrs={'placeholder': 'Observaciones',
+                   'class': 'form-control'})

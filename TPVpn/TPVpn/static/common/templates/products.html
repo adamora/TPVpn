@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+    {% load render_table from django_tables2 %}
     {% load staticfiles %}
 {% block style %}
   <!-- Custom styling plus plugins -->
@@ -7,17 +8,16 @@
 {% endblock %}
 {% block mainContent %}
   <!-- page content -->
-  <div class="right_col" role="main">
     <div class="row">
       <div class="page-title">
         <div class="title_left">
-            <h3>Buscar Productos</h3>
+            <h3>Productos</h3>
         </div>
         <div class="title_right">
-          <form method='post' action='' id='searchBill'> {% csrf_token %}
+          <form method='GET' action='' id='searchBill'>
               <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                   <div class="input-group">
-                    {{searchProduct.search}}
+                    {{search_product.search}}
                     <span class="input-group-btn">
                       <input type="hidden" name="searching" value="searchProd">
                       <button class="btn btn-default" type="submit">Ir!</button>
@@ -28,168 +28,37 @@
         </div>
       </div>
       <div class="clearfix"></div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>Productos</h2>
-
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-
-                        <p>Listado de productos de la tienda <big><b>{{marketNow.name}}</b></big></p>
-
-                        <!-- start project list -->
-                        <table class="table table-striped projects ">
-                        <!--table class="table table-striped projects responsive-utilities" id="products"-->
-                            <thead>
-                                <tr class="headings">
-                                    <th>Imagen</th>
-                                    <th>Cód. Barras</th>
-                                    <th>Nombre del Producto</th>
-                                    <th>Proveedor (Marca)</th>
-                                    <th>
-                                      <a class="red">Compra</a> / <a class="blue">Venta</a>
-                                    </th>
-                                    <th>Existencias</th>
-                                    <th style="width: 20%">#Editar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for i in products %}
-                                <tr class="even pointer">
-                                    <td class=" "><img src="/media/{{i.image}}" class="avatar-view" style="height:50px;width:50px"></img></td>
-                                    <td class=" ">{{i.barCode}}</td>
-                                    <td class=" ">
-                                      <a>{{i.name}}</a>
-                                      <br>
-                                      <small>*(IVA aplicado: {{i.iva}}%)</small>
-                                    </td>
-                                    <td class=" ">
-                                      {{i.provider.namePro}} ({{i.brand}})
-                                      <br>
-                                      <small><b>Tlf: {{i.provider.tel}}</b></small>
-                                    </td>
-                                    <td class=" ">
-                                        <a class="red">{{i.buyPrice}}€</a> <b>/</b> <a class="blue">{{i.sellPrice}}€</a>
-                                    </td>
-                                    <td class=" ">
-                                        {% if i.amount > 10 %}
-                                            <button type="button" class="btn btn-success btn-xs">{{i.amount}} {{i.kind}}</button>
-                                        {% elif i.amount <= 0 %}
-                                            <button type="button" class="btn btn-danger btn-xs">{{i.amount}} {{i.kind}}</button>
-                                        {% else %}
-                                            <button type="button" class="btn btn-warning btn-xs">{{i.amount}} {{i.kind}}</button>
-                                        {% endif %}
-                                    </td>
-                                    <td class=" ">
-                                        <a href="/modProd/{{i.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Editar </a>
-                                        <a href="javascript:void(0);" onclick="delete_product('{{i.name}}',{{i.pk}})" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Borrar </a>
-                                        <a class="btn btn-warning btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{i.pk}}"><i class="fa fa-sliders"></i> Stock </a>
-                                        <a class="btn btn-success btn-xs" data-toggle="modal" data-target=".bs-example-modal-offer-{{i.pk}}"><i class="fa fa-eur"></i> Oferta </a>
-                                    </td>
-                                </tr>
-
-                                <!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
-                                <div class="modal fade bs-example-modal-{{i.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                                                </button>
-                                                <h4 class="modal-title" id="myModalLabel">Cantidad actual de producto: <b class="green">{{i.amount}} {{i.kind}}</b></h4>
-                                            </div>
-                                            <form class="form-horizontal form-label-left" method='post' action='' id="newStock"> {% csrf_token %}
-                                                <div class="modal-body">
-                                                    <b class="red">{{ modQuantity.new.error }}</b><div class="clearfix"></div><br>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ modQuantity.new.errors }}</span></div>
-                                                        </label>
-                                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.new }}
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <div class="clearfix"></div>
-                                                    <br>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ modQuantity.add.errors }}</span></div>
-                                                        </label>
-                                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.add }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <br>
-                                                <div class="clearfix"></div>
-                                                <br>
-                                                <div class="modal-footer">
-                                                    <input type="hidden" name="newQuantity" value="{{i.pk}}">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                                    <button type="submit" class="btn btn-primary">Enviar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /END MODAL -->
-
-                                <!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
-                                <div class="modal fade bs-example-modal-offer-{{i.pk}}" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                                                </button>
-                                                <h4 class="modal-title" id="myModalLabel">Precio actual de producto: <b class="green">{{i.sellPrice}}</b></h4>
-                                            </div>
-                                            <form class="form-horizontal form-label-left" method='post' action='' id="newStock"> {% csrf_token %}
-                                                <div class="modal-body">
-                                                    <b class="red">{{ modQuantity.new.error }}</b><div class="clearfix"></div><br>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nueva cantidad: <br><span class="required small blue"><i>(Esta opcion sustituirá la cantidad anterior)</i></span><div class='byline'><span class='red'>{{ modQuantity.new.errors }}</span></div>
-                                                        </label>
-                                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.new }}
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <div class="clearfix"></div>
-                                                    <br>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Agregar cantidad: <br><span class="required small blue"><i>(Esta opción sumará/restará a la cantidad disponible)</i></span><div class='byline'><span class='red'>{{ modQuantity.add.errors }}</span></div>
-                                                        </label>
-                                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                                            {{ modQuantity.add }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <br>
-                                                <div class="clearfix"></div>
-                                                <br>
-                                                <div class="modal-footer">
-                                                    <input type="hidden" name="newQuantity" value="{{i.pk}}">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                                    <button type="submit" class="btn btn-primary">Enviar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /END MODAL -->
-
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <!-- end project list -->
-                    </div>
+      <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Filtrar Productos</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    {% if table %}
+                    <form method="GET" action=".">
+                        <div class="col-md-12">
+                            <div class='col-md-3'>{{filter_products.bar_code}}</div>
+                            <div class='col-md-3'>{{filter_products.provider}}</div>
+                            <div class='col-md-3'>{{filter_products.brand}}</div>
+                            <div class='col-md-3'>{{filter_products.iva}}</div>
+                        </div>
+                        <br><br><br>
+                        <div class="col-md-12">
+                            <a href="{{request.path}}" class="btn btn-default" style="float: right">Restablecer Criterios</a>
+                            <button type="submit" class="btn btn-primary" style="float: right"><i class="glyphicon glyphicon-search"></i> Filtrar</button>
+                        </div>
+                    </form>
+                    <!-- PARA QUE SALGA LA PAGINACIÓN, DIRIGETE A /usr/local/lib/python2.7/dist-packages/django_tables2/templates/table.html -->
+                    {% render_table table %}
+                    {% else %}
+                        <div class="alert alert-info" role="alert">No se han encontrado resultados</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+      </div>
     </div>
     <div class="clearfix"></div>
 {% endblock %}
@@ -205,7 +74,38 @@
         window.location.assign(url);
       }
     }
+  </script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script>
+    $( function() {
+      $( "[id^='datepicker']").datepicker();
+    } );
+  </script>
 
+
+  <script>
+     $.datepicker.regional['es'] = {
+       closeText: 'Cerrar',
+       prevText: 'Anterior',
+       nextText: 'Siguiente',
+       currentText: 'Hoy',
+       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+       monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+       dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+       dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+       dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+       weekHeader: 'Sm',
+       dateFormat: 'dd/mm/yy',
+       firstDay: 1,
+       isRTL: false,
+       showMonthAfterYear: false,
+       yearSuffix: ''
+     };
+     $.datepicker.setDefaults($.datepicker.regional['es']);
+    $(function () {
+    $("#fecha").datepicker();
+    });
   </script>
 
 {% endblock %}

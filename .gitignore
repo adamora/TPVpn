@@ -1,0 +1,8 @@
+*.pyc
+*.sqlite3
+TPVpn/TPVpn/media/clients/profile/*
+TPVpn/TPVpn/media/users/profile/*
+TPVpn/TPVpn/media/products/uploaded/*
+TPVpn/TPVpn/*.pyc
+TPVpn/TPVpnapp/*.pyc
+

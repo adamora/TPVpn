@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'TPVpnapp',
     'rest_framework',
     'corsheaders',
+    'django_tables2',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,7 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    #EVITAR PROBLEMAS CSRF
+    # EVITAR PROBLEMAS CSRF
     'TPVpnapp.disableCSRF.DisableCSRF',
     'TPVpnapp.django-crossdomainxhr-middleware.XsSharing',
     'corsheaders.middleware.CorsMiddleware',
@@ -80,14 +81,24 @@ WSGI_APPLICATION = 'TPVpn.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db',
+        'USER': 'root',
+        'PASSWORD': 'qw78zx12',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -102,7 +113,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-#Serializer to work with Angular
+# Serializer to work with Angular
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 
@@ -122,19 +133,17 @@ MEDIAFILES_DIRS = (
     'TPVpn/media',
 )
 '''
-#MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
-
-
-#STATICFILES_FINDERS = (
+# STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.FileSystemFinder',
 #    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-##    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-#)
-#MEDIA_URL = '/media/'
-#MEDIA_ROOT = (
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+# )
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = (
 #    'TPVpn/media',
-#)
+# )
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -148,9 +157,12 @@ REST_FRAMEWORK = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-
+'''
 CORS_ORIGIN_WHITELIST = [
     '127.0.0.1:8000',
+    '0.0.0.0:8001',
+    '127.0.0.1:8001',
+    '192.168.1.37:8001'
 ]
-
+'''
 CORS_ALLOW_CREDENTIALS = True
