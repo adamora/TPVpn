@@ -10,7 +10,6 @@
 </style>
 {% endblock %}
 {% block mainContent %}
-
 <!-- page content -->
   <div class="" ng-app="TPVpnapp">
   <div class="col-md-12" id='angular_preload'>
@@ -56,7 +55,7 @@
                 <input type="text" class="form-control" ng-model='improviseName' placeholder="Producto improvisado">
               </div>
               <div class="col-md-2 col-sm-2 col-xs-2">
-                <button type='submit' class='btn btn-success' ng-click="addList('null' + improviseName + improvisePrice,improviseName,improvisePrice); improviseName=''; improvisePrice=0">Añadir</button>
+                <button type='submit' class='btn btn-success' ng-click="addList('null' + improviseName + improvisePrice,improviseName,improvisePrice); improviseName=''; improvisePrice=0;" onclick="play_sound();">Añadir</button>
               </div>
             </form>
 
@@ -308,6 +307,7 @@
 
             angular.element(document.getElementById('StartAngular')).scope().addList(res[0],res[1],res[2]);
             angular.element(document.getElementById('StartAngular')).scope().$apply();
+            audioElement.play();
 
             //Pone el scroll abajo cuando prod introducido en venta
             var objDiv = document.getElementById("productListPanel");
@@ -379,6 +379,13 @@
             $(".select2_single_client").select2('val','');
           });
 
+          //Estilo para barras selectoras
+          $('span.select2').css('width', '100%');
+
+          //Pitido cuando selecciona producto
+          var audioElement = document.createElement('audio');
+          audioElement.setAttribute('src', '/media/loading/beep.mp3');
+
       });
   </script>
   <!-- /select2 -->
@@ -439,7 +446,11 @@
       $('#factura_imprimir').hide()
     }
 
-
+          function play_sound() {
+            var audioElement = document.createElement('audio');
+            audioElement.setAttribute('src', '/media/loading/beep.mp3');
+            audioElement.play();
+          }
   </script>
   <!-- /shortcuts -->
 

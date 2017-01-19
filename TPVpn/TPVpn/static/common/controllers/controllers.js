@@ -103,6 +103,9 @@
             var priceProd = $scope.completeList[i].sellPrice;
             $scope.addList(pk,nameProd,priceProd);
             $scope.takeBar=null;
+            var audioElement = document.createElement('audio');
+            audioElement.setAttribute('src', '/media/loading/beep.mp3');
+            audioElement.play();
           }
         }
       }

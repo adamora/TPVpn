@@ -1,0 +1,7 @@
+{% if record.amount > 10 %}
+    <button type="button" class="btn btn-success btn-xs">{{record.amount}} {{record.kind}}</button>
+{% elif record.amount <= 0 %}
+    <button type="button" class="btn btn-danger btn-xs">{{record.amount}} {{record.kind}}</button>
+{% else %}
+    <button type="button" class="btn btn-warning btn-xs">{{record.amount}} {{record.kind}}</button>
+{% endif %}

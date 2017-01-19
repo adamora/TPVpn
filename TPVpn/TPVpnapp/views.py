@@ -192,7 +192,11 @@ def mod_worker(request, pk):
                         setattr(worker_now.user, key, value)
                     worker_now.user.save()
                     for key, value in new_address.cleaned_data.items():
-                        setattr(worker_now.home, key, value)
+                        if worker_now.home:
+                            setattr(worker_now.home, key, value)
+                        else:
+                            home = new_address.save()
+                            worker_now.home = home
                     worker_now.home.save()
                     for key, value in neworker.cleaned_data.items():
                         setattr(worker_now, key, value)
@@ -974,7 +978,13 @@ def configuration(request):
                 db_file = request.FILES.get('db_file', None)
                 if db_file:
                     file_name = db_file.name
-                    load_data(request, file_name)
+                    try:
+                        load_data(request, file_name)
+                    except:
+                        messages.error(
+                            request, 'Archivo incorrecto. ' +
+                            'No se encuentra en el mismo directorio ' +
+                            'que "manage.py"')
                     return redirect('/configuration')
         else:
             form = ConfigurationForm(data=request.POST)
