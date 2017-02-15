@@ -58,6 +58,10 @@ def get_categorys_subcategorys(products):
     subcategorys = set([])
     [[categorys.add(i.category), subcategorys.add(i.subcategory)]
         for i in products]
+    if categorys:
+        categorys = sorted(categorys, key=unicode.lower)
+    if subcategorys:
+        subcategorys = sorted(subcategorys, key=unicode.lower)
     return categorys, subcategorys
 
 

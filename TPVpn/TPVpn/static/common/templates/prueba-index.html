@@ -310,7 +310,6 @@
   <link href="{% static "common/templates/css/select/select2.min.css" %} " rel="stylesheet">
   <script>
       $(document).ready(function () {
-          $('#menu_toggle').click();
           $(".select2_single_products").select2({
               placeholder: "Seleccione producto",
               allowClear: true
@@ -403,7 +402,7 @@
           //Pitido cuando selecciona producto
           var audioElement = document.createElement('audio');
           audioElement.setAttribute('src', '/media/loading/beep.mp3');
-
+        //$('#menu_toggle').click();
       });
   </script>
   <!-- /select2 -->

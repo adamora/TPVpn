@@ -34,7 +34,7 @@ from TPVpnapp.models import (Client, Configuration, Market, Notification,
                              Product, ProductSale, Provider, Sale, Worker)
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
                                   SaleSerializer)
-from .tables import ProductTable
+from .tables import CategoryTable, ProductTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
                     paginator_function, get_ivas, get_total_invoice,
@@ -1044,3 +1044,51 @@ def load_data(request, file_name):
         request,
         'Se ha cargado una copia de la base de datos satisfactoriamente.')
     return redirect('/configuration')
+
+
+@login_required(login_url='/')
+def edit_category(request):
+    worker_now, market_now = get_worker_market(request)
+    products = Product.objects.filter(market=market_now)
+
+    if request.method == 'POST':
+        new_cat = request.POST.get('new_name')
+        if new_cat:
+            if request.POST.get('kind') == 'category':
+                cat_prod = products.filter(
+                    category=request.POST.get('old_name'))
+                for i in cat_prod:
+                    i.category = new_cat
+                    i.save()
+            elif request.POST.get('kind') == 'subcategory':
+                cat_prod = products.filter(
+                    subcategory=request.POST.get('old_name'))
+                for i in cat_prod:
+                    i.subcategory = new_cat
+                    i.save()
+
+            products = Product.objects.filter(market=market_now)
+        else:
+            messages.warning(
+                request,
+                'No se han aplicado cambios. No ha introducido un nombre.')
+
+    categorys, subcategorys = get_categorys_subcategorys(products)
+
+    categorys = [{'name': i, 'kind': 'category'} for i in categorys]
+    subcategorys = [{'name': i, 'kind': 'subcategory'} for i in subcategorys]
+
+    category_table = CategoryTable(categorys, prefix='category')
+    subcategory_table = CategoryTable(subcategorys, prefix='subcategory')
+    config = RequestConfig(request, paginate={'per_page': 5})
+    config.configure(category_table)
+    config.configure(subcategory_table)
+
+    context = {
+        'worker_now': worker_now,
+        'category_table': category_table,
+        'subcategory_table': subcategory_table,
+        'categorys': categorys,
+        'subcategorys': subcategorys
+    }
+    return render(request, 'category_template.html', context=context)
