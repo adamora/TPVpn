@@ -76,6 +76,7 @@ MIDDLEWARE_CLASSES = (
     'TPVpnapp.disableCSRF.DisableCSRF',
     'TPVpnapp.django-crossdomainxhr-middleware.XsSharing',
     'corsheaders.middleware.CorsMiddleware',
+    'TPVpnapp.utils.ThreadLocalMiddleware',
 )
 
 ROOT_URLCONF = 'TPVpn.urls'

@@ -263,3 +263,24 @@ def save_data(market, all_dict):
         client_instance.home = direction_instance
         client_instance.bank = bank_instance
         client_instance.save()
+
+
+try:
+    from threading import local
+except ImportError:
+    from django.utils._threading_local import local
+_thread_locals = local()
+
+
+class ThreadLocalMiddleware(object):
+    def process_request(self, request):
+        _thread_locals.request = request
+
+    def process_response(self, request, response):
+        if hasattr(_thread_locals, 'request'):
+            del _thread_locals.request
+        return response
+
+
+def get_request():
+    return getattr(_thread_locals, 'request', None)

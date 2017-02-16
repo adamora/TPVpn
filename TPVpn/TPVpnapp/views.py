@@ -34,7 +34,7 @@ from TPVpnapp.models import (Client, Configuration, Market, Notification,
                              Product, ProductSale, Provider, Sale, Worker)
 from TPVpnapp.serializers import (ClientSerializer, ProductSerializer,
                                   SaleSerializer)
-from .tables import CategoryTable, ProductTable
+from .tables import CategoryTable, ProductTable, ProviderTable
 from .utils import (get_categorys_subcategorys, get_worker_market,
                     update_offers, search_clients, search_workers,
                     paginator_function, get_ivas, get_total_invoice,
@@ -1052,22 +1052,43 @@ def edit_category(request):
     products = Product.objects.filter(market=market_now)
 
     if request.method == 'POST':
-        new_cat = request.POST.get('new_name')
+        new_cat = request.POST.get('new_name', None)
+        delete = request.POST.get('delete', None)
         if new_cat:
-            if request.POST.get('kind') == 'category':
+            if request.POST.get('kind') == 'categoria':
                 cat_prod = products.filter(
                     category=request.POST.get('old_name'))
                 for i in cat_prod:
                     i.category = new_cat
                     i.save()
-            elif request.POST.get('kind') == 'subcategory':
+            elif request.POST.get('kind') == 'subcategoria':
                 cat_prod = products.filter(
                     subcategory=request.POST.get('old_name'))
                 for i in cat_prod:
                     i.subcategory = new_cat
                     i.save()
-
+            msg = ('%(kind)s %(old_name)s fue modificada por %(new_name)s' %
+                   {'kind': request.POST.get('kind'),
+                    'old_name': request.POST.get('old_name'),
+                    'new_name': request.POST.get('new_name')})
             products = Product.objects.filter(market=market_now)
+            messages.success(request, msg.capitalize())
+        elif delete:
+            if request.POST.get('kind') == 'categoria':
+                cat_prod = products.filter(
+                    category=request.POST.get('old_name'))
+                for i in cat_prod:
+                    i.category = 'Ninguna'
+                    i.save()
+            elif request.POST.get('kind') == 'subcategoria':
+                cat_prod = products.filter(
+                    subcategory=request.POST.get('old_name'))
+                for i in cat_prod:
+                    i.subcategory = 'Ninguna'
+                    i.save()
+            msg = ('%(kind)s %(old_name)s fue borrada' %
+                   {'kind': request.POST.get('kind'),
+                    'old_name': request.POST.get('old_name')})
         else:
             messages.warning(
                 request,
@@ -1075,8 +1096,8 @@ def edit_category(request):
 
     categorys, subcategorys = get_categorys_subcategorys(products)
 
-    categorys = [{'name': i, 'kind': 'category'} for i in categorys]
-    subcategorys = [{'name': i, 'kind': 'subcategory'} for i in subcategorys]
+    categorys = [{'name': i, 'kind': 'categoria'} for i in categorys]
+    subcategorys = [{'name': i, 'kind': 'subcategoria'} for i in subcategorys]
 
     category_table = CategoryTable(categorys, prefix='category')
     subcategory_table = CategoryTable(subcategorys, prefix='subcategory')
@@ -1092,3 +1113,38 @@ def edit_category(request):
         'subcategorys': subcategorys
     }
     return render(request, 'category_template.html', context=context)
+
+
+@login_required(login_url='/')
+def providers(request):
+    worker_now, market_now = get_worker_market(request)
+    data = request.POST or None
+    newprovider = ProviderForm(data=data)
+    if request.method == 'POST':
+        if 'delete' in data:
+            id_pro = data.get('id_provider')
+            try:
+                instance = Provider.objects.get(id=id_pro)
+                instance.delete()
+                messages.success(request,
+                                 'Proveedor borrado satisfactoriamente')
+            except ObjectDoesNotExist:
+                pass
+        else:
+            if newprovider.is_valid():
+                newprovider.save()
+                newprovider = ProviderForm()
+                messages.success(request,
+                                 'Proveedor agregado satisfactoriamente')
+            else:
+                messages.error(request, 'Formulario de proveedor invalido')
+    providers = Provider.objects.filter(market=market_now)
+    table = ProviderTable(providers)
+    RequestConfig(request, paginate={'per_page': 5}).configure(table)
+    context = {
+        'worker_now': worker_now,
+        'providers': providers,
+        'table': table,
+        'newprovider': newprovider
+    }
+    return render(request, 'providers_template.html', context=context)

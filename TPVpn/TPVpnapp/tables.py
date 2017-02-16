@@ -47,8 +47,19 @@ class ProductTable(tables.Table):
 
 class CategoryTable(tables.Table):
     name = tables.Column(verbose_name='Nombre')
-    edit = tables.TemplateColumn(verbose_name='Editar',
+    edit = tables.TemplateColumn(verbose_name='Editar', orderable=False,
                                  template_name='tables/edit_column.html')
+
+    class Meta:
+        attrs = {'class': 'table table-striped projects'}
+
+
+class ProviderTable(tables.Table):
+    namePro = tables.Column(verbose_name='Nombre')
+    email = tables.EmailColumn(verbose_name='Email')
+    tel = tables.Column(verbose_name='Teléfono')
+    del_pro = tables.TemplateColumn(verbose_name='Opciones', orderable=False,
+                                    template_name='tables/del_pro_table.html')
 
     class Meta:
         attrs = {'class': 'table table-striped projects'}

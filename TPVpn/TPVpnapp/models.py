@@ -63,6 +63,22 @@ class Provider(models.Model):
     def __unicode__(self):
         return unicode(self.namePro)
 
+    @property
+    def name(self):
+        return self.namePro
+
+    @name.setter
+    def name(self, value):
+        self.namePro = value
+
+
+@receiver(pre_save, sender=Provider)
+def provider_pre_save(sender, instance, **kwargs):
+    from TPVpnapp.utils import get_request, get_worker_market
+    request = get_request()
+    worker_now, market_now = get_worker_market(request)
+    instance.market = market_now
+
 
 class Offer(models.Model):
     offer = models.FloatField()
