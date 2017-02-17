@@ -187,3 +187,10 @@ CORS_ORIGIN_WHITELIST = [
 ]
 '''
 CORS_ALLOW_CREDENTIALS = True
+
+EMAIL_USE_TLS = True
+EMAIL_SENDER = 'blabla@gmail.es'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'blabla@gmail.es'
+EMAIL_HOST_PASSWORD = 'blabla'
+EMAIL_PORT = 587

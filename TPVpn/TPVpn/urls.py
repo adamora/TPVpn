@@ -76,6 +76,7 @@ urlpatterns = [
     url(r'^dump_data/$', 'TPVpnapp.views.dump_data'),
     url(r'^categorys/$', 'TPVpnapp.views.edit_category'),
     url(r'^providers/$', 'TPVpnapp.views.providers'),
+    url(r'^recover_password/$', 'TPVpnapp.views.recover_password'),
     # url(r'^invoice-report/$', 'TPVpnapp.views.invoice_report'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

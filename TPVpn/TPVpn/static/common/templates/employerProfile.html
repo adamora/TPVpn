@@ -250,7 +250,7 @@
                                           </div>
                                           <div class="message_wrapper">
                                             <h4 class="heading">Mensaje de <a class="green" href="/employer_profile/{{notification.writer.dni}}">{{notification.writer.user.first_name}}</a></h4>
-                                            <blockquote class="message">{{notification.content}}</blockquote>
+                                            <blockquote class="message">{{notification.content | safe}}</blockquote>
                                             {% if worker_now == workerProfile and workerProfile != notification.writer %}
                                             <br />
                                             <p class="url">

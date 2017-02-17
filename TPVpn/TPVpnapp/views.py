@@ -640,11 +640,11 @@ def mod_client(request, pk):
                                  "Cliente modificado satisfactoriamente.")
                 note = Notification(reciverCli=client, writer=worker_now,
                                     content="Cliente modificado. \
-                                             Datos anteriores; \
-                                             Nombre: " + str(aux.name) + "; \
-                                             DNI: " + str(aux.dni) + "; \
-                                             E-mail: " + str(aux.email) + "; \
-                                             Telefono: " + str(aux.tel) + "; \
+                                             Datos anteriores; <br>\
+                                             Nombre: " + str(aux.name) + "; <br>\
+                                             DNI: " + str(aux.dni) + "; <br>\
+                                             E-mail: " + str(aux.email) + "; <br>\
+                                             Telefono: " + str(aux.tel) + "; <br>\
                                              Monedero: " + str(aux.wallet),
                                     typeNote='normal')
                 note.save()
@@ -705,10 +705,10 @@ def delete_client(request, pk):
     notification = Notification(
         writer=worker_now,
         reciver=worker_now,
-        content="<p>Cliente " + client.name + " eliminado satisfactoriamente. \
-            DNI: " + client.dni + " \
-            Fecha de baja: " + str(datetime.now()) + " \
-            Saldo acumulado: " + str(client.wallet) + " ",
+        content="<p>Cliente <b>" + client.name + "</b> eliminado satisfactoriamente.<br> \
+            DNI: " + client.dni + "<br> \
+            Fecha de baja: " + str(datetime.now()) + "<br> \
+            Saldo acumulado: " + str(client.wallet) + " </p>",
         typeNote='normal'
     )
     notification.save()
@@ -1148,3 +1148,43 @@ def providers(request):
         'newprovider': newprovider
     }
     return render(request, 'providers_template.html', context=context)
+
+
+def recover_password(request):
+    if request.method == 'POST':
+        import random
+        import string
+        paswd = ''.join(
+            random.SystemRandom().choice(
+                string.ascii_uppercase + string.digits) for _ in range(8))
+        email = request.POST.get('email', None)
+        dni = request.POST.get('dni', None)
+        if email:
+            try:
+                instance = Worker.objects.get(dni=dni, user__email=email)
+                instance.user.set_password(paswd)
+                instance.user.save()
+                instance.save()
+
+                from django.core.mail import send_mail
+                from TPVpn import settings
+                send_mail(
+                    'Recuperacion de password',
+                    'Su nueva contraseña es: %s. Para mas seguridad, borre este \
+                    correo de inmediato' % paswd,
+                    settings.EMAIL_SENDER,
+                    [email],
+                    fail_silently=False,
+                )
+
+                messages.success(request, 'Su petición ha sido tramitada.<br> \
+                    En breves, recibirá un correo electrónico con las \
+                    instrucciones requeridas.')
+            except ObjectDoesNotExist:
+                messages.error(request, 'Su petición no ha sido tramitada.<br> \
+                    No se ha encontrado el usuario con los datos \
+                    especificados.<br> \
+                    Intentelo de nuevo o contacte con el administrador.')
+        return redirect('/')
+    else:
+        return render(request, 'recover_password.html')
