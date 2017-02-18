@@ -150,6 +150,9 @@
                                     <li role="presentation">
                                       <a href="#tab_content3" role="tab" data-toggle="tab" aria-expanded="false">Movimientos de Monedero</a>
                                     </li>
+                                    <li role="presentation">
+                                      <a href="#tab_content4" role="tab" data-toggle="tab" aria-expanded="false">Datos Bancarios</a>
+                                    </li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content">
                                     <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab" style="overflow: scroll; overflow-x:hidden; max-height: 420px;">
@@ -272,6 +275,26 @@
                                         {% else %}
                                             <div class="alert alert-info" role="alert">
                                                 No se han registrado movimientos de monedero en este cliente
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="tab_content4">
+                                        {% if client.bank %}
+                                            <p>
+                                                <b>Método de pago: </b>{{client.bank.payment_method}} <br>
+                                                <b>Nombre del propietario: </b>{{client.bank.owner_name}} <br>
+                                                <b>Apellidos del porpietario: </b>{{client.bank.owner_surname}} <br>
+                                                <b>NIF del propietario: </b>{{client.bank.owner_nif}} <br>
+                                                <b>Nombre del banco: </b>{{client.bank.bank_name}} <br>
+                                                <b>Número de cuenta: </b>{{client.bank.account_number}} <br>
+                                                <b>Cuota: </b>{{client.bank.subscription}} <br>
+                                                <b>Frecuencia de cuota: </b>{{client.bank.frequency}} <br>
+                                                <b>Observaciones: </b>{{client.bank.observations}} <br>
+                                            </p>
+                                        {% else %}
+                                            <div class="alert alert-info" role="alert">
+                                                No se han registrado datos bancarios
                                             </div>
                                         {% endif %}
                                     </div>

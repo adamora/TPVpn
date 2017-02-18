@@ -310,7 +310,7 @@
             new PNotify({
                 title: '{{message.tags|title}}',
                 type: '{{message.tags}}',
-                text: '{{message}}',
+                text: '{{message | safe}}',
                 before_close: function (PNotify) {
                     // You can access the notice's options with this. It is read only.
                     //PNotify.options.text;

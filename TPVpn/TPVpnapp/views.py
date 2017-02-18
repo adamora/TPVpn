@@ -1159,32 +1159,40 @@ def recover_password(request):
                 string.ascii_uppercase + string.digits) for _ in range(8))
         email = request.POST.get('email', None)
         dni = request.POST.get('dni', None)
-        if email:
+        if email and dni:
             try:
                 instance = Worker.objects.get(dni=dni, user__email=email)
                 instance.user.set_password(paswd)
-                instance.user.save()
-                instance.save()
+                try:
+                    from django.core.mail import send_mail
+                    from TPVpn import settings
+                    send_mail(
+                        'Recuperacion de password',
+                        'Su nueva contraseña es: %s. Para mas seguridad, borre este \
+                        correo de inmediato.' % paswd,
+                        settings.EMAIL_SENDER,
+                        [email],
+                        fail_silently=False,
+                    )
 
-                from django.core.mail import send_mail
-                from TPVpn import settings
-                send_mail(
-                    'Recuperacion de password',
-                    'Su nueva contraseña es: %s. Para mas seguridad, borre este \
-                    correo de inmediato' % paswd,
-                    settings.EMAIL_SENDER,
-                    [email],
-                    fail_silently=False,
-                )
+                    instance.user.save()
+                    instance.save()
 
-                messages.success(request, 'Su petición ha sido tramitada.<br> \
-                    En breves, recibirá un correo electrónico con las \
-                    instrucciones requeridas.')
+                    messages.success(request, 'Su petición ha sido tramitada.<br> \
+                        En breves, recibirá un correo electrónico con las \
+                        instrucciones requeridas.')
+                except:
+                    messages.error(request, 'Mail no configurado.<br> \
+                        La recuperación de la contraseña no ha podido ser \
+                        tramitada. <br>Contacte con un administrador.')
             except ObjectDoesNotExist:
                 messages.error(request, 'Su petición no ha sido tramitada.<br> \
                     No se ha encontrado el usuario con los datos \
                     especificados.<br> \
                     Intentelo de nuevo o contacte con el administrador.')
+        else:
+            messages.error(request, 'No ha relleneado los campos \
+                necesarios para la recuperación de su contraseña.')
         return redirect('/')
     else:
         return render(request, 'recover_password.html')
