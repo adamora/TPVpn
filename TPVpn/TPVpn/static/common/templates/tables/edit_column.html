@@ -1,0 +1,80 @@
+<!--
+//    This file is part of TPVpn.
+//
+//    TPVpn is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    TPVpn is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with TPVpn.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<a class="btn btn-warning btn-xs" data-toggle="modal" data-target=".bs-example-modal-{{record.name}}-{{record.kind}}"><i class="fa fa-pencil"></i> Editar</a>
+<a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".bs-example-modal-sm-{{record.name}}-{{record.kind}}"><i class="fa fa-close"></i> Borrar</a>
+
+<!-- MODAL -->
+<div class="modal fade bs-example-modal-{{record.name}}-{{record.kind}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Editar {{record.kind}}: <b class="green">{{record.name}}</b></h4>
+            </div>
+            <form class="form-horizontal form-label-left" method='POST' action='.'> {% csrf_token %}
+                <div class="modal-body">
+                    <b class="red">{{ mod_quantity.new.error }}</b><div class="clearfix"></div><br>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nuevo nombre: 
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" name="new_name" />
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="clearfix"></div>
+                <br>
+                <div class="modal-footer">
+                    <input type="hidden" name="kind" value="{{record.kind}}">
+                    <input type="hidden" name="old_name" value="{{record.name}}">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /END MODAL -->
+<!-- Small modal -->
+
+<div class="modal fade bs-example-modal-sm-{{record.name}}-{{record.kind}}" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Borrar {{record.kind}}: <b class="green">{{record.name}}</b></h4>
+        </div>
+        <br>
+        <center><b>¿Está seguro de que desea eliminar esta {{record.kind}}?</b></center>
+        <br>
+        <div class="modal-footer">
+            <form method="POST" action="." style="display: inline;">
+                <input type="hidden" name="kind" value="{{record.kind}}">
+                <input type="hidden" name="old_name" value="{{record.name}}">
+                <button type="button" class="btn btn-default btn-xs" data-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-danger btn-xs" name="delete" value="Ninguna" style="float: left;"><icon class="fa fa-close"></icon> Borrar</button>
+            </form>
+        </div>
+    </div>
+  </div>
+</div>

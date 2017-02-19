@@ -1,0 +1,89 @@
+<!--
+//    This file is part of TPVpn.
+//
+//    TPVpn is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    TPVpn is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with TPVpn.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+{% extends 'base.html' %}
+    {% load render_table from django_tables2 %}
+    {% load staticfiles %}
+{% block style %}
+  <!-- Custom styling plus plugins -->
+  <link href="{% static "templates/css/custom.css" %}" rel="stylesheet">
+  <link href="{% static "templates/css/datatables/tools/css/dataTables.tableTools.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block mainContent %}
+  <!-- page content -->
+    <div class="row">
+      <div class="page-title">
+        <div class="title_left">
+            <h3>Categorías / Subcategorías </h3>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Aviso</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+         			<div class="alert" role="alert"><p class="blue"><i>Para crear nuevas categorías, deberá agregar un nuevo producto a la plataforma y con el crear una nueva categoría. Toda categoría huerfana del sistema será descatalogada</i></p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Categorías</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    {% if categorys %}
+                    	<!-- PARA QUE SALGA LA PAGINACIÓN, DIRIGETE A /usr/local/lib/python2.7/dist-packages/django_tables2/templates/table.html -->
+                    	{% render_table category_table %}
+                    {% else %}
+                        <div class="alert alert-info" role="alert">No se han encontrado categorías</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Subcategorías</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    {% if subcategorys %}
+                    	<!-- PARA QUE SALGA LA PAGINACIÓN, DIRIGETE A /usr/local/lib/python2.7/dist-packages/django_tables2/templates/table.html -->
+                    	{% render_table subcategory_table %}
+                    {% else %}
+                        <div class="alert alert-info" role="alert">No se han encontrado categorías</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+{% endblock %}

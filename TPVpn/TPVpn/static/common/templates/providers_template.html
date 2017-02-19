@@ -1,0 +1,111 @@
+<!--
+//    This file is part of TPVpn.
+//
+//    TPVpn is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    TPVpn is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with TPVpn.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+{% extends 'base.html' %}
+    {% load render_table from django_tables2 %}
+    {% load staticfiles %}
+{% block style %}
+  <!-- Custom styling plus plugins -->
+  <link href="{% static "templates/css/custom.css" %}" rel="stylesheet">
+  <link href="{% static "templates/css/datatables/tools/css/dataTables.tableTools.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block mainContent %}
+	<div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Aviso</h2>
+                    <ul class="nav navbar-right panel_toolbox" style="float: right;">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+         			<div class="alert" role="alert"><center><p class="blue"><i>Solo aquellos proveedores que no consten en ningún producto, podrán ser eliminados.</i></p></center></div>
+                </div>
+            </div>
+        </div>
+	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Proveedores</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+					{% if providers %}
+						{% render_table table %}
+					{% else %}
+						<div class="alert alert-info" role="alert">No se han registrado proveedores</div>
+					{% endif %}
+				</div>
+                <div class="x_footer">
+                	<button class="btn btn-default" style="float: right;" data-toggle="modal" data-target=".bs-example-modal-lg"><icon class="fa fa-plus"></icon> Añadir Proveedor</button>
+                	<!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
+			        <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+			            <div class="modal-dialog modal-lg">
+			                <div class="modal-content">
+
+			                    <div class="modal-header">
+			                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+			                        </button>
+			                        <h4 class="modal-title" id="myModalLabel">Formulario Proveedor</h4>
+			                    </div>
+			                    <form class="form-horizontal form-label-left" method='post' action='' id="newprod"> {% csrf_token %}
+			                        <div class="modal-body">
+			                            <div class="form-group">
+			                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Nombre del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.namePro.errors }}</span></div>
+			                                </label>
+			                                <div class="col-md-6 col-sm-6 col-xs-12">
+			                                    {{ newprovider.namePro }}
+			                                </div>
+			                            </div>
+			                            <div class="form-group">
+			                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Telefono del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.tel.errors }}</span></div>
+			                                </label>
+			                                <div class="col-md-6 col-sm-6 col-xs-12">
+			                                    {{ newprovider.tel }}
+			                                </div>
+			                            </div>
+			                            <div class="form-group">
+			                                <label class="control-label col-md-3 col-sm-3 col-xs-12">E-mail del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.email.errors }}</span></div>
+			                                </label>
+			                                <div class="col-md-6 col-sm-6 col-xs-12">
+			                                    {{ newprovider.email }}
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="modal-footer">
+			                            <input type="hidden" name="inputInNewProd" value="newProvider">
+			                            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+			                            <button type="submit" class="btn btn-primary">Guardar</button>
+			                        </div>
+			                    </form>
+			                </div>
+			            </div>
+			        </div>
+			        <!-- /END MODAL -->
+                </div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

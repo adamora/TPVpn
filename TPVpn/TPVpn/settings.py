@@ -80,7 +80,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'TPVpn.urls'
-
+STATIC_ROOT = os.path.join(BASE_DIR, "TPVpn/static/")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -143,12 +143,12 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    'TPVpn/static',
+    'TPVpn/static/common',
 )
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'TPVpn/media/')
-MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = '/media/'
 '''
 MEDIAFILES_DIRS = (
     'TPVpn/media',
