@@ -680,6 +680,13 @@ def client_profile(request, pk):
     worker_now = Worker.objects.get(user=user_now)
     market_now = worker_now.market
     client = Client.objects.get(pk=pk, market=market_now)
+    bank = [j for i, j in client.bank.__dict__.items() if (j and i != 'id' and
+                                                           i != 'date' and
+                                                           i != '_state')]
+    if bank:
+        bank = True
+    else:
+        bank = False
     sales = Sale.objects.filter(
         market=market_now, buyer=client,
         totAmount__gt=0).order_by("-date")
@@ -692,7 +699,8 @@ def client_profile(request, pk):
 
     to_return = {'worker_now': worker_now, 'market_now': market_now,
                  'client': client, 'notifications': notifications,
-                 'warnings_wallet': warnings_wallet, 'sales': sales}
+                 'warnings_wallet': warnings_wallet, 'sales': sales,
+                 'bank': bank}
 
     return render(request, 'clientProfile.html', to_return)
 
