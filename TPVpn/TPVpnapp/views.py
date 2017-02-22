@@ -555,33 +555,33 @@ def list_clients(request):
                     clients = search_clients(
                         request, search_clie, market_now, clients)
         if 'newNotification' in request.POST:
-            for i in clients:
-                if request.POST['newNotification'] == i.pk:
-                    if notification.is_valid(request):
-                        note_aux = notification.save(commit=False)
-                        note_aux.writer = worker_now
-                        note_aux.reciverCli = i
-                        note_aux.typeNote = 'normal'
-                        note_aux.save()
-                        notification = NotificationForm()
+            if request.POST.get('newNotification', None):
+                i = clients.get(id=request.POST['newNotification'])
+                if notification.is_valid(request):
+                    note_aux = notification.save(commit=False)
+                    note_aux.writer = worker_now
+                    note_aux.reciverCli = i
+                    note_aux.typeNote = 'normal'
+                    note_aux.save()
+                    notification = NotificationForm()
         if 'modWallet' in request.POST:
-            for i in clients:
-                if request.POST['modWallet'] == i.pk:
-                    if wallet.is_valid(request):
-                        old_val = i.wallet
-                        for key, value in wallet.cleaned_data.items():
-                            if value and key == 'new':
-                                i.wallet = float(value)
-                            elif value and key == 'add':
-                                i.wallet += float(value)
-                        i.save()
-                        wallet = InputMoney()
-                        note = Notification(
-                            reciverCli=i, writer=worker_now,
-                            content=("Se ma modificado el monedero del " +
-                                     "cliente de " + str(old_val) + "€ a " +
-                                     str(i.wallet) + "€"), typeNote='wallet')
-                        note.save()
+            if request.POST.get('modWallet', None):
+                i = clients.get(id=request.POST['modWallet'])
+                if wallet.is_valid(request):
+                    old_val = i.wallet
+                    for key, value in wallet.cleaned_data.items():
+                        if value and key == 'new':
+                            i.wallet = float(value)
+                        elif value and key == 'add':
+                            i.wallet += float(value)
+                    i.save()
+                    wallet = InputMoney()
+                    note = Notification(
+                        reciverCli=i, writer=worker_now,
+                        content=("Se ma modificado el monedero del " +
+                                 "cliente de " + str(old_val) + "€ a " +
+                                 str(i.wallet) + "€"), typeNote='wallet')
+                    note.save()
     else:
         search_clie = SearchClientForm()
         notification = NotificationForm()
@@ -1129,7 +1129,7 @@ def providers(request):
     data = request.POST or None
     newprovider = ProviderForm(data=data)
     if request.method == 'POST':
-        if 'delete' in data:
+        if 'delete' in data.keys():
             id_pro = data.get('id_provider')
             try:
                 instance = Provider.objects.get(id=id_pro)
@@ -1137,13 +1137,29 @@ def providers(request):
                 messages.success(request,
                                  'Proveedor borrado satisfactoriamente')
             except ObjectDoesNotExist:
+                messages.error(request, 'No se ha encontrado el proveedor')
                 pass
+        elif 'modify' in data.keys():
+            id_pro = data.get('id_provider')
+            try:
+                instance = Provider.objects.get(id=id_pro)
+                newprovider = ProviderForm(instance=instance, data=data)
+                if newprovider.is_valid():
+                    newprovider.save()
+                    messages.success(
+                        request, 'Proveedor modificado correctamente')
+                    newprovider = ProviderForm()
+                else:
+                    messages.error(request, 'No se ha modificado el proveedor')
+            except ObjectDoesNotExist:
+                messages.error(request, 'No se ha encontrado el proveedor')
         else:
             if newprovider.is_valid():
                 newprovider.save()
                 newprovider = ProviderForm()
                 messages.success(request,
                                  'Proveedor agregado satisfactoriamente')
+                newprovider = ProviderForm()
             else:
                 messages.error(request, 'Formulario de proveedor invalido')
     providers = Provider.objects.filter(market=market_now)

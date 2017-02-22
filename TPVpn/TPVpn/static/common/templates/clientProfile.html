@@ -240,7 +240,7 @@
                                             </div>
                                             <div class="message_wrapper">
                                               <h4 class="heading">Nota de <a class="green" href="/employer_profile/{{i.writer.dni}}">@{{notification.writer.user.username}}</a></h4>
-                                              <blockquote class="message">{{notification.content}}</blockquote>
+                                              <blockquote class="message">{{notification.content|safe}}</blockquote>
                                               <!--p class="url">
                                                 <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
                                                 <a onclick="document.getElementById('{{notification.pk}}').style.display = 'none'"><i class="fa fa-check"></i> Listo </a>

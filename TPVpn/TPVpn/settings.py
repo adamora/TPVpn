@@ -45,7 +45,7 @@ SECRET_KEY = 'p_%m*r$+%+e9)+$mgm=txinz#m5(e#&$6mgux*s#)sk)8h-l(j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition

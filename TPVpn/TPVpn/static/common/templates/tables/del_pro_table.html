@@ -24,3 +24,50 @@
   </div>
 </div>
 {% endif %}
+
+<button class="btn btn-warning btn-xs" data-toggle="modal" data-target=".bs-example-modal-lg-{{record.id}}"><icon class="fa fa-pencil"></icon> Editar Proveedor</button>
+<!-- MODAL (VENTANA EMERGENTE AGREGAR PROVEEDOR -->
+<div class="modal fade bs-example-modal-lg-{{record.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Formulario Proveedor</h4>
+            </div>
+            <form class="form-horizontal form-label-left" method='post' action='' id="newprod"> {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Nombre del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.namePro.errors }}</span></div>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input class="form-control col-md-7 col-xs-12" id="id_namePro" name="namePro" type="text" value="{{record.namePro}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Telefono del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.tel.errors }}</span></div>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input class="form-control col-md-7 col-xs-12" id="id_tel" name="tel" type="number" value="{{record.tel}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">E-mail del proveedor <span class="required">*</span><div class='byline'><span class='red'>{{ newprovider.email.errors }}</span></div>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input class="form-control col-md-7 col-xs-12" id="id_email" name="email" type="email" value="{{record.email}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="id_provider" value="{{record.id}}">
+                    <input type="hidden" name="modify" value="">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /END MODAL -->
