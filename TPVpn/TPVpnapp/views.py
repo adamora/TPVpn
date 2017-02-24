@@ -177,6 +177,11 @@ def list_workers(request):
                         aux.typeNote = 'normal'
                         aux.save()
                         notification = NotificationForm()
+                        messages.success(request, "Notificación generada \
+                            satisfactoriamente")
+                    else:
+                        request.warning(request, "La notificación no se ha \
+                            generado.<br>Compruebe los datos introducidos")
     else:
         search = SearchWorkerForm()
         notification = NotificationForm()
@@ -286,6 +291,7 @@ def new_login(request, user, key):
 
 @login_required(login_url='/')
 def logout_session(request):
+    update_offers(market=Worker.objects.get(user=request.user).market)
     logout(request)
     return redirect('/')
 
@@ -307,6 +313,8 @@ def new_product(request):
                     provider = newprovider.save(commit=False)
                     provider.market = worker_now.market
                     provider.save()
+                    messages.success(request, "Proveedor agregado \
+                        satisfactoriamente")
                 else:
                     provider = Provider.objects.get(
                         namePro=newprovider['namePro'].value(),
@@ -336,8 +344,8 @@ def new_product(request):
                                                % {'prod': prod.name}))
                     return redirect('/new_product')
             else:
-                print "¡Error!: No se han cumplimentado correctamente los \
-                       datos del producto."
+                messages.error(request, "¡Error!: No se han cumplimentado correctamente los \
+                       datos del producto.")
     else:
         newprovider = ProviderForm()
         newprod = ProductForm()
@@ -365,13 +373,14 @@ def list_products(request):
             try:
                 if inst_prod.offer:
                     inst_prod.offer.delete()
-                    inst_prod.save()
+                    # inst_prod.save()
             except ObjectDoesNotExist:
                 pass
             inst_prod.offer = instance_offer
             inst_prod.save()
             products = Product.objects.filter(market=market_now)
             offer_form = OfferForm()
+            messages.success(request, "Oferta actualizada correctamente")
         id_prod_q = request.POST.get('q_prod_id', None)
         if id_prod_q:
             q_instance_prod = products.get(id=id_prod_q)
@@ -385,6 +394,7 @@ def list_products(request):
                 q_instance_prod.save()
                 products = Product.objects.filter(market=market_now)
                 mod_quantity = StockForm()
+                messages.success(request, "Stock actualizado correctamente")
     if search_product.is_valid():
         criteria = search_product.get_filter()
         if criteria:
@@ -427,6 +437,7 @@ def delete_product(request, product_id):
 
     if product:
         product.delete()
+        messages.success(request, "Producto borrado satisfactoriamente")
     # else:
         # AGREGAR UNA NOTIFICACION AL USUARIO
     return redirect('/products')
@@ -439,7 +450,7 @@ def delete_offer(request, product_id):
 
     if product:
         product.offer.delete()
-        product.save()
+        messages.success(request, "Oferta borrada satisfactoriamente")
     # else:
         # AGREGAR UNA NOTIFICACION AL USUARIO
     return redirect('/products')
@@ -564,6 +575,11 @@ def list_clients(request):
                     note_aux.typeNote = 'normal'
                     note_aux.save()
                     notification = NotificationForm()
+                    messages.success(request, "Notificación realizada \
+                        satisfactoriamente")
+                else:
+                    messages.warning(request, "Fallo al enviar la \
+                        notificación")
         if 'modWallet' in request.POST:
             if request.POST.get('modWallet', None):
                 i = clients.get(id=request.POST['modWallet'])
@@ -582,6 +598,10 @@ def list_clients(request):
                                  "cliente de " + str(old_val) + "€ a " +
                                  str(i.wallet) + "€"), typeNote='wallet')
                     note.save()
+                    messages.success(request, "Monedero modificado")
+                else:
+                    messages.error(request, "No se ha podido modificar el \
+                        monedero.<br>Formulario erroneo.")
     else:
         search_clie = SearchClientForm()
         notification = NotificationForm()
@@ -721,7 +741,7 @@ def delete_client(request, pk):
     )
     notification.save()
     client.delete()
-
+    messages.success(request, "Cliente eliminado")
     return redirect('/clients')
 
 

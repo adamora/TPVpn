@@ -30,6 +30,7 @@ from TPVpnapp.models import Client, Product, Worker, FullDirection, BankData
 
 
 def update_offers(market):
+    counter = False
     today = date.today()
     query = Product.objects.filter(market=market)
     for i in query:
@@ -37,9 +38,13 @@ def update_offers(market):
             if i.offer:
                 if i.offer.end_date < today:
                     i.offer.delete()
-                    i.save()
-        except ObjectDoesNotExist:
+                    counter = True
+        except:
             pass
+    if counter:
+        request = get_request()
+        messages.success(request, "Ofertas actualizadas.<br>\
+            Por favor, revise los productos")
 
 
 def get_worker_market(request):
